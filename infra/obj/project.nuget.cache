@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xxedGVbQox6HxMr9OVnWcrnljMJn9aAXARl3KviDV+qh17UpOmcfJt+Maxo04Np5aqgjC8vDnov8ctUGZxvVXw==",
+  "dgSpecHash": "877ljT7dQ0KliZpJ26VgSrEbkW9EpXzsuOe4/OOVHEHQQ7igOxNbUkxDVrQJf7ftlUCBdmBp1n5hOeIbZ+kR7A==",
   "success": true,
-  "projectFilePath": "d:\\ats5\\infra\\infra.csproj",
+  "projectFilePath": "D:\\ats5\\infra\\infra.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication\\2.1.0\\microsoft.aspnetcore.authentication.2.1.0.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.1.0\\microsoft.aspnetcore.authentication.abstractions.2.1.0.nupkg.sha512",
@@ -58,7 +58,8 @@
     "C:\\Users\\hp\\.nuget\\packages\\system.security.cryptography.xml\\4.5.0\\system.security.cryptography.xml.4.5.0.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\system.security.permissions\\4.5.0\\system.security.permissions.4.5.0.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\system.security.principal.windows\\4.5.0\\system.security.principal.windows.4.5.0.nupkg.sha512",
-    "C:\\Users\\hp\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512"
+    "C:\\Users\\hp\\.nuget\\packages\\system.text.encodings.web\\4.5.0\\system.text.encodings.web.4.5.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\system.text.json\\5.0.1\\system.text.json.5.0.1.nupkg.sha512"
   ],
   "logs": []
 }

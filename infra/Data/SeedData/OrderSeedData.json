@@ -1,0 +1,166 @@
+[
+    {  
+        "OrderDate": "2020-10-10T10:00:00", "CustomerId": 1, "OrderRef": "telehonic message", 
+        "SalesmanId": 2,  "CustomerOfficialForLogistics": 2, "customerOfficialForHR": 3, 
+        "customerOfficialForAccounts": 2, "CompleteBy": "2021-01-01T10:00:00", "Country": "Saudi Arabia", 
+        "CityOfWorking": "Jeddah", "OrderStatus": "Active",
+        "OrderItems": 
+        [
+            {
+                "SrNo": 1, "CategoryId": 1, "SourceFrom": "India", "Quantity": 15, "MinCVs": 30, "MaxCVs": 60,
+                "Ecnr": false, "RequireAssess": false, "HrExecId": 2, "HrSupId": 2, "HrmId": 1, "AssignedId": null, 
+                "Charges": 25000,
+                "JobDescription_JobDescInBrief": "job desc one", 
+                    "JobDescription_QualificationDesired": "Qualification desired one", 
+                    "JobDescription_ExpDesiredMin" : 2, "JobDescription_ExpDesiredMax": 5, 
+                    "JobDescription_MinAge": 25, "JobDescription_MaxAge": 52,  
+                "Remuneration_SalaryCurrency": "SAR", "Remuneration_SalaryMin": 1200, 
+                    "Remuneration_SalaryMax": 1500, "Remuneration_ContractPeriodInMonths": 24, 
+                    "Remuneration_HousingProvidedFree": true, "Remuneration_HousingAllowance": 0, 
+                    "Remuneration_Remuneration_FoodProvidedFree": true, "Remuneration_Remuneration_FoodAllowance": 0, 
+                    "Remuneration_Remuneration_TransportProvidedFree": true, 
+                    "Remuneration_Remuneration_TransportAllowance": 0, "Remuneration_Remuneration_OtherAllowance": 0, 
+                    "Remuneration_Remuneration_LeavePerYearInDays": 28, 
+                    "Remuneration_LeaveAirfareEntitlementAfterMonths": 24
+            },
+            {
+                "SrNo": 2, "CategoryId": 2, "SourceFrom": "India", "Quantity": 5, "MinCVs": 15,"MaxCVs": 30, 
+                "Ecnr": false, "RequireAssess": false, "HrExecId": 3, "HrSupId": 1, "HrmId": 1, "AssignedId": null, 
+                "Charges": 25500,
+                "JobDescription_JobDescInBrief": "job desc two", 
+                "JobDescription_QualificationDesired": "Qualification desired two", 
+                    "JobDescription_ExpDesiredMin" : 2, "JobDescription_ExpDesiredMax": 5, 
+                    "JobDescription_MinAge": 25, "JobDescription_MaxAge": 52,  
+                "Remuneration_SalaryCurrency": "SAR", "Remuneration_SalaryMin": 1200, 
+                    "Remuneration_SalaryMax": 1500, "Remuneration_ContractPeriodInMonths": 24, 
+                    "Remuneration_HousingProvidedFree": true, "Remuneration_HousingAllowance": 0, 
+                    "Remuneration_FoodProvidedFree": true, "Remuneration_FoodAllowance": 0, 
+                    "Remuneration_TransportProvidedFree": true, "Remuneration_TransportAllowance": 0, 
+                    "Remuneration_OtherAllowance": 0, "Remuneration_LeavePerYearInDays": 28, 
+                    "Remueration_LeaveAirfareEntitlementAfterMonths": 24
+            }
+        ]
+    },
+    {  
+        "OrderDate": "2020-11-11T10:00:00", "CustomerId": 3, "OrderRef": "telehonic message", 
+        "SalesmanId": 2,  "CustomerOfficialForLogistics": 7, "customerOfficialForHR": null, 
+        "customerOfficialForAccounts": null, "CompleteBy": "2021-01-01T11:11:11", "Country": "Saudi Arabia", 
+        "CityOfWorking": "Dammam",
+        "OrderItems": 
+        [
+            {
+                "SrNo": 1, "CategoryId": 2, "SourceFrom": "India", "Quantity": 5, "MinCVs": 15, "MaxCVs": 20,
+                "Ecnr": false, "RequireAssess": false, "HrExecId": 1, "HrSupId": 2, "HrmId": 3, "AssignedId": null, 
+                "Charges": 35000,
+                "JobDescription_JobDescInBrief": "job desc two A", 
+                "JobDescription_QualificationDesired": "Qualification desired two A", 
+                    "JobDescription_ExpDesiredMin" : 3, "JobDescription_ExpDesiredMax": 4, 
+                    "JobDescription_MinAge": 22, "JobDescription_MaxAge":32,  
+                "Remuneration_SalaryCurrency": "SAR", "Remuneration_SalaryMin": 1100, "Remuneration_SalaryMax": 1200, 
+                    "Remuneration_ContractPeriodInMonths": 24, "Remuneration_HousingProvidedFree": true, "Remuneration_HousingAllowance": 0, 
+                    "Remuneration_FoodProvidedFree": false, "Remuneration_FoodAllowance": 400, "Remuneration_TransportProvidedFree": true, 
+                    "Remuneration_TransportAllowance": 0, "Remuneration_OtherAllowance": 200, "Remuneration_LeavePerYearInDays": 28, 
+                    "Remueration_LeaveAirfareEntitlementAfterMonths": 12
+            },
+            {
+                "SrNo": 2, "CategoryId": 3, "SourceFrom": "India", "Quantity": 4, "MinCVs": 8,"MaxCVs": 12, 
+                "Ecnr": true, "RequireAssess": false, "HrExecId": 3, "HrSupId": 1, "HrmId": 1, "AssignedId": null, 
+                "Charges": 45500, 
+                    "JobDescription_JobDescInBrief": "job desc two B", 
+                    "QualificationDesired": "Qualification desired two B", 
+                    "JobDescription_ExpDesiredMin" : 2, "ExpDesiredMax": 5, 
+                    "JobDescription_MinAge": 25, "JobDescription_MaxAge": 52,  
+                "Remuneration_SalaryCurrency": "SAR", "Remuneration_SalaryMin": 2200, 
+                "Remuneration_SalaryMax": 2500, "Remuneration_ContractPeriodInMonths": 24, 
+                    "Remuneration_HousingProvidedFree": true, "Remuneration_HousingAllowance": 0, 
+                    "Remuneration_FoodProvidedFree": true, 
+                    "Remuneration_FoodAllowance": 0, "Remuneration_TransportProvidedFree": true, 
+                    "Remuneration_TransportAllowance": 0, 
+                    "Remuneration_OtherAllowance": 0, "Remuneration_LeavePerYearInDays": 28, 
+                    "Remueration_LeaveAirfareEntitlementAfterMonths": 24
+            }
+        ]
+    },
+    {  
+        "OrderDate": "2020-10-12T10:00:00", "CustomerId": 2, "OrderRef": "telehonic message", 
+        "SalesmanId": 2,  "CustomerOfficialForLogistics": 5, "customerOfficialForHR": 11, 
+        "customerOfficialForAccounts": null, "CompleteBy": "2020-11-01T00:10:10", "Country": "Saudi Arabia", 
+        "CityOfWorking": "Dammam",
+        "OrderItems": 
+        [
+            {
+                "SrNo": 1, "CategoryId": 4, "SourceFrom": "India", "Quantity": 1, "MinCVs": 3, "MaxCVs": 6,
+                "Ecnr": false, "RequireAssess": false, "HrExecId": 2, "HrSupId": 2, "HrmId": 1, "AssignedId": null, 
+                "Charges": 25500, 
+                "JobDescription_JobDescInBrief": "job desc one", 
+                "QualificationDesired": "Qualification desired one", 
+                "JobDescription_ExpDesiredMin" : 2, "JobDescription_ExpDesiredMax": 5, 
+                "JobDescription_MinAge": 25, "JobDescription_MaxAge": 52,  
+                "Remuneration_SalaryCurrency": "SAR", "Remuneration_SalaryMin": 1200, 
+                    "Remuneration_SalaryMax": 1500, "Remuneration_ContractPeriodInMonths": 24, 
+                    "Remuneration_HousingProvidedFree": true, "Remuneration_HousingAllowance": 0, 
+                    "Remuneration_FoodProvidedFree": true, "Remuneration_FoodAllowance": 0, 
+                    "Remuneration_TransportProvidedFree": true, 
+                    "Remuneration_TransportAllowance": 0, "Remuneration_OtherAllowance": 0, 
+                    "Remuneration_LeavePerYearInDays": 28, 
+                    "Remueration_LeaveAirfareEntitlementAfterMonths": 24
+            },
+            {
+                "SrNo": 2, "CategoryId": 2, "SourceFrom": "India", "Quantity": 5, "MinCVs": 15,"MaxCVs": 30, 
+                "Ecnr": false, "RequireAssess": false, "HrExecId": 3, "HrSupId": 1, "HrmId": 1, "AssignedId": null, 
+                "Charges": 15000,
+                "JobDescription_JobDescInBrief": "job desc three A", 
+                    "JobDescription_QualificationDesired": "Qualification desired three A", 
+                    "JobDescription_ExpDesiredMin" : 2, "JobDescription_ExpDesiredMax": 5, 
+                    "JobDescription_MinAge": 25, "JobDescription_MaxAge": 52,  
+                "Remuneration_SalaryCurrency": "SAR", "Remuneration_SalaryMin": 1200, 
+                "Remuneration_SalaryMax": 1500, "Remuneration_ContractPeriodInMonths": 24, 
+                    "Remuneration_HousingProvidedFree": true, "Remuneration_HousingAllowance": 0, 
+                    "Remuneration_FoodProvidedFree": true, "Remuneration_FoodAllowance": 0, 
+                    "Remuneration_TransportProvidedFree": true, "Remuneration_TransportAllowance": 0, 
+                    "Remuneration_OtherAllowance": 0, "Remuneration_LeavePerYearInDays": 28, 
+                    "Remueration_LeaveAirfareEntitlementAfterMonths": 24
+            }
+        ]
+    },
+    {  
+        "OrderDate": "2019-02-25T01:00:12",  "CustomerId": 4, "OrderRef": "telehonic message", 
+        "SalesmanId": 2,  "CustomerOfficialForLogistics": 24, "customerOfficialForHR": 26, 
+        "customerOfficialForAccounts": 24, "CompleteBy": "2021-11-12T12:00:00", "Country": "Saudi Arabia", 
+        "CityOfWorking": "Jeddah",
+        "OrderItems": 
+        [
+            {
+                "SrNo": 1, "CategoryId": 1, "SourceFrom": "India", "Quantity": 15, "MinCVs": 30, "MaxCVs": 60,
+                "Ecnr": false, "RequireAssess": false, "HrExecId": 2, "HrSupId": 2, "HrmId": 1, "AssignedId": null, 
+                "Charges": 0,
+                "JobDescription_JobDescInBrief": "job desc three B", 
+                "JobDescription_QualificationDesired": "Qualification desired THREE b", 
+                "JobDescription_ExpDesiredMin" : 2, "JobDescription_ExpDesiredMax": 5, 
+                "JobDescription_MinAge": 25, "JobDescription_MaxAge": 52,  
+                "Remuneration_SalaryCurrency": "SAR", "Remuneration_SalaryMin": 1200, 
+                    "Remuneration_SalaryMax": 1500, "Remuneration_ContractPeriodInMonths": 24, 
+                    "Remuneration_HousingProvidedFree": true, "Remuneration_HousingAllowance": 0, 
+                    "Remuneration_FoodProvidedFree": true, "Remuneration_FoodAllowance": 0, 
+                    "Remuneration_TransportProvidedFree": true, "Remuneration_TransportAllowance": 0, 
+                    "Remuneration_OtherAllowance": 0, "Remuneration_LeavePerYearInDays": 28, 
+                    "Remueration_LeaveAirfareEntitlementAfterMonths": 24
+            },
+            {
+                "SrNo": 2, "CategoryId": 2, "SourceFrom": "India", "Quantity": 5, "MinCVs": 15,"MaxCVs": 30, 
+                "Ecnr": false, "RequireAssess": false, "HrExecId": 3, "HrSupId": 1, "HrmId": 1, "AssignedId": null, 
+                "Charges": 12500,
+                "JobDescription_JobDescInBrief": "job desc three B", 
+                    "QualificationDesired": "Qualification desired three B", 
+                    "JobDescription_ExpDesiredMin" : 2, "JobDescription_ExpDesiredMax": 5, 
+                    "JobDescription_MinAge": 25, "JobDescription_MaxAge": 52,  
+                "Remuneration_SalaryCurrency": "SAR", "Remuneration_SalaryMin": 1200, "Remuneration_SalaryMax": 1500, 
+                        "Remuneration_ContractPeriodInMonths": 24, "Remuneration_HousingProvidedFree": true, 
+                        "Remuneration_HousingAllowance": 0, "Remuneration_FoodProvidedFree": true, 
+                        "Remuneration_FoodAllowance": 0, "Remuneration_TransportProvidedFree": true, "Remuneration_TransportAllowance": 0, 
+                        "Remuneration_OtherAllowance": 0, "Remuneration_LeavePerYearInDays": 28, 
+                        "Remueration_LeaveAirfareEntitlementAfterMonths": 24
+            }
+        ]
+    }
+]

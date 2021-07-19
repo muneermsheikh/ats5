@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\ats5\\core\\core.csproj": {}
+    "D:\\ats5\\core\\core.csproj": {}
   },
   "projects": {
-    "d:\\ats5\\core\\core.csproj": {
+    "D:\\ats5\\core\\core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\ats5\\core\\core.csproj",
+        "projectUniqueName": "D:\\ats5\\core\\core.csproj",
         "projectName": "core",
-        "projectPath": "d:\\ats5\\core\\core.csproj",
+        "projectPath": "D:\\ats5\\core\\core.csproj",
         "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-        "outputPath": "d:\\ats5\\core\\obj\\",
+        "outputPath": "D:\\ats5\\core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -41,6 +41,10 @@
             "Microsoft.AspNetCore.Identity": {
               "target": "Package",
               "version": "[2.1.0, )"
+            },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[5.0.1, )"
             },
             "Microsoft.Extensions.Identity.Stores": {
               "target": "Package",

@@ -1,0 +1,15 @@
+D:\ats5\infra\bin\Debug\net5.0\infra.deps.json
+D:\ats5\infra\bin\Debug\net5.0\infra.dll
+D:\ats5\infra\bin\Debug\net5.0\ref\infra.dll
+D:\ats5\infra\bin\Debug\net5.0\infra.pdb
+D:\ats5\infra\bin\Debug\net5.0\core.dll
+D:\ats5\infra\bin\Debug\net5.0\core.pdb
+D:\ats5\infra\obj\Debug\net5.0\infra.csprojAssemblyReference.cache
+D:\ats5\infra\obj\Debug\net5.0\infra.GeneratedMSBuildEditorConfig.editorconfig
+D:\ats5\infra\obj\Debug\net5.0\infra.AssemblyInfoInputs.cache
+D:\ats5\infra\obj\Debug\net5.0\infra.AssemblyInfo.cs
+D:\ats5\infra\obj\Debug\net5.0\infra.csproj.CoreCompileInputs.cache
+D:\ats5\infra\obj\Debug\net5.0\infra.csproj.CopyComplete
+D:\ats5\infra\obj\Debug\net5.0\infra.dll
+D:\ats5\infra\obj\Debug\net5.0\ref\infra.dll
+D:\ats5\infra\obj\Debug\net5.0\infra.pdb

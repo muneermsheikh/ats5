@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "d:\\ats5\\infra\\infra.csproj": {}
+    "D:\\ats5\\infra\\infra.csproj": {}
   },
   "projects": {
-    "d:\\ats5\\core\\core.csproj": {
+    "D:\\ats5\\core\\core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\ats5\\core\\core.csproj",
+        "projectUniqueName": "D:\\ats5\\core\\core.csproj",
         "projectName": "core",
-        "projectPath": "d:\\ats5\\core\\core.csproj",
+        "projectPath": "D:\\ats5\\core\\core.csproj",
         "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-        "outputPath": "d:\\ats5\\core\\obj\\",
+        "outputPath": "D:\\ats5\\core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -42,6 +42,10 @@
               "target": "Package",
               "version": "[2.1.0, )"
             },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[5.0.1, )"
+            },
             "Microsoft.Extensions.Identity.Stores": {
               "target": "Package",
               "version": "[5.0.1, )"
@@ -66,14 +70,14 @@
         }
       }
     },
-    "d:\\ats5\\infra\\infra.csproj": {
+    "D:\\ats5\\infra\\infra.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\ats5\\infra\\infra.csproj",
+        "projectUniqueName": "D:\\ats5\\infra\\infra.csproj",
         "projectName": "infra",
-        "projectPath": "d:\\ats5\\infra\\infra.csproj",
+        "projectPath": "D:\\ats5\\infra\\infra.csproj",
         "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-        "outputPath": "d:\\ats5\\infra\\obj\\",
+        "outputPath": "D:\\ats5\\infra\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -88,8 +92,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "d:\\ats5\\core\\core.csproj": {
-                "projectPath": "d:\\ats5\\core\\core.csproj"
+              "D:\\ats5\\core\\core.csproj": {
+                "projectPath": "D:\\ats5\\core\\core.csproj"
               }
             }
           }
@@ -119,6 +123,10 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[6.11.1, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[5.0.1, )"
             }
           },
           "imports": [

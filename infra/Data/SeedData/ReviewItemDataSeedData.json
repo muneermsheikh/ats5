@@ -1,0 +1,13 @@
+[
+     {"SrNo": 1, "ReviewDescription": "Salary Offered Feasible"},
+     {"SrNo": 2, "ReviewDescription": "Technically Feasible"},
+     {"SrNo": 3, "ReviewDescription": "Comemercially Feasible"},
+     {"SrNo": 4, "ReviewDescription": "Logistically Feasible"},
+     {"SrNo": 5, "ReviewDescription": "Visa Available"},
+     {"SrNo": 6, "ReviewDescription": "Documentations will be available"},
+     {"SrNo": 7, "ReviewDescription": "Emigrate registered"},
+     {"SrNo": 8, "ReviewDescription": "Historical Data avaialble"},
+     {"SrNo": 9, "ReviewDescription": "Service Charges in INR"},
+     {"SrNo": 10, "ReviewDescription": "Fee from client"},
+     {"SrNo": 11, "ReviewDescription": "Fee from client Currency"}
+]

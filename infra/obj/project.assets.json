@@ -715,11 +715,21 @@
           "lib/netstandard2.0/System.Text.Encodings.Web.dll": {}
         }
       },
+      "System.Text.Json/5.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netcoreapp3.0/System.Text.Json.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp3.0/System.Text.Json.dll": {}
+        }
+      },
       "core/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
           "Microsoft.AspNetCore.Identity": "2.1.0",
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "5.0.1",
           "Microsoft.Extensions.Identity.Stores": "5.0.1"
         },
         "compile": {
@@ -1934,6 +1944,28 @@
         "version.txt"
       ]
     },
+    "System.Text.Json/5.0.1": {
+      "sha512": "/UM3UK1dXKl8Ybysg/21gM4S8DJgkR+yLU8JwqCVbuNqQNImelntgYFAN5QxR8sJJ1kMx//hOUdf0lltosi8cQ==",
+      "type": "package",
+      "path": "system.text.json/5.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/System.Text.Json.dll",
+        "lib/net461/System.Text.Json.xml",
+        "lib/netcoreapp3.0/System.Text.Json.dll",
+        "lib/netcoreapp3.0/System.Text.Json.xml",
+        "lib/netstandard2.0/System.Text.Json.dll",
+        "lib/netstandard2.0/System.Text.Json.xml",
+        "system.text.json.5.0.1.nupkg.sha512",
+        "system.text.json.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
     "core/1.0.0": {
       "type": "project",
       "path": "../core/core.csproj",
@@ -1946,6 +1978,7 @@
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 5.0.1",
       "Microsoft.IdentityModel.Tokens >= 6.11.1",
       "System.IdentityModel.Tokens.Jwt >= 6.11.1",
+      "System.Text.Json >= 5.0.1",
       "core >= 1.0.0"
     ]
   },
@@ -1955,11 +1988,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "d:\\ats5\\infra\\infra.csproj",
+      "projectUniqueName": "D:\\ats5\\infra\\infra.csproj",
       "projectName": "infra",
-      "projectPath": "d:\\ats5\\infra\\infra.csproj",
+      "projectPath": "D:\\ats5\\infra\\infra.csproj",
       "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-      "outputPath": "d:\\ats5\\infra\\obj\\",
+      "outputPath": "D:\\ats5\\infra\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -1974,8 +2007,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "d:\\ats5\\core\\core.csproj": {
-              "projectPath": "d:\\ats5\\core\\core.csproj"
+            "D:\\ats5\\core\\core.csproj": {
+              "projectPath": "D:\\ats5\\core\\core.csproj"
             }
           }
         }
@@ -2005,6 +2038,10 @@
           "System.IdentityModel.Tokens.Jwt": {
             "target": "Package",
             "version": "[6.11.1, )"
+          },
+          "System.Text.Json": {
+            "target": "Package",
+            "version": "[5.0.1, )"
           }
         },
         "imports": [
