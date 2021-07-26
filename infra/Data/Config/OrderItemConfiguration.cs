@@ -19,8 +19,8 @@ namespace infra.Data.Config
 
                builder.OwnsOne(o => o.Remuneration , a => 
                { a.WithOwner(); });
-
-               //builder.HasOne(p => p.Order).WithMany().HasForeignKey(p => p.OrderId);
+               builder.HasMany(s => s.CVRefs).WithOne().OnDelete(DeleteBehavior.Cascade);
+               //builder.HasOne(s => s.Category).WithOne().OnDelete(DeleteBehavior.Restrict);
           }
      }
 }

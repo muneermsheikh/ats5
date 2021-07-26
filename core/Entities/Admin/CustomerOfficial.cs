@@ -1,3 +1,5 @@
+using core.Entities.Admin;
+
 namespace core.Entities
 {
     public class CustomerOfficial: BaseEntity
@@ -6,8 +8,8 @@ namespace core.Entities
           {
           }
 
-          public CustomerOfficial(int customerId, string gender, string title, 
-            string officialName, string designation, string phoneNo, string mobile, string email, string imageUrl, bool isValid)
+          public CustomerOfficial(int customerId, string gender, string title, string officialName, string designation, 
+            string phoneNo, string mobile, string email, string imageUrl, bool login, bool isValid)
           {
                CustomerId = customerId;
                Gender = gender;
@@ -19,8 +21,26 @@ namespace core.Entities
                Email = email;
                ImageUrl = imageUrl;
                IsValid = isValid;
+               LogInCredential = login;
           }
 
+        public CustomerOfficial(string appuserid, string gender, string title, string officialName, string designation, 
+            string phoneNo, string mobile, string email, string imageUrl, bool login)
+          {
+               AppUserId = appuserid;
+               Gender = gender;
+               Title = title;
+               OfficialName = officialName;
+               Designation = designation;
+               PhoneNo = phoneNo;
+               Mobile = mobile;
+               Email = email;
+               ImageUrl = imageUrl;
+               LogInCredential = login;
+          }
+
+        public bool LogInCredential {get; set;}=false;
+        public string AppUserId { get; set; }
         public int CustomerId { get; set; }
         public string Gender { get; set; }="M";
         public string Title { get; set; }
@@ -30,7 +50,7 @@ namespace core.Entities
         public string Mobile { get; set; }
         public string Email { get; set; }
         public string ImageUrl { get; set; }
-        public bool IsValid { get; set; }
+        public bool IsValid { get; set; }=true;
         //public Customer Customer {get; set;}
     }
 }

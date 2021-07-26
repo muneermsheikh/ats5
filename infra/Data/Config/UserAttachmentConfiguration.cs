@@ -12,7 +12,7 @@ namespace infra.Data.Config
                builder.Property(p => p.AttachmentType).IsRequired().HasMaxLength(10);
                builder.Property(p => p.AttachmentUrl).IsRequired();
                builder.HasIndex(p => p.AttachmentUrl).IsUnique();
-               builder.HasOne(p => p.Candidate).WithMany().HasForeignKey(p => p.CandidateId);
+               //builder.HasOne(p => p.Candidate).WithMany().HasForeignKey(p => p.CandidateId);
           }
      }
 }

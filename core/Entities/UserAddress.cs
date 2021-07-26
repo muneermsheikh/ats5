@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using core.Entities.Users;
 
-namespace core.Entities.Identity
+namespace core.Entities
 {
     public class UserAddress
     {
@@ -18,9 +18,8 @@ namespace core.Entities.Identity
         public string State { get; set; }
         [Required]
         public string Country { get; set; }="India";
-        [Required]
+        //[Required]
         public string AppUserId { get; set; }
-        public AppUser AppUser { get; set; }
         [Required ]
         public bool IsMain { get; set;} 
     }

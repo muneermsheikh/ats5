@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace core.Entities.Users
 {
     public class EntityAddress: BaseEntity
@@ -20,7 +22,7 @@ namespace core.Entities.Users
                IsMain = isMain;
           }
 
-        public int CandidateId { get; set; }
+        //public int CandidateId { get; set; }
         public string AddressType { get; set; }
         public string Add { get; set; }
         public string StreetAdd { get; set; }
@@ -30,6 +32,7 @@ namespace core.Entities.Users
         public string District { get; set; }
         public string Country { get; set; }
         public bool IsMain { get; set; }
-        public Candidate Candidate {get; set;}
+        public int CandidateId { get; set; }
+        //public Candidate Candidate {get; set;}
     }
 }

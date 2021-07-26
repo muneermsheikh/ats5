@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace core.Entities.Users
 {
     public class UserProfession:  BaseEntity
@@ -25,7 +27,6 @@ namespace core.Entities.Users
         public int CategoryId { get; set; }
         public int IndustryId { get; set; }
         public bool IsMain { get; set; }
-
         //public Candidate Candidate {get; set;}
     }
 }

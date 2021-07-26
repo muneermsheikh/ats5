@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using core.Entities.Admin;
 using core.Entities.Identity;
 using core.Entities.Users;
 
-namespace api.DTOs
+namespace core.ParamsAndDtos
 {
     public class RegisterDto
     {
         [Required]
         public string UserType {get; set;}
+        public Address Address {get; set;}
         [Required]
         public string DisplayName { get; set; }
         [Required]
@@ -21,21 +23,28 @@ namespace api.DTOs
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-        [Required]
-        public string Gender {get; set;}="M";
-        [Required]
-        public string FirstName {get; set;}
-        public string SecondName {get; set;}
-        public string FamilyName {get; set;}
+        public string PlaceOfBirth { get; set; }
+        public string Department {get; set;}    //for employees
+        public DateTime DOJ {get; set;}         //for employees
+        public string AadharNo { get; set; }    //for employees
+        public string PpNo { get; set; }
+        public DateTime PPValidity { get; set; }
         public string Nationality {get; set;}="Indian";
-        [Required]
-        public DateTime DOB {get; set;}
         public int? CompanyId {get; set;}
         public string UserRole { get; set; }
-        public Address Address {get; set;}
+        public string Introduction { get; set; }
+        public string Interests { get; set; }
+        public string Position { get; set; }
+        public string AppUserId {get; set;}
         public ICollection<UserQualification> UserQualifications {get; set;}
         public ICollection<UserExp> UserExperiences {get; set;}
         public ICollection<UserProfession> UserProfessions {get; set;}
+        public ICollection<UserPhone> UserPhones {get; set;}
+        public ICollection<UserPassport> UserPassports {get; set;}
+        public ICollection<EmployeeHRSkill> HrSkills {get; set;}        //for employees
+        public ICollection<EmployeeOtherSkill> OtherSkills{get; set;}   //for employees
+
+
 
     }
 }

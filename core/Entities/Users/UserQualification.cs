@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace core.Entities.Users
 {
     public class UserQualification: BaseEntity

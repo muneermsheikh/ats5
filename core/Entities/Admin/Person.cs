@@ -9,9 +9,10 @@ namespace core.Entities.Admin
           {
           }
 
-          public Person(string firstName, string secondName, string familyName, string knownAs, DateTime dOB, 
+          public Person(string gender, string firstName, string secondName, string familyName, string knownAs, DateTime dOB, 
             string placeOfBirth, string aadharNo, string pPNo, string nationality)
           {
+               Gender = gender;
                FirstName = firstName;
                SecondName = secondName;
                FamilyName = familyName;

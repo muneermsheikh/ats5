@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace core.Entities.Users
 {
     public class UserAttachment: BaseEntity
@@ -20,6 +22,6 @@ namespace core.Entities.Users
         public string AttachmentType { get; set; }
         public int AttachmentSizeInKB { get; set; }
         public string AttachmentUrl {get; set;}
-        public Candidate Candidate {get; set;}
+        //public Candidate Candidate {get; set;}
     }
 }

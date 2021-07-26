@@ -2,6 +2,15 @@ namespace core.Entities.MasterEntities
 {
     public class ReviewItemStatus: BaseEntity
     {
-        public string ItemStatus { get; set; }
+          public ReviewItemStatus()
+          {
+          }
+
+          public ReviewItemStatus(string itemStatus)
+          {
+               ItemStatus = itemStatus;
+          }
+
+          public string ItemStatus { get; set; }
     }
 }

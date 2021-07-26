@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using core.Entities.Admin;
+using core.Entities.Identity;
 using core.Entities.MasterEntities;
 
 namespace core.Entities.Users
@@ -12,33 +13,33 @@ namespace core.Entities.Users
           {
           }
 
-          public Candidate(string appUserId, int applicationNo, 
+          public Candidate(string gender, string appUserId, int applicationNo, 
                 string firstName, string secondName, string familyName, string knownAs, DateTime dOB, 
-                string city, string placeOfBirth, string aadharNo, string email, string introduction, 
+                string placeOfBirth, string aadharNo, string email, string introduction, 
                 string interests, ICollection<UserQualification> userQualifications, 
                 ICollection<UserProfession> userProfessions, ICollection<UserPassport> userPassports, 
                 ICollection<UserAttachment> userAttachments)
-          {
-               AppUserId = appUserId;
-               ApplicationNo = applicationNo;
-               FirstName = firstName;  SecondName = secondName; FamilyName=familyName;
-               KnownAs= knownAs; DOB = dOB; AadharNo=AadharNo; Email = Email;
-               City = city; PlaceOfBirth = placeOfBirth; 
-               City = city;
-               Introduction = introduction;
-               Interests = interests;
-               UserQualifications = userQualifications;
-               UserProfessions = userProfessions;
-               UserPassports = userPassports;
-               UserAttachments = userAttachments;
-          }
+            {
+                Gender = gender;
+                AppUserIdNotEnforced = appUserId;
+                ApplicationNo = applicationNo;
+                FirstName = firstName;  SecondName = secondName; FamilyName=familyName;
+                KnownAs= knownAs; DOB = dOB; AadharNo=AadharNo; Email = Email;
+                PlaceOfBirth = placeOfBirth; 
+                Introduction = introduction;
+                Interests = interests;
+                
+                UserQualifications = userQualifications;
+                UserProfessions = userProfessions;
+                UserPassports = userPassports;
+                UserAttachments = userAttachments;
+                
+            }
 
-        public string AppUserId {get; set;}
         public int ApplicationNo { get; set; }
-        public string UserType {get; set;}
-        [Required]
-        public string Gender { get; set; }
-        [Required]
+//names                
+        [Required, MaxLength(1)]
+        public string Gender {get; set;}="M";
         public string FirstName { get; set; }
         public string SecondName { get; set; }
         public string FamilyName { get; set; }
@@ -51,23 +52,24 @@ namespace core.Entities.Users
         public string PpNo { get; set; } 
         public string Nationality {get; set;}
         [EmailAddress]
-        public string Email {get; set;}
-        public string UserName {get; set;}
-        public string City { get; set; }
-
+        public string Email { get; set; }
+    //general
+        public int? CompanyId {get; set;}       //associate id
         public DateTime Created { get; set; }
         public DateTime LastActive { get; set; }
         public string Introduction { get; set; }
         public string Interests { get; set; }
-        public int? CompanyId {get; set;}       //associate id
+    //navigations
+        public string AppUserIdNotEnforced { get; set; }
+
         public EnumCandidateStatus? CandidateStatus {get; set;} = EnumCandidateStatus.NotReferred;
-        //public ICollection<Address> Addresses { get; set; }
         public ICollection<UserPhone> UserPhones {get; set;}
         public ICollection<UserQualification> UserQualifications { get; set; }
         public ICollection<UserProfession> UserProfessions {get; set;}
         public ICollection<UserPassport> UserPassports {get; set;}
         public ICollection<UserAttachment> UserAttachments { get; set; }
-
+        public ICollection<EntityAddress> EntityAddresses {get; set;}
+        public ICollection<UserExp> UserExperiences {get; set;}
         public string FullName {get => FirstName + " " + SecondName + " " + FamilyName;}
     }
 }

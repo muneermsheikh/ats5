@@ -15,8 +15,7 @@ namespace infra.Data.Config
             builder.HasIndex(x => x.CVRefId);
             builder.Property(x => x.TransactionDate).IsRequired();
             
-            builder.HasOne(p => p.CVRef).WithMany()
-                .HasForeignKey(p => p.CVRefId);
+            //builder.HasOne(p => p.CVRef).WithMany().HasForeignKey(p => p.CVRefId);
         }
      }
 }

@@ -83,6 +83,15 @@ namespace infra.Data
                     await context.SaveChangesAsync();
                 }
 
+                if(!context.AssessmentQsBank.Any()) {
+                    var jsonData = File.ReadAllText("../infra/data/SeedData/AssessmentQBankSeedData.json");
+                    var fileData = JsonSerializer.Deserialize<List<AssessmentQBank>>(jsonData);
+                    foreach(var item in fileData) {
+                        context.AssessmentQsBank.Add(item);
+                    }
+                    await context.SaveChangesAsync();
+                }
+
                 if(!context.DeployStages.Any()) {
                     var jsonData = File.ReadAllText("../infra/data/SeedData/DeployStageSeedData.json");
                     var fileData = JsonSerializer.Deserialize<List<DeployStage>>(jsonData);
@@ -128,10 +137,10 @@ namespace infra.Data
                     await context.SaveChangesAsync();
                 }
 
-                if(!context.Orders.Any()) {
-                    var jsonData = File.ReadAllText("../infra/data/SeedData/OrderSeedData.json");
-                    var fileData = JsonSerializer.Deserialize<List<Order>>(jsonData);
-                    foreach(var item in fileData) {
+                if(true) { //!context.Orders.Any()) {
+                    var jsnData = File.ReadAllText("../infra/data/SeedData/OrderSeedData.json");
+                    var filData = JsonSerializer.Deserialize<List<Order>>(jsnData);
+                    foreach(var item in filData) {
                         context.Orders.Add(item);
                     }
                     await context.SaveChangesAsync();

@@ -18,9 +18,12 @@ namespace infra.Data.Config
             builder.HasIndex(x => x.CustomerId);
             builder.Property(x => x.CityOfWorking).IsRequired();
 
-            //modelBuilder.Entity<Company>().HasMany(c => c.Employees).WithOne(e => e.Company);
+            builder.OwnsOne(i => i.OrderAddress, 
+                io => { io.WithOwner(); }
+            );
             
             builder.HasMany(s => s.OrderItems).WithOne().IsRequired().OnDelete(DeleteBehavior.Cascade);
+            //builder.HasOne(s => s.Customer).WithOne().IsRequired().OnDelete(DeleteBehavior.Restrict);
         }
      }
 }

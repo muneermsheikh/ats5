@@ -9,13 +9,14 @@ namespace core.Entities.Orders
         {
         }
 
-        public ContractReviewItem(int orderItemId, string categoryName, int quantity)
+        public ContractReviewItem(int orderItemId, int orderId, string categoryName, int quantity)
         {
+            OrderId = orderId;
             OrderItemId = orderItemId;
             CategoryName = categoryName;
             Quantity = quantity;
         }
-
+        public int OrderId {get; set;}
         public int OrderItemId { get; set; }
         public string CategoryName { get; set; }
         public int Quantity { get; set; }

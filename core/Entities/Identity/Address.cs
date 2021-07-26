@@ -22,6 +22,8 @@ namespace core.Entities.Identity
           }
 
         public string AddressType { get; set; }="R";
+        [Required, MaxLength(1)]
+        public string Gender { get; set; }="M";
         public string FirstName { get; set; }
         public string SecondName { get; set; }
         public string FamilyName { get; set; }
@@ -29,16 +31,12 @@ namespace core.Entities.Identity
         public string Add { get; set; }
         public string StreetAdd { get; set; }
         public string Location { get; set; }
-        [Required]
         public string City { get; set; }
         public string District { get; set; }
-        [Required]
         public string State { get; set; }
-        [Required]
         public string Pin { get; set; }
-        [Required]
         public string Country { get; set; }="India";
-        [Required]
+        //[Required]
         public string AppUserId { get; set; }
         public AppUser AppUser { get; set; }
           

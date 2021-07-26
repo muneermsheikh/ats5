@@ -4,6 +4,31 @@ namespace core.Entities.Orders
 {
     public class Remuneration
     {
+          public Remuneration()
+          {
+          }
+
+          public Remuneration(string salaryCurrency, int salaryMin, int salaryMax, 
+            int contractPeriodInMonths, bool housingProvidedFree, int housingAllowance, 
+            bool foodProvidedFree, int foodAllowance, bool transportProvidedFree, 
+            int transportAllowance, int otherAllowance, int leavePerYearInDays, 
+            int leaveAirfareEntitlementAfterMonths)
+          {
+               SalaryCurrency = salaryCurrency;
+               SalaryMin = salaryMin;
+               SalaryMax = salaryMax;
+               ContractPeriodInMonths = contractPeriodInMonths;
+               HousingProvidedFree = housingProvidedFree;
+               HousingAllowance = housingAllowance;
+               FoodProvidedFree = foodProvidedFree;
+               FoodAllowance = foodAllowance;
+               TransportProvidedFree = transportProvidedFree;
+               TransportAllowance = transportAllowance;
+               OtherAllowance = otherAllowance;
+               LeavePerYearInDays = leavePerYearInDays;
+               LeaveAirfareEntitlementAfterMonths = leaveAirfareEntitlementAfterMonths;
+          }
+
         [Required]
         [MinLength(3), MaxLength(3)]
         public string SalaryCurrency { get; set; }

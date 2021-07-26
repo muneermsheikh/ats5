@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using core.Entities.HR;
 
 namespace core.Entities.Process
@@ -9,6 +10,7 @@ namespace core.Entities.Process
         public DateTime TransactionDate { get; set; }
         public int DeployStageId { get; set; }
         public int NextDeployStageId { get; set; }
+        [ForeignKey("CVRefId")]
         public CVRef CVRef {get; set;}
         public DateTime NextDeployStageEstimatedDate { get; set; }
     }

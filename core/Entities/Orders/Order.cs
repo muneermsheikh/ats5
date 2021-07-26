@@ -8,8 +8,6 @@ namespace core.Entities.Orders
     {
           private List<OrderItem> items;
           private string buyerEmail;
-          private UserAddress shippingAddress;
-          private DeliveryMethod deliveryMethod;
           private int subtotal;
 
           public Order()
@@ -17,10 +15,11 @@ namespace core.Entities.Orders
           }
 
           public Order(int orderNo, int customerId, string orderRef, int salesmanId, int estimatedRevenue,
-            DateTime completeBy, ICollection<OrderItem> orderItems)
+            DateTime completeBy, OrderAddress orderAddress,ICollection<OrderItem> orderItems)
           {
                OrderNo = orderNo;
                CustomerId = customerId;
+               OrderAddress = orderAddress;
                OrderRef = orderRef;
                SalesmanId = salesmanId;
                CompleteBy = completeBy;
@@ -29,12 +28,14 @@ namespace core.Entities.Orders
           }
 
         public int OrderNo { get; set; }
+        public OrderAddress OrderAddress { get; set; }
         public DateTimeOffset OrderDate { get; set; }=DateTimeOffset.Now;
         public int CustomerId { get; set; }
         public string BuyerEmail {get; set;}
         public string OrderRef { get; set; }
-        public int SalesmanId { get; set; }
-        public int AppUserId { get; set; }
+        public int? SalesmanId { get; set; }
+        public string SalesmanName { get; set; }
+        //public string AppUserId { get; set; }
         public DateTime CompleteBy { get; set; }
         public string Country { get; set; }
         public string CityOfWorking { get; set; }

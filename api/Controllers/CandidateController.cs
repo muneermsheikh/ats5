@@ -33,29 +33,14 @@ namespace api.Controllers
                _unitOfWork = unitOfWork;
           }
 
-     [HttpPost("newcandidate")]
-     public async Task<ActionResult<Candidate>> RegisterCandidate([FromQuery] CandidateToCreateDto dto)
-     {
-
-          //check if the Email is already taken
-          var user = await _userManager.FindByEmailAsync(dto.Person.Email);
-          if (user != null) return BadRequest(new ApiResponse(401, "That Email is already taken"));
-
-          var cand = await _userService.CreateCandidateAsync(dto);
-          if(cand==null) {
-              return BadRequest(new ApiResponse(401, "Failed to regsiter the candidate"));
-          } else {
-              return Ok(cand);
-          }
-     }
-
+     
      [HttpGet("canidatelist")]
      public async Task<ActionResult<Pagination<Candidate>>> GetCandidateListAsync(CandidateSpecParams candidateParam)
      {
           var spec = new CandidateSpecs(candidateParam);
           var countSpec = new CandidateForCountSpecs(candidateParam);
 
-          var totalItems = await _candRepo.CountAsync(spec);
+          var totalItems = await _candRepo.CountAsync(countSpec);
           var cands = await _candRepo.ListAsync(spec);
 
           //var data = _mapper.Map<IReadOnlyList<CandidateToReturnDto>>(cands);

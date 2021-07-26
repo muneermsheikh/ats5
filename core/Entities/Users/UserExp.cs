@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace core.Entities.Users
 {
@@ -31,6 +32,6 @@ namespace core.Entities.Users
         public int? MonthlySalaryDrawn { get; set; }
         public DateTime WorkedFrom { get; set; }
         public DateTime WorkedUpto {get; set;}
-        public Candidate Candidate {get; set;}
+        //public Candidate Candidate {get; set;}
     }
 }

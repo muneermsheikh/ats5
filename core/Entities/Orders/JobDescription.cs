@@ -4,7 +4,21 @@ namespace core.Entities.Orders
 {
     public class JobDescription
     {
-        [Required, MaxLength(250)]
+          public JobDescription()
+          {
+          }
+
+          public JobDescription(string jobDescInBrief, string qualificationDesired, int expDesiredMin, int expDesiredMax, int minAge, int maxAge)
+          {
+               JobDescInBrief = jobDescInBrief;
+               QualificationDesired = qualificationDesired;
+               ExpDesiredMin = expDesiredMin;
+               ExpDesiredMax = expDesiredMax;
+               MinAge = minAge;
+               MaxAge = maxAge;
+          }
+
+          [Required, MaxLength(250)]
         public string JobDescInBrief { get; set; }
         public string QualificationDesired { get; set; }
         [Range(0,40)]

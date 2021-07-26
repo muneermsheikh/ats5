@@ -9,7 +9,7 @@ using infra.Data;
 namespace infra.Data.Migrations
 {
     [DbContext(typeof(ATSContext))]
-    [Migration("20210719141143_InitialCreate")]
+    [Migration("20210725081946_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,11 @@ namespace infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("AadharNo")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Add")
                         .HasColumnType("TEXT");
 
@@ -33,12 +38,18 @@ namespace infra.Data.Migrations
                     b.Property<string>("City")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("DOJ")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Department")
                         .IsRequired()
                         .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastActive")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("LastWorkingDay")
@@ -79,7 +90,7 @@ namespace infra.Data.Migrations
                     b.HasIndex("EmployeeId", "CategoryId", "IndustryId")
                         .IsUnique();
 
-                    b.ToTable("EmployeeHRSkill");
+                    b.ToTable("EmployeeHRSkills");
                 });
 
             modelBuilder.Entity("core.Entities.Admin.EmployeeOtherSkill", b =>
@@ -128,7 +139,7 @@ namespace infra.Data.Migrations
                     b.HasIndex("EmployeeId", "QualificationId")
                         .IsUnique();
 
-                    b.ToTable("EmployeeQualification");
+                    b.ToTable("EmployeeQualifications");
                 });
 
             modelBuilder.Entity("core.Entities.Category", b =>
@@ -181,6 +192,9 @@ namespace infra.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("District")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("KnownAs")
@@ -289,6 +303,12 @@ namespace infra.Data.Migrations
                     b.Property<int>("OrderItemId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("OrderItemId1")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderItemId2")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("PaymentIntentId")
                         .HasColumnType("TEXT");
 
@@ -307,6 +327,8 @@ namespace infra.Data.Migrations
                     b.HasIndex("DeployStageId");
 
                     b.HasIndex("OrderItemId");
+
+                    b.HasIndex("OrderItemId1");
 
                     b.HasIndex("CandidateId", "OrderItemId")
                         .IsUnique();
@@ -354,9 +376,6 @@ namespace infra.Data.Migrations
                     b.Property<int>("ChecklistHRId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("ChecklistHRId1")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Exceptions")
                         .HasColumnType("TEXT");
 
@@ -378,8 +397,6 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("ChecklistHRId");
 
-                    b.HasIndex("ChecklistHRId1");
-
                     b.ToTable("CheckListItemHRs");
                 });
 
@@ -396,15 +413,12 @@ namespace infra.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("AppUserId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("City")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Country")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DOB")
@@ -419,18 +433,21 @@ namespace infra.Data.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Location")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Pin")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SecondName")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("State")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("StreetAdd")
@@ -463,6 +480,9 @@ namespace infra.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
@@ -812,6 +832,9 @@ namespace infra.Data.Migrations
                     b.Property<bool>("Ecnr")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("OrderItemId")
                         .HasColumnType("INTEGER");
 
@@ -844,9 +867,6 @@ namespace infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("AppUserId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("BuyerEmail")
                         .HasColumnType("TEXT");
 
@@ -875,8 +895,11 @@ namespace infra.Data.Migrations
                     b.Property<string>("OrderRef")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("SalesmanId")
+                    b.Property<int?>("SalesmanId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("SalesmanName")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -898,8 +921,14 @@ namespace infra.Data.Migrations
                     b.Property<int?>("AssignedId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("AssignedToName")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Charges")
                         .HasColumnType("INTEGER");
@@ -913,17 +942,29 @@ namespace infra.Data.Migrations
                     b.Property<int>("FeeFromClientINR")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("HRExecName")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("HrExecId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("HrSupId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("HrSupName")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("HrmId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("HrmName")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("IndustryId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("IndustryName")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("MaxCVs")
                         .HasColumnType("INTEGER");
@@ -957,7 +998,8 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("AssignedId");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryId")
+                        .IsUnique();
 
                     b.HasIndex("OrderId");
 
@@ -1098,18 +1140,13 @@ namespace infra.Data.Migrations
                     b.Property<string>("AadharNo")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("AppUserId")
+                    b.Property<string>("AppUserIdNotEnforced")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ApplicationNo")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("CandidateStatus")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(40)
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("CompanyId")
@@ -1125,14 +1162,19 @@ namespace infra.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FamilyName")
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(75)
+                        .IsUnicode(false)
+                        .HasColumnType("VARCHAR");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(75)
+                        .IsUnicode(false)
+                        .HasColumnType("VARCHAR");
 
                     b.Property<string>("Gender")
                         .IsRequired()
+                        .HasMaxLength(1)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Interests")
@@ -1158,13 +1200,9 @@ namespace infra.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SecondName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserType")
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(75)
+                        .IsUnicode(false)
+                        .HasColumnType("VARCHAR");
 
                     b.HasKey("Id");
 
@@ -1173,6 +1211,52 @@ namespace infra.Data.Migrations
                         .HasFilter("[ApplicationNo] > 0");
 
                     b.ToTable("Candidates");
+                });
+
+            modelBuilder.Entity("core.Entities.Users.EntityAddress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Add")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .IsUnicode(false)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AddressType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CandidateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("City")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("District")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Pin")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("State")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StreetAdd")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.ToTable("EntityAddress");
                 });
 
             modelBuilder.Entity("core.Entities.Users.Photo", b =>
@@ -1219,17 +1303,12 @@ namespace infra.Data.Migrations
                     b.Property<int>("CandidateId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CandidateId1")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AttachmentUrl")
                         .IsUnique();
 
                     b.HasIndex("CandidateId");
-
-                    b.HasIndex("CandidateId1");
 
                     b.ToTable("UserAttachments");
                 });
@@ -1271,9 +1350,6 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("CandidateId");
 
-                    b.HasIndex("Employer")
-                        .IsUnique();
-
                     b.ToTable("UserExps");
                 });
 
@@ -1289,7 +1365,7 @@ namespace infra.Data.Migrations
                     b.Property<bool>("IsValid")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("IssuedOn")
+                    b.Property<DateTime?>("IssuedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Nationality")
@@ -1323,7 +1399,7 @@ namespace infra.Data.Migrations
                     b.Property<int>("CandidateId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CandidateId1")
+                    b.Property<int?>("EmployeeId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsMain")
@@ -1331,6 +1407,9 @@ namespace infra.Data.Migrations
 
                     b.Property<bool>("IsValid")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("MobileNo")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PhoneNo")
                         .IsRequired()
@@ -1342,7 +1421,7 @@ namespace infra.Data.Migrations
                     b.HasIndex("CandidateId")
                         .HasFilter("[IsValid]=1");
 
-                    b.HasIndex("CandidateId1");
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("PhoneNo")
                         .IsUnique();
@@ -1524,8 +1603,14 @@ namespace infra.Data.Migrations
                         .HasForeignKey("DeployStageId");
 
                     b.HasOne("core.Entities.Orders.OrderItem", "OrderItem")
-                        .WithMany("CVRefs")
+                        .WithMany()
                         .HasForeignKey("OrderItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("core.Entities.Orders.OrderItem", null)
+                        .WithMany("CVRefs")
+                        .HasForeignKey("OrderItemId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1557,26 +1642,18 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.HR.ChecklistItemHR", b =>
                 {
-                    b.HasOne("core.Entities.HR.ChecklistHR", "ChecklistHR")
-                        .WithMany()
+                    b.HasOne("core.Entities.HR.ChecklistHR", null)
+                        .WithMany("ChecklistItemHRs")
                         .HasForeignKey("ChecklistHRId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("core.Entities.HR.ChecklistHR", null)
-                        .WithMany("ChecklistItemHRs")
-                        .HasForeignKey("ChecklistHRId1");
-
-                    b.Navigation("ChecklistHR");
                 });
 
             modelBuilder.Entity("core.Entities.Identity.Address", b =>
                 {
                     b.HasOne("core.Entities.Identity.AppUser", "AppUser")
                         .WithOne("Address")
-                        .HasForeignKey("core.Entities.Identity.Address", "AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("core.Entities.Identity.Address", "AppUserId");
 
                     b.Navigation("AppUser");
                 });
@@ -1638,7 +1715,62 @@ namespace infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsOne("core.Entities.Orders.OrderAddress", "OrderAddress", b1 =>
+                        {
+                            b1.Property<int>("OrderId")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("Add")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("CompanyName")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("District")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Location")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<int?>("OrderId1")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("Pin")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("State")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("StreetAdd")
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("OrderId");
+
+                            b1.HasIndex("OrderId1");
+
+                            b1.ToTable("Orders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId");
+
+                            b1.HasOne("core.Entities.Orders.Order", "Order")
+                                .WithMany()
+                                .HasForeignKey("OrderId1");
+
+                            b1.Navigation("Order");
+                        });
+
                     b.Navigation("Customer");
+
+                    b.Navigation("OrderAddress");
                 });
 
             modelBuilder.Entity("core.Entities.Orders.OrderItem", b =>
@@ -1648,9 +1780,9 @@ namespace infra.Data.Migrations
                         .HasForeignKey("AssignedId");
 
                     b.HasOne("core.Entities.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithOne()
+                        .HasForeignKey("core.Entities.Orders.OrderItem", "CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("core.Entities.Orders.Order", null)
@@ -1686,7 +1818,7 @@ namespace infra.Data.Migrations
 
                             b1.HasKey("OrderItemId");
 
-                            b1.ToTable("OrderItems");
+                            b1.ToTable("JobDescriptions");
 
                             b1.WithOwner()
                                 .HasForeignKey("OrderItemId");
@@ -1740,7 +1872,7 @@ namespace infra.Data.Migrations
 
                             b1.HasKey("OrderItemId");
 
-                            b1.ToTable("OrderItems");
+                            b1.ToTable("Remunerations");
 
                             b1.WithOwner()
                                 .HasForeignKey("OrderItemId");
@@ -1786,30 +1918,31 @@ namespace infra.Data.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("core.Entities.Users.UserAttachment", b =>
+            modelBuilder.Entity("core.Entities.Users.EntityAddress", b =>
                 {
-                    b.HasOne("core.Entities.Users.Candidate", "Candidate")
-                        .WithMany()
+                    b.HasOne("core.Entities.Users.Candidate", null)
+                        .WithMany("EntityAddresses")
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
+            modelBuilder.Entity("core.Entities.Users.UserAttachment", b =>
+                {
                     b.HasOne("core.Entities.Users.Candidate", null)
                         .WithMany("UserAttachments")
-                        .HasForeignKey("CandidateId1");
-
-                    b.Navigation("Candidate");
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("core.Entities.Users.UserExp", b =>
                 {
-                    b.HasOne("core.Entities.Users.Candidate", "Candidate")
-                        .WithMany()
+                    b.HasOne("core.Entities.Users.Candidate", null)
+                        .WithMany("UserExperiences")
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Candidate");
                 });
 
             modelBuilder.Entity("core.Entities.Users.UserPassport", b =>
@@ -1823,17 +1956,15 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.Users.UserPhone", b =>
                 {
-                    b.HasOne("core.Entities.Users.Candidate", "Candidate")
-                        .WithMany()
+                    b.HasOne("core.Entities.Users.Candidate", null)
+                        .WithMany("UserPhones")
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("core.Entities.Users.Candidate", null)
+                    b.HasOne("core.Entities.Admin.Employee", null)
                         .WithMany("UserPhones")
-                        .HasForeignKey("CandidateId1");
-
-                    b.Navigation("Candidate");
+                        .HasForeignKey("EmployeeId");
                 });
 
             modelBuilder.Entity("core.Entities.Users.UserProfession", b =>
@@ -1861,6 +1992,8 @@ namespace infra.Data.Migrations
                     b.Navigation("OtherSkills");
 
                     b.Navigation("Qualifications");
+
+                    b.Navigation("UserPhones");
                 });
 
             modelBuilder.Entity("core.Entities.Customer", b =>
@@ -1914,7 +2047,11 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.Users.Candidate", b =>
                 {
+                    b.Navigation("EntityAddresses");
+
                     b.Navigation("UserAttachments");
+
+                    b.Navigation("UserExperiences");
 
                     b.Navigation("UserPassports");
 

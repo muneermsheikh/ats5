@@ -1,9 +1,9 @@
 [
     {  
         "OrderDate": "2020-10-10T10:00:00", "CustomerId": 1, "OrderRef": "telehonic message", 
-        "SalesmanId": 2,  "CustomerOfficialForLogistics": 2, "customerOfficialForHR": 3, 
-        "customerOfficialForAccounts": 2, "CompleteBy": "2021-01-01T10:00:00", "Country": "Saudi Arabia", 
-        "CityOfWorking": "Jeddah", "OrderStatus": "Active",
+        "SalesmanId": 2,  "CustomerOfficialForLogistics": 2, "customerOfficialForHR": 3, "OrderNo": 1000,
+        "CustomerOfficialForAccounts": 2, "CompleteBy": "2021-01-01T10:00:00", "Country": "Saudi Arabia", 
+        "CityOfWorking": "Jeddah", "AssignedId": 1,
         "OrderItems": 
         [
             {
@@ -45,7 +45,7 @@
         "OrderDate": "2020-11-11T10:00:00", "CustomerId": 3, "OrderRef": "telehonic message", 
         "SalesmanId": 2,  "CustomerOfficialForLogistics": 7, "customerOfficialForHR": null, 
         "customerOfficialForAccounts": null, "CompleteBy": "2021-01-01T11:11:11", "Country": "Saudi Arabia", 
-        "CityOfWorking": "Dammam",
+        "CityOfWorking": "Dammam", "OrderNo": 1004, "AssignedId": 1,
         "OrderItems": 
         [
             {
@@ -85,7 +85,7 @@
         "OrderDate": "2020-10-12T10:00:00", "CustomerId": 2, "OrderRef": "telehonic message", 
         "SalesmanId": 2,  "CustomerOfficialForLogistics": 5, "customerOfficialForHR": 11, 
         "customerOfficialForAccounts": null, "CompleteBy": "2020-11-01T00:10:10", "Country": "Saudi Arabia", 
-        "CityOfWorking": "Dammam",
+        "CityOfWorking": "Dammam", "OrderNo": 1002, "AssignedId":1,
         "OrderItems": 
         [
             {
@@ -127,7 +127,7 @@
         "OrderDate": "2019-02-25T01:00:12",  "CustomerId": 4, "OrderRef": "telehonic message", 
         "SalesmanId": 2,  "CustomerOfficialForLogistics": 24, "customerOfficialForHR": 26, 
         "customerOfficialForAccounts": 24, "CompleteBy": "2021-11-12T12:00:00", "Country": "Saudi Arabia", 
-        "CityOfWorking": "Jeddah",
+        "CityOfWorking": "Jeddah", "OrderNo": 1003,
         "OrderItems": 
         [
             {

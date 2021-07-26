@@ -13,6 +13,7 @@ namespace infra.Data.Migrations
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     UserType = table.Column<string>(type: "TEXT", nullable: true),
+                    Gender = table.Column<string>(type: "TEXT", nullable: true),
                     DisplayName = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", nullable: true),
@@ -40,13 +41,11 @@ namespace infra.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    AppUserId = table.Column<string>(type: "TEXT", nullable: true),
                     ApplicationNo = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserType = table.Column<string>(type: "TEXT", nullable: true),
-                    Gender = table.Column<string>(type: "TEXT", nullable: false),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    SecondName = table.Column<string>(type: "TEXT", nullable: true),
-                    FamilyName = table.Column<string>(type: "TEXT", nullable: true),
+                    Gender = table.Column<string>(type: "TEXT", maxLength: 1, nullable: false),
+                    FirstName = table.Column<string>(type: "VARCHAR", unicode: false, maxLength: 75, nullable: false),
+                    SecondName = table.Column<string>(type: "VARCHAR", unicode: false, maxLength: 75, nullable: true),
+                    FamilyName = table.Column<string>(type: "VARCHAR", unicode: false, maxLength: 75, nullable: true),
                     KnownAs = table.Column<string>(type: "TEXT", nullable: false),
                     DOB = table.Column<DateTime>(type: "TEXT", nullable: false),
                     PlaceOfBirth = table.Column<string>(type: "TEXT", nullable: true),
@@ -54,13 +53,12 @@ namespace infra.Data.Migrations
                     PpNo = table.Column<string>(type: "TEXT", nullable: true),
                     Nationality = table.Column<string>(type: "TEXT", nullable: true),
                     Email = table.Column<string>(type: "TEXT", nullable: true),
-                    UserName = table.Column<string>(type: "TEXT", nullable: true),
-                    City = table.Column<string>(type: "TEXT", maxLength: 40, nullable: false),
+                    CompanyId = table.Column<int>(type: "INTEGER", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastActive = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Introduction = table.Column<string>(type: "TEXT", nullable: true),
                     Interests = table.Column<string>(type: "TEXT", nullable: true),
-                    CompanyId = table.Column<int>(type: "INTEGER", nullable: true),
+                    AppUserIdNotEnforced = table.Column<string>(type: "TEXT", nullable: true),
                     CandidateStatus = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -110,7 +108,8 @@ namespace infra.Data.Migrations
                     Pin = table.Column<string>(type: "TEXT", nullable: true),
                     District = table.Column<string>(type: "TEXT", nullable: true),
                     State = table.Column<string>(type: "TEXT", nullable: true),
-                    Country = table.Column<string>(type: "TEXT", nullable: true)
+                    Country = table.Column<string>(type: "TEXT", nullable: true),
+                    Email = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -156,6 +155,9 @@ namespace infra.Data.Migrations
                     LastWorkingDay = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Status = table.Column<string>(type: "TEXT", nullable: false),
                     Remarks = table.Column<string>(type: "TEXT", nullable: true),
+                    AadharNo = table.Column<string>(type: "TEXT", maxLength: 12, nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LastActive = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Add = table.Column<string>(type: "TEXT", nullable: true),
                     City = table.Column<string>(type: "TEXT", nullable: true)
                 },
@@ -297,6 +299,7 @@ namespace infra.Data.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     AddressType = table.Column<string>(type: "TEXT", nullable: true),
+                    Gender = table.Column<string>(type: "TEXT", maxLength: 1, nullable: false),
                     FirstName = table.Column<string>(type: "TEXT", nullable: true),
                     SecondName = table.Column<string>(type: "TEXT", nullable: true),
                     FamilyName = table.Column<string>(type: "TEXT", nullable: true),
@@ -304,12 +307,12 @@ namespace infra.Data.Migrations
                     Add = table.Column<string>(type: "TEXT", nullable: true),
                     StreetAdd = table.Column<string>(type: "TEXT", nullable: true),
                     Location = table.Column<string>(type: "TEXT", nullable: true),
-                    City = table.Column<string>(type: "TEXT", nullable: false),
+                    City = table.Column<string>(type: "TEXT", nullable: true),
                     District = table.Column<string>(type: "TEXT", nullable: true),
-                    State = table.Column<string>(type: "TEXT", nullable: false),
-                    Pin = table.Column<string>(type: "TEXT", nullable: false),
-                    Country = table.Column<string>(type: "TEXT", nullable: false),
-                    AppUserId = table.Column<string>(type: "TEXT", nullable: false)
+                    State = table.Column<string>(type: "TEXT", nullable: true),
+                    Pin = table.Column<string>(type: "TEXT", nullable: true),
+                    Country = table.Column<string>(type: "TEXT", nullable: true),
+                    AppUserId = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -319,7 +322,7 @@ namespace infra.Data.Migrations
                         column: x => x.AppUserId,
                         principalTable: "AppUser",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -358,6 +361,34 @@ namespace infra.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EntityAddress",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    AddressType = table.Column<string>(type: "TEXT", nullable: true),
+                    Add = table.Column<string>(type: "TEXT", unicode: false, maxLength: 250, nullable: false),
+                    StreetAdd = table.Column<string>(type: "TEXT", nullable: true),
+                    City = table.Column<string>(type: "TEXT", nullable: true),
+                    Pin = table.Column<string>(type: "TEXT", nullable: true),
+                    State = table.Column<string>(type: "TEXT", nullable: true),
+                    District = table.Column<string>(type: "TEXT", nullable: true),
+                    Country = table.Column<string>(type: "TEXT", nullable: true),
+                    IsMain = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CandidateId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EntityAddress", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EntityAddress_Candidates_CandidateId",
+                        column: x => x.CandidateId,
+                        principalTable: "Candidates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserAttachments",
                 columns: table => new
                 {
@@ -367,8 +398,7 @@ namespace infra.Data.Migrations
                     AppUserId = table.Column<string>(type: "TEXT", nullable: true),
                     AttachmentType = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
                     AttachmentSizeInKB = table.Column<int>(type: "INTEGER", nullable: false),
-                    AttachmentUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    CandidateId1 = table.Column<int>(type: "INTEGER", nullable: true)
+                    AttachmentUrl = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -379,12 +409,6 @@ namespace infra.Data.Migrations
                         principalTable: "Candidates",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserAttachments_Candidates_CandidateId1",
-                        column: x => x.CandidateId1,
-                        principalTable: "Candidates",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -423,7 +447,7 @@ namespace infra.Data.Migrations
                     CandidateId = table.Column<int>(type: "INTEGER", nullable: false),
                     PassportNo = table.Column<string>(type: "TEXT", maxLength: 15, nullable: false),
                     Nationality = table.Column<string>(type: "TEXT", nullable: true),
-                    IssuedOn = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IssuedOn = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Validity = table.Column<DateTime>(type: "TEXT", nullable: false),
                     IsValid = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
@@ -436,35 +460,6 @@ namespace infra.Data.Migrations
                         principalTable: "Candidates",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserPhones",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    CandidateId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PhoneNo = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
-                    IsMain = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CandidateId1 = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserPhones", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserPhones_Candidates_CandidateId",
-                        column: x => x.CandidateId,
-                        principalTable: "Candidates",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserPhones_Candidates_CandidateId1",
-                        column: x => x.CandidateId1,
-                        principalTable: "Candidates",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -565,12 +560,22 @@ namespace infra.Data.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     OrderNo = table.Column<int>(type: "INTEGER", nullable: false),
+                    OrderAddress_CompanyName = table.Column<string>(type: "TEXT", nullable: true),
+                    OrderAddress_Add = table.Column<string>(type: "TEXT", nullable: true),
+                    OrderAddress_StreetAdd = table.Column<string>(type: "TEXT", nullable: true),
+                    OrderAddress_Location = table.Column<string>(type: "TEXT", nullable: true),
+                    OrderAddress_City = table.Column<string>(type: "TEXT", nullable: true),
+                    OrderAddress_District = table.Column<string>(type: "TEXT", nullable: true),
+                    OrderAddress_State = table.Column<string>(type: "TEXT", nullable: true),
+                    OrderAddress_Pin = table.Column<string>(type: "TEXT", nullable: true),
+                    OrderAddress_Country = table.Column<string>(type: "TEXT", nullable: true),
+                    OrderAddress_OrderId1 = table.Column<int>(type: "INTEGER", nullable: true),
                     OrderDate = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CustomerId = table.Column<int>(type: "INTEGER", nullable: false),
                     BuyerEmail = table.Column<string>(type: "TEXT", nullable: true),
                     OrderRef = table.Column<string>(type: "TEXT", nullable: true),
-                    SalesmanId = table.Column<int>(type: "INTEGER", nullable: false),
-                    AppUserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SalesmanId = table.Column<int>(type: "INTEGER", nullable: true),
+                    SalesmanName = table.Column<string>(type: "TEXT", nullable: true),
                     CompleteBy = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Country = table.Column<string>(type: "TEXT", nullable: true),
                     CityOfWorking = table.Column<string>(type: "TEXT", nullable: false),
@@ -586,10 +591,16 @@ namespace infra.Data.Migrations
                         principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Orders_Orders_OrderAddress_OrderId1",
+                        column: x => x.OrderAddress_OrderId1,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "EmployeeHRSkill",
+                name: "EmployeeHRSkills",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -601,9 +612,9 @@ namespace infra.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeeHRSkill", x => x.Id);
+                    table.PrimaryKey("PK_EmployeeHRSkills", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EmployeeHRSkill_Employees_EmployeeId",
+                        name: "FK_EmployeeHRSkills_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
@@ -633,7 +644,7 @@ namespace infra.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EmployeeQualification",
+                name: "EmployeeQualifications",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -644,12 +655,42 @@ namespace infra.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeeQualification", x => x.Id);
+                    table.PrimaryKey("PK_EmployeeQualifications", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EmployeeQualification_Employees_EmployeeId",
+                        name: "FK_EmployeeQualifications_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserPhones",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CandidateId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PhoneNo = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    MobileNo = table.Column<string>(type: "TEXT", nullable: true),
+                    IsMain = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
+                    EmployeeId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPhones", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserPhones_Candidates_CandidateId",
+                        column: x => x.CandidateId,
+                        principalTable: "Candidates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserPhones_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -738,7 +779,9 @@ namespace infra.Data.Migrations
                     OrderId = table.Column<int>(type: "INTEGER", nullable: false),
                     SrNo = table.Column<int>(type: "INTEGER", nullable: false),
                     CategoryId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CategoryName = table.Column<string>(type: "TEXT", nullable: true),
                     IndustryId = table.Column<int>(type: "INTEGER", nullable: false),
+                    IndustryName = table.Column<string>(type: "TEXT", nullable: true),
                     SourceFrom = table.Column<string>(type: "TEXT", nullable: true),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
                     MinCVs = table.Column<int>(type: "INTEGER", nullable: false),
@@ -747,32 +790,17 @@ namespace infra.Data.Migrations
                     RequireAssess = table.Column<bool>(type: "INTEGER", nullable: false),
                     CompleteBefore = table.Column<DateTime>(type: "TEXT", nullable: false),
                     HrExecId = table.Column<int>(type: "INTEGER", nullable: true),
+                    HRExecName = table.Column<string>(type: "TEXT", nullable: true),
                     HrSupId = table.Column<int>(type: "INTEGER", nullable: true),
+                    HrSupName = table.Column<string>(type: "TEXT", nullable: true),
                     HrmId = table.Column<int>(type: "INTEGER", nullable: true),
+                    HrmName = table.Column<string>(type: "TEXT", nullable: true),
                     AssignedId = table.Column<int>(type: "INTEGER", nullable: true),
+                    AssignedToName = table.Column<string>(type: "TEXT", nullable: true),
                     Charges = table.Column<int>(type: "INTEGER", nullable: false),
                     FeeFromClientINR = table.Column<int>(type: "INTEGER", nullable: false),
                     Status = table.Column<string>(type: "TEXT", nullable: false),
-                    ReviewItemStatusId = table.Column<int>(type: "INTEGER", nullable: false),
-                    JobDescription_JobDescInBrief = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
-                    JobDescription_QualificationDesired = table.Column<string>(type: "TEXT", nullable: true),
-                    JobDescription_ExpDesiredMin = table.Column<int>(type: "INTEGER", nullable: true),
-                    JobDescription_ExpDesiredMax = table.Column<int>(type: "INTEGER", nullable: true),
-                    JobDescription_MinAge = table.Column<int>(type: "INTEGER", nullable: true),
-                    JobDescription_MaxAge = table.Column<int>(type: "INTEGER", nullable: true),
-                    Remuneration_SalaryCurrency = table.Column<string>(type: "TEXT", maxLength: 3, nullable: true),
-                    Remuneration_SalaryMin = table.Column<int>(type: "INTEGER", nullable: true),
-                    Remuneration_SalaryMax = table.Column<int>(type: "INTEGER", nullable: true),
-                    Remuneration_ContractPeriodInMonths = table.Column<int>(type: "INTEGER", nullable: true),
-                    Remuneration_HousingProvidedFree = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Remuneration_HousingAllowance = table.Column<int>(type: "INTEGER", nullable: true),
-                    Remuneration_FoodProvidedFree = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Remuneration_FoodAllowance = table.Column<int>(type: "INTEGER", nullable: true),
-                    Remuneration_TransportProvidedFree = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Remuneration_TransportAllowance = table.Column<int>(type: "INTEGER", nullable: true),
-                    Remuneration_OtherAllowance = table.Column<int>(type: "INTEGER", nullable: true),
-                    Remuneration_LeavePerYearInDays = table.Column<int>(type: "INTEGER", nullable: true),
-                    Remuneration_LeaveAirfareEntitlementAfterMonths = table.Column<int>(type: "INTEGER", nullable: true)
+                    ReviewItemStatusId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -782,7 +810,7 @@ namespace infra.Data.Migrations
                         column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_OrderItems_Employees_AssignedId",
                         column: x => x.AssignedId,
@@ -831,6 +859,7 @@ namespace infra.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    OrderId = table.Column<int>(type: "INTEGER", nullable: false),
                     OrderItemId = table.Column<int>(type: "INTEGER", nullable: false),
                     CategoryName = table.Column<string>(type: "TEXT", nullable: true),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
@@ -871,7 +900,9 @@ namespace infra.Data.Migrations
                     Charges = table.Column<int>(type: "INTEGER", nullable: false),
                     PaymentIntentId = table.Column<string>(type: "TEXT", nullable: true),
                     RefStatus = table.Column<string>(type: "TEXT", nullable: false),
-                    DeployStageDate = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    DeployStageDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    OrderItemId1 = table.Column<int>(type: "INTEGER", nullable: false),
+                    OrderItemId2 = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -894,6 +925,65 @@ namespace infra.Data.Migrations
                         principalTable: "OrderItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CVRefs_OrderItems_OrderItemId1",
+                        column: x => x.OrderItemId1,
+                        principalTable: "OrderItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JobDescriptions",
+                columns: table => new
+                {
+                    OrderItemId = table.Column<int>(type: "INTEGER", nullable: false),
+                    JobDescInBrief = table.Column<string>(type: "TEXT", maxLength: 250, nullable: false),
+                    QualificationDesired = table.Column<string>(type: "TEXT", nullable: true),
+                    ExpDesiredMin = table.Column<int>(type: "INTEGER", nullable: false),
+                    ExpDesiredMax = table.Column<int>(type: "INTEGER", nullable: false),
+                    MinAge = table.Column<int>(type: "INTEGER", nullable: false),
+                    MaxAge = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobDescriptions", x => x.OrderItemId);
+                    table.ForeignKey(
+                        name: "FK_JobDescriptions_OrderItems_OrderItemId",
+                        column: x => x.OrderItemId,
+                        principalTable: "OrderItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Remunerations",
+                columns: table => new
+                {
+                    OrderItemId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SalaryCurrency = table.Column<string>(type: "TEXT", maxLength: 3, nullable: false),
+                    SalaryMin = table.Column<int>(type: "INTEGER", nullable: false),
+                    SalaryMax = table.Column<int>(type: "INTEGER", nullable: false),
+                    ContractPeriodInMonths = table.Column<int>(type: "INTEGER", nullable: false),
+                    HousingProvidedFree = table.Column<bool>(type: "INTEGER", nullable: false),
+                    HousingAllowance = table.Column<int>(type: "INTEGER", nullable: false),
+                    FoodProvidedFree = table.Column<bool>(type: "INTEGER", nullable: false),
+                    FoodAllowance = table.Column<int>(type: "INTEGER", nullable: false),
+                    TransportProvidedFree = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TransportAllowance = table.Column<int>(type: "INTEGER", nullable: false),
+                    OtherAllowance = table.Column<int>(type: "INTEGER", nullable: false),
+                    LeavePerYearInDays = table.Column<int>(type: "INTEGER", nullable: false),
+                    LeaveAirfareEntitlementAfterMonths = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Remunerations", x => x.OrderItemId);
+                    table.ForeignKey(
+                        name: "FK_Remunerations_OrderItems_OrderItemId",
+                        column: x => x.OrderItemId,
+                        principalTable: "OrderItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -908,8 +998,7 @@ namespace infra.Data.Migrations
                     Accepts = table.Column<bool>(type: "INTEGER", nullable: false),
                     Response = table.Column<string>(type: "TEXT", nullable: true),
                     Exceptions = table.Column<string>(type: "TEXT", nullable: true),
-                    MandatoryTrue = table.Column<bool>(type: "INTEGER", nullable: false),
-                    ChecklistHRId1 = table.Column<int>(type: "INTEGER", nullable: true)
+                    MandatoryTrue = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -920,12 +1009,6 @@ namespace infra.Data.Migrations
                         principalTable: "ChecklistHRs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CheckListItemHRs_ChecklistHRs_ChecklistHRId1",
-                        column: x => x.ChecklistHRId1,
-                        principalTable: "ChecklistHRs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1006,11 +1089,6 @@ namespace infra.Data.Migrations
                 column: "ChecklistHRId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CheckListItemHRs_ChecklistHRId1",
-                table: "CheckListItemHRs",
-                column: "ChecklistHRId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Connections_GroupName",
                 table: "Connections",
                 column: "GroupName");
@@ -1087,6 +1165,11 @@ namespace infra.Data.Migrations
                 column: "OrderItemId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CVRefs_OrderItemId1",
+                table: "CVRefs",
+                column: "OrderItemId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DeployStages_Sequence",
                 table: "DeployStages",
                 column: "Sequence",
@@ -1099,8 +1182,8 @@ namespace infra.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeHRSkill_EmployeeId_CategoryId_IndustryId",
-                table: "EmployeeHRSkill",
+                name: "IX_EmployeeHRSkills_EmployeeId_CategoryId_IndustryId",
+                table: "EmployeeHRSkills",
                 columns: new[] { "EmployeeId", "CategoryId", "IndustryId" },
                 unique: true);
 
@@ -1111,10 +1194,15 @@ namespace infra.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_EmployeeQualification_EmployeeId_QualificationId",
-                table: "EmployeeQualification",
+                name: "IX_EmployeeQualifications_EmployeeId_QualificationId",
+                table: "EmployeeQualifications",
                 columns: new[] { "EmployeeId", "QualificationId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EntityAddress_CandidateId",
+                table: "EntityAddress",
+                column: "CandidateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Industries_Name",
@@ -1140,7 +1228,8 @@ namespace infra.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_CategoryId",
                 table: "OrderItems",
-                column: "CategoryId");
+                column: "CategoryId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
@@ -1151,6 +1240,11 @@ namespace infra.Data.Migrations
                 name: "IX_Orders_CustomerId",
                 table: "Orders",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_OrderAddress_OrderId1",
+                table: "Orders",
+                column: "OrderAddress_OrderId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Qualifications_Name",
@@ -1230,20 +1324,9 @@ namespace infra.Data.Migrations
                 column: "CandidateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserAttachments_CandidateId1",
-                table: "UserAttachments",
-                column: "CandidateId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserExps_CandidateId",
                 table: "UserExps",
                 column: "CandidateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserExps_Employer",
-                table: "UserExps",
-                column: "Employer",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserPassports_CandidateId",
@@ -1264,9 +1347,9 @@ namespace infra.Data.Migrations
                 filter: "[IsValid]=1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserPhones_CandidateId1",
+                name: "IX_UserPhones_EmployeeId",
                 table: "UserPhones",
-                column: "CandidateId1");
+                column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserPhones_PhoneNo",
@@ -1326,16 +1409,22 @@ namespace infra.Data.Migrations
                 name: "CVDeploys");
 
             migrationBuilder.DropTable(
-                name: "EmployeeHRSkill");
+                name: "EmployeeHRSkills");
 
             migrationBuilder.DropTable(
                 name: "EmployeeOtherSkills");
 
             migrationBuilder.DropTable(
-                name: "EmployeeQualification");
+                name: "EmployeeQualifications");
+
+            migrationBuilder.DropTable(
+                name: "EntityAddress");
 
             migrationBuilder.DropTable(
                 name: "Industries");
+
+            migrationBuilder.DropTable(
+                name: "JobDescriptions");
 
             migrationBuilder.DropTable(
                 name: "Messages");
@@ -1345,6 +1434,9 @@ namespace infra.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Qualifications");
+
+            migrationBuilder.DropTable(
+                name: "Remunerations");
 
             migrationBuilder.DropTable(
                 name: "ReviewItemDatas");

@@ -1,29 +1,34 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace core.Entities.Users
 {
-    public class UserPhone
+    public class UserPhone: BaseEntity
     {
         public UserPhone()
         {
         }
+        
+        public UserPhone(string phoneNo, string mobileNo, bool isMain)
+        {
+            PhoneNo = phoneNo;
+            MobileNo = mobileNo;
+            IsMain = isMain;
+        }
 
-        public UserPhone(int candidateId, string phoneNo, bool isMain, bool isValid)
+        public UserPhone(int candidateId, string phoneNo, string mobileNo, bool isMain)
         {
             PhoneNo = phoneNo;
             IsMain = isMain;
-            IsValid = isValid;
+            MobileNo=mobileNo;
             CandidateId = candidateId;
         }
 
         public int CandidateId { get; set; }
-        public int Id { get; set; }
-        [Required]
         public string PhoneNo { get; set; }
-        [Required]
-        public bool IsMain {get; set;}
+        public string MobileNo { get; set; }
+        public bool IsMain {get; set;}=false;
         public bool IsValid { get; set; }=true;
-
-        public Candidate Candidate {get; set;}
+        //public Candidate Candidate {get; set;}
     }
 }

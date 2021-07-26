@@ -11,10 +11,9 @@ namespace infra.Data.Config
           public void Configure(EntityTypeBuilder<UserExp> builder)
           {
                builder.Property(p => p.PositionId).IsRequired();
-               builder.HasIndex(p => p.Employer).IsUnique();
                builder.Property(x => x.WorkedFrom).IsRequired();
                builder.Property(x => x.WorkedUpto).IsRequired();
-               builder.HasOne(p => p.Candidate).WithMany().HasForeignKey(p => p.CandidateId);
+               //builder.HasOne(p => p.Candidate).WithMany().HasForeignKey(p => p.CandidateId);
           }
      }
 }

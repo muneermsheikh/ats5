@@ -18,8 +18,15 @@ namespace api.Extensions
                 services.AddScoped<ICategoryRepository, CategoryRepository>();
                 //services.AddScoped<IMessageRepository, MessageRepository>();
                 services.AddScoped<IUnitOfWork, UnitOfWork>();
-                //services.AddScoped<IOrderService, OrderService>();
+                services.AddScoped<IOrderService, OrderService>();
                 services.AddScoped<IUserService, UserService>();
+                services.AddScoped<ICustomerService, CustomerService>();
+                services.AddScoped<IMastersService, MastersService>();
+                services.AddScoped<IEmployeeService, EmployeeService>();
+                services.AddScoped<IOrderAssessmentService, OrderAssessmentService>();
+                services.AddScoped<ICandidateAssessmentService, CandidateAssessmentService>();
+                services.AddScoped<ICVRefService, CVRefService>();
+                services.AddScoped<IContractReviewService, ContractReviewService>();
                 /*
                 services.AddScoped<IPaymentService, PaymentService>();
                 

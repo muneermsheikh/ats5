@@ -13,7 +13,7 @@ namespace infra.Data.Config
             builder.Property(x => x.SrNo).IsRequired();
             builder.Property(x => x.Parameter).IsRequired().HasMaxLength(200);            
 
-            builder.HasOne(p => p.ChecklistHR).WithMany().HasForeignKey(p => p.ChecklistHRId);
+            //builder.HasOne(p => p.ChecklistHR).WithMany().HasForeignKey(p => p.ChecklistHRId);
         }
      }
 }
