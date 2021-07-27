@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using core.Entities.HR;
 using core.Entities.Orders;
 using core.Interfaces;
+using core.ParamsAndDtos;
 using infra.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,17 +21,23 @@ namespace infra.Services
                _unitOfWork = unitOfWork;
           }
 
-          public async Task<CandidateAssessment> AssessNewCandidate(int candidateId, int orderItemId, int loggedInUserId, DateTime dateAssessed)
+          public async Task<CandidateAssessment> AssessNewCandidate(CandidateAssessmentParams candParams)
           {
+                var orderItemId = candParams.OrderDetailId;
+                var candidateId = candParams.CandidateId;
+                var loggedInIdentityUserId = candParams.LoggedInIdentityUserId;
+                var dateAssessed = candParams.DateAssessed;
+                var loggedInUserId = await _context.Employees.Where(x => x.AppUserId == loggedInIdentityUserId).Select(x => x.Id).FirstOrDefaultAsync();
+                
                 var itemassessment = await _context.OrderItemAssessments
-                    .Where(x => x.OrderItemId == orderItemId)
+                    .Where(x => x.OrderItemId == candParams.OrderDetailId)
                     .Include(x => x.OrderItemAssessmentQs.OrderBy(x => x.QuestionNo))
                     .FirstOrDefaultAsync();
                 if (itemassessment == null) throw new System.Exception("Order Category assessment parameters not defined");
 
                 //check if the assessment already exists
                 var candassessment = await _context.CandidateAssessments
-                    .Where(x => x.CandidateId == candidateId && x.OrderItemId == orderItemId)
+                    .Where(x => x.CandidateId == candParams.CandidateId && x.OrderItemId == orderItemId)
                     .FirstOrDefaultAsync();
                 
                 if (candassessment != null) return candassessment;
@@ -61,6 +68,11 @@ namespace infra.Services
                _unitOfWork.Repository<CandidateAssessment>().Delete(candidateAssessment);
                return await _unitOfWork.Complete() > 0;
           }
+          public async Task<bool> DeleteCandidateAssessmentItem(CandidateAssessmentItem assessmentItem)
+          {
+              _unitOfWork.Repository<CandidateAssessmentItem>().Delete(assessmentItem);
+              return await _unitOfWork.Complete() > 0;
+          }
 
           public async Task<bool> EditCandidateAssessment(CandidateAssessment candidateAssessment)
           {
@@ -70,6 +82,15 @@ namespace infra.Services
                    _unitOfWork.Repository<CandidateAssessmentItem>().Update(item);
                }
                return (await _unitOfWork.Complete() > 0);
+          }
+
+          public async Task<CandidateAssessment> GetCandidateAssessment(int candidateId, int orderItemId)
+          {
+              return await _context.CandidateAssessments
+                .Where(x => x.CandidateId == candidateId && x.OrderItemId == orderItemId)
+                .Include(x => x.CandidateAssessmentItems.OrderBy(x => x.QuestionNo))
+                .FirstOrDefaultAsync();
+            
           }
 
      }

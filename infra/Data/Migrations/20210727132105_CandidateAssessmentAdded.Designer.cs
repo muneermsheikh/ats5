@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using infra.Data;
 
 namespace infra.Data.Migrations
 {
     [DbContext(typeof(ATSContext))]
-    partial class ATSContextModelSnapshot : ModelSnapshot
+    [Migration("20210727132105_CandidateAssessmentAdded")]
+    partial class CandidateAssessmentAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -341,6 +343,12 @@ namespace infra.Data.Migrations
                     b.Property<int>("OrderItemId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("OrderItemId1")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderItemId2")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("PaymentIntentId")
                         .HasColumnType("TEXT");
 
@@ -356,6 +364,8 @@ namespace infra.Data.Migrations
                     b.HasIndex("DeployStageId");
 
                     b.HasIndex("OrderItemId");
+
+                    b.HasIndex("OrderItemId1");
 
                     b.HasIndex("CandidateId", "OrderItemId")
                         .IsUnique();
@@ -1141,9 +1151,6 @@ namespace infra.Data.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("OrderItemId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
@@ -1170,8 +1177,6 @@ namespace infra.Data.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("OrderId");
-
-                    b.HasIndex("OrderItemId");
 
                     b.ToTable("OrderItems");
                 });
@@ -1385,9 +1390,6 @@ namespace infra.Data.Migrations
                     b.Property<int>("ApplicationNo")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CVRefId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("CandidateStatus")
                         .HasColumnType("TEXT");
 
@@ -1451,8 +1453,6 @@ namespace infra.Data.Migrations
                     b.HasIndex("ApplicationNo")
                         .IsUnique()
                         .HasFilter("[ApplicationNo] > 0");
-
-                    b.HasIndex("CVRefId");
 
                     b.ToTable("Candidates");
                 });
@@ -1847,17 +1847,33 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.HR.CVRef", b =>
                 {
+                    b.HasOne("core.Entities.Users.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("core.Entities.MasterEntities.DeployStage", "DeployStage")
                         .WithMany()
                         .HasForeignKey("DeployStageId");
 
-                    b.HasOne("core.Entities.Orders.OrderItem", null)
-                        .WithMany("CVRefs")
+                    b.HasOne("core.Entities.Orders.OrderItem", "OrderItem")
+                        .WithMany()
                         .HasForeignKey("OrderItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("core.Entities.Orders.OrderItem", null)
+                        .WithMany("CVRefs")
+                        .HasForeignKey("OrderItemId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
                     b.Navigation("DeployStage");
+
+                    b.Navigation("OrderItem");
                 });
 
             modelBuilder.Entity("core.Entities.HR.CandidateAssessment", b =>
@@ -2050,11 +2066,6 @@ namespace infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("core.Entities.HR.CVRef", null)
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderItemId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.OwnsOne("core.Entities.Orders.JobDescription", "JobDescription", b1 =>
                         {
                             b1.Property<int>("OrderItemId")
@@ -2190,14 +2201,6 @@ namespace infra.Data.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("core.Entities.Users.Candidate", b =>
-                {
-                    b.HasOne("core.Entities.HR.CVRef", null)
-                        .WithMany("Candidates")
-                        .HasForeignKey("CVRefId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
             modelBuilder.Entity("core.Entities.Users.EntityAddress", b =>
                 {
                     b.HasOne("core.Entities.Users.Candidate", null)
@@ -2287,11 +2290,7 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.HR.CVRef", b =>
                 {
-                    b.Navigation("Candidates");
-
                     b.Navigation("Deploys");
-
-                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("core.Entities.HR.CandidateAssessment", b =>

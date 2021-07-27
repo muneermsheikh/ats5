@@ -67,7 +67,8 @@ namespace infra.Data
           public DbSet<ReviewItemData> ReviewItemDatas{get; set;}
 
       //Process
-          public DbSet<CVDeploy> CVDeploys {get; set;}
+          public DbSet<Deploy> Deploys {get; set;}
+          public DbSet<DeployStatus> DeployStatus {get; set;}
           
      //Tasks
           public DbSet<Task> Tasks {get; set;}

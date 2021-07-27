@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using infra.Data;
 
 namespace infra.Data.Migrations
 {
     [DbContext(typeof(ATSContext))]
-    partial class ATSContextModelSnapshot : ModelSnapshot
+    [Migration("20210727163334_CVRefNavigationsAdded")]
+    partial class CVRefNavigationsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

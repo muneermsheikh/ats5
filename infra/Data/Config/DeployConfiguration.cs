@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace infra.Data.Config
 {
-     public class CVDeployConfiguration : IEntityTypeConfiguration<CVDeploy>
+     public class DeployConfiguration : IEntityTypeConfiguration<Deploy>
      {
-        public void Configure(EntityTypeBuilder<CVDeploy> builder)
+        public void Configure(EntityTypeBuilder<Deploy> builder)
         {
             builder.HasIndex(x => x.CVRefId);
             builder.Property(x => x.TransactionDate).IsRequired();

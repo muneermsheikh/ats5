@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using core.Entities.Orders;
 
 namespace core.Entities.HR
@@ -20,11 +21,14 @@ namespace core.Entities.HR
                CandidateAssessmentItems = candidateassessmentitems;
           }
 
+        [Required]
         public int OrderItemId { get; set; }
         public int AssessedById { get; set; }
+        [Required]
         public int CandidateId {get; set;}
         public DateTime AssessedOn { get; set; }
-        public string AssessResult { get; set; }
+        [Required]
+        public EnumCandidateAssessmentResult AssessResult { get; set; }
         public string Remarks { get; set; }
         public OrderItem OrderItem { get; set; }
         public ICollection<CandidateAssessmentItem> CandidateAssessmentItems { get; set; }

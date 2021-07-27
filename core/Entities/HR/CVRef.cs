@@ -31,10 +31,10 @@ namespace core.Entities.HR
         public EnumCVRefStatus RefStatus { get; set; }=EnumCVRefStatus.Referred;
         public DeployStage DeployStage {get; set;}
         public DateTime? DeployStageDate {get; set;}
-        public Candidate Candidate {get; set;}
+        public ICollection<Candidate> Candidates {get; set;}
         [ForeignKey("OrderItemId")]
-        public OrderItem OrderItem { get; set; }
-        public ICollection<CVDeploy> Deploys {get; set;}
+        public ICollection<OrderItem> OrderItems { get; set; }
+        public ICollection<Deploy> Deploys {get; set;}
         
     }
 }

@@ -17,6 +17,8 @@ namespace api.Helpers
                CreateMap<Customer, CustomerTypeNameKnownAsOfficialsToReturnDto>();
                CreateMap<Customer, CustomerDto>();
                CreateMap<CVRef, CVRefDto>();
+               CreateMap<CVRef, CVRefAndDeployDto>();
+                    //.ForMember(d => d.PictureUrl, o => o.MapFrom<ProductUrlResolver>());
                CreateMap<OrderItem, OrderItemDto>();
                CreateMap<Order, OrderToReturnDto>();
                CreateMap<RegisterDto, Candidate>()

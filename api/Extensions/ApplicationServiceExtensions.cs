@@ -27,6 +27,7 @@ namespace api.Extensions
                 services.AddScoped<ICandidateAssessmentService, CandidateAssessmentService>();
                 services.AddScoped<ICVRefService, CVRefService>();
                 services.AddScoped<IContractReviewService, ContractReviewService>();
+                services.AddScoped<IDeployService, DeployService>();
                 /*
                 services.AddScoped<IPaymentService, PaymentService>();
                 

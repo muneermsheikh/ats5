@@ -13,9 +13,28 @@ namespace api.Extensions
             return user.FindFirst(ClaimTypes.Name)?.Value;
         }
 
+    /*
         public static int GetUserId(this ClaimsPrincipal user)
         {
             return int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
         }
+    */
+        public static string GetIdentityUserId(this ClaimsPrincipal user)
+        {
+            //var id = user.FindFirst("Id").Value;
+            var x = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        }
+
+        public static string GetIdentityUserEmailId(this ClaimsPrincipal user)
+        {
+            return user.FindFirst(ClaimTypes.Email)?.Value;
+        }
+        public static bool IsUserAuthenticated(this ClaimsPrincipal user)
+        {
+            return user.Identity.IsAuthenticated;
+        }
+
     }
 }
