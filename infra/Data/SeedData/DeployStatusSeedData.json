@@ -1,0 +1,21 @@
+[
+     {"StageId": 1000, "StatusName": "Selected", "NextStageId": 1100, "WorkingDaysReqdForNextStage": 8},
+     {"StageId": 1100, "StatusName": "Referred for medical tests", "NextStageId": 1100, "WorkingDaysReqdForNextStage": 2},
+     {"StageId": 1200, "StatusName": "Medically Unfit", "NextStageId": 10000},
+     {"StageId": 1300, "StatusName": "Medically Fit", "NextStageId": 1400, "WorkingDaysReqdForNextStage": 3},
+     {"StageId": 1400, "StatusName": "Visa Documents Preapred", "NextStageId": 1500, "WorkingDaysReqdForNextStage": 3},
+     {"StageId": 1500, "StatusName": "Visa Documents Submitted", "NextStageId": 1600, "WorkingDaysReqdForNextStage": 2},
+     {"StageId": 1600, "StatusName": "Visa Query Received", "NextStageId": 1800, "WorkingDaysReqdForNextStage": 3},
+     {"StageId": 1700, "StatusName": "Visa Denied", "NextStageId": 10000},
+     {"StageId": 1800, "StatusName": "Visa Issued", "NextStageId": 1900, "WorkingDaysReqdForNextStage": 2},
+     {"StageId": 1900, "StatusName": "Emigration Docs Lodged Online", "NextStageId": 2000, "WorkingDaysReqdForNextStage": 2},
+     {"StageId": 2000, "StatusName": "Emigration Query Received", "NextStageId": 1900, "WorkingDaysReqdForNextStage": 2},
+     {"StageId": 2100, "StatusName": "Emigration Docs submitted", "NextStageId": 2300, "WorkingDaysReqdForNextStage": 3},
+     {"StageId": 2200, "StatusName": "Emigration Denied", "NextStageId": 10000},
+     {"StageId": 2300, "StatusName": "Emigration Granted", "NextStageId": 2400, "WorkingDaysReqdForNextStage": 8},
+     {"StageId": 2400, "StatusName": "Travel ticket booked", "NextStageId": 2600},
+     {"StageId": 2500, "StatusName": "Travel Canceled", "NextStageId": 10000},
+     {"StageId": 2600, "StatusName": "Traveled", "NextStageId": 2700, "WorkingDaysReqdForNextStage": 2},
+     {"StageId": 2700, "StatusName": "Arrival acknowledged by Client", "NextStageId": 10000},
+     {"StageId": 10000, "StatusName": "Concluded", "NextStageId": 0}
+]

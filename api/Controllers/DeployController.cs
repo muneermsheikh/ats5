@@ -1,21 +1,32 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using api.Errors;
 using core.Entities.HR;
 using core.Entities.Process;
 using core.Interfaces;
+using core.ParamsAndDtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
      public class DeployController : BaseApiController
      {
-          private readonly IDeployService _deployService;
-          public DeployController(IDeployService deployService)
-          {
-               _deployService = deployService;
-          }
-        [HttpGet("{orderItemId")]
+        private readonly IDeployService _deployService;
+        public DeployController(IDeployService deployService)
+        {
+            _deployService = deployService;
+        }
+        
+        [HttpGet("pending")]
+        public async Task<ActionResult<Pagination<CommonDataDto>>> GetPendingDeployments (DeploymentParams depParams)
+        {
+            var pendings = await _deployService.GetPendingDeployments();
+            return Ok(new Pagination<CommonDataDto>(depParams.PageIndex,
+               depParams.PageSize, pendings.Count(), pendings));
+        }
+        
+        [HttpGet("{orderItemId}")]
         public async Task<ActionResult<ICollection<CVRef>>> GetDeploymentsOfOrderItemId(int orderItemId)
         {
             var cvrefs = await _deployService.GetDeploymentsOfOrderItemId(orderItemId);
@@ -31,7 +42,7 @@ namespace api.Controllers
             return NotFound(new ApiResponse(404, "No referrals exist for the selected candidate"));
         }
         
-        [HttpGet("deploybyid/{cvrefid}")]
+        [HttpGet("bycvrefid/{cvrefid}")]
         public async Task<ActionResult<CVRef>> GetDeploymentsById(int cvrefid)
         {
             var cvref = await _deployService.GetDeploymentsById(cvrefid);

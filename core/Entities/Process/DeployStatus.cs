@@ -3,10 +3,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace core.Entities.Process
 {
-    public class DeployStatus
+    public class DeployStatus: BaseEntity
     {
-        public int Id { get; set; }
+        [Required]
+        public int StageId { get; set; }
         [Required]
         public string StatusName { get; set; }
+        [Required]
+        public int NextStageId {get; set;}
+        public int WorkingDaysReqdForNextStage { get; set; }
     }
 }

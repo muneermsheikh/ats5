@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using core.Entities.HR;
+using core.Entities.Process;
 
 namespace core.ParamsAndDtos
 {
@@ -10,7 +11,7 @@ namespace core.ParamsAndDtos
         public int OrderItemId { get; set; }
         public int ApplicationNo { get; set; }
         public string CandidateName {get; set;}
-        public string OrderNoAndCustomerName {get; set;}
+        public string OrderNo {get; set;}
         public string CategoryName {get; set;}
         public DateTime ReferredOn { get; set; } = DateTime.Now;
         public EnumCVRefStatus RefStatus { get; set; }

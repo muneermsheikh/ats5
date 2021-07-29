@@ -37,13 +37,15 @@ namespace infra.Data
           public DbSet<ChecklistItemHR> CheckListItemHRs {get; set;}
           public DbSet<CVRef> CVRefs {get; set;}
           public DbSet<CVRefRestriction> CVRefRestrictions {get; set;}
+          public DbSet<SelectionDecision> SelectionDecisions {get; set;}
+          public DbSet<Employment> Employments {get; set;}
      
        // masters
           //public DbSet<core.Entities.Users.Address> Addresses {get; set;}
           public DbSet<AssessmentQBank> AssessmentQsBank { get; set; }
           public DbSet<Category> Categories {get; set;}
           public DbSet<ChecklistHRData> ChecklistHRDatas {get; set;}
-          public DbSet<DeployStage> DeployStages {get; set;}
+          //public DbSet<DeployStage> DeployStages {get; set;}
           public DbSet<Employee> Employees {get; set;}
           public DbSet<EmployeeQualification> EmployeeQualifications {get; set;}
           public DbSet<EmployeeHRSkill> EmployeeHRSkills {get; set;}
@@ -55,6 +57,8 @@ namespace infra.Data
           public DbSet<ReviewItemStatus> ReviewItemStatuses {get; set;}
           public DbSet<ReviewStatus> ReviewStatuses {get; set;}
           public DbSet<SkillData> SkillDatas {get; set;}
+          public DbSet<SelectionStatus> SelectionStatuses {get; set;}
+          
           
      ///orders
           

@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace core.Entities.HR
+namespace core.Entities.Process
 {
     public enum EnumDeployStatus
     {

@@ -9,6 +9,7 @@ using core.Entities.Admin;
 using core.Entities.HR;
 using core.Entities.MasterEntities;
 using core.Entities.Orders;
+using core.Entities.Process;
 using core.Entities.Users;
 using Microsoft.Extensions.Logging;
 
@@ -65,6 +66,15 @@ namespace infra.Data
                     await context.SaveChangesAsync();
                 }
 
+                if(!context.SelectionStatuses.Any()) {
+                    var jsonData = File.ReadAllText("../infra/data/SeedData/SelectionStatusSeedData.json");
+                    var fileData = JsonSerializer.Deserialize<List<SelectionStatus>>(jsonData);
+                    foreach(var item in fileData) {
+                        context.SelectionStatuses.Add(item);
+                    }
+                    await context.SaveChangesAsync();
+                }
+
                 if(!context.ReviewItemDatas.Any()) {
                     var jsonData = File.ReadAllText("../infra/data/SeedData/ReviewItemDataSeedData.json");
                     var fileData = JsonSerializer.Deserialize<List<ReviewItemData>>(jsonData);
@@ -92,11 +102,11 @@ namespace infra.Data
                     await context.SaveChangesAsync();
                 }
 
-                if(!context.DeployStages.Any()) {
-                    var jsonData = File.ReadAllText("../infra/data/SeedData/DeployStageSeedData.json");
-                    var fileData = JsonSerializer.Deserialize<List<DeployStage>>(jsonData);
+                if(!context.DeployStatus.Any()) {
+                    var jsonData = File.ReadAllText("../infra/data/SeedData/DeployStatusSeedData.json");
+                    var fileData = JsonSerializer.Deserialize<List<DeployStatus>>(jsonData);
                     foreach(var item in fileData) {
-                        context.DeployStages.Add(item);
+                        context.DeployStatus.Add(item);
                     }
                     await context.SaveChangesAsync();
                 }

@@ -8,6 +8,7 @@ namespace core.Interfaces
 {
     public interface IDeployService
     {
+        Task<IReadOnlyList<CommonDataDto>> GetPendingDeployments();
         Task<ICollection<CVRef>> GetDeploymentsOfOrderItemId(int orderItemId);
         Task<ICollection<CVRef>> GetDeploymentsOfACandidate(int candidateId);
         Task<CVRef> GetDeploymentsById(int cvrefid);

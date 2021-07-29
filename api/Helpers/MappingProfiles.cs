@@ -19,6 +19,8 @@ namespace api.Helpers
                CreateMap<CVRef, CVRefDto>();
                CreateMap<CVRef, CVRefAndDeployDto>();
                     //.ForMember(d => d.PictureUrl, o => o.MapFrom<ProductUrlResolver>());
+               CreateMap<CVRef, CVRefPostedDto>();
+               CreateMap<CVRef, SelectionsPendingDto>();
                CreateMap<OrderItem, OrderItemDto>();
                CreateMap<Order, OrderToReturnDto>();
                CreateMap<RegisterDto, Candidate>()
@@ -29,7 +31,7 @@ namespace api.Helpers
                     .ForMember(d => d.DOB, o => o.MapFrom(s => s.Address.DOB))
                     ;
                CreateMap<Address, EntityAddress>();
-               
+               CreateMap<SelectionDecision, SelectionDecisionToRegisterDto>();
           }
      }
 }

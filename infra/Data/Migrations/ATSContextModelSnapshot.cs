@@ -326,11 +326,26 @@ namespace infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ApplicationNo")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("CandidateId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("CandidateName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Charges")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("DeployStageDate")
                         .HasColumnType("TEXT");
@@ -338,7 +353,13 @@ namespace infra.Data.Migrations
                     b.Property<int?>("DeployStageId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("OrderItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderNo")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PaymentIntentId")
@@ -535,6 +556,70 @@ namespace infra.Data.Migrations
                     b.HasIndex("ChecklistHRId");
 
                     b.ToTable("CheckListItemHRs");
+                });
+
+            modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ApplicationNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CVRefId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CandidateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CandidateName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SelectionStatusId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CVRefId")
+                        .IsUnique();
+
+                    b.ToTable("SelectionDecisions");
+                });
+
+            modelBuilder.Entity("core.Entities.HR.SelectionStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DecisionType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SelectionStatuses");
                 });
 
             modelBuilder.Entity("core.Entities.Identity.Address", b =>
@@ -810,7 +895,7 @@ namespace infra.Data.Migrations
                     b.HasIndex("Status")
                         .IsUnique();
 
-                    b.ToTable("DeployStages");
+                    b.ToTable("DeployStage");
                 });
 
             modelBuilder.Entity("core.Entities.MasterEntities.Qualification", b =>
@@ -1242,7 +1327,7 @@ namespace infra.Data.Migrations
                     b.ToTable("OrderItemAssessmentQs");
                 });
 
-            modelBuilder.Entity("core.Entities.Process.CVDeploy", b =>
+            modelBuilder.Entity("core.Entities.Process.Deploy", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1251,19 +1336,16 @@ namespace infra.Data.Migrations
                     b.Property<int>("CVRefId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CVRefId1")
+                    b.Property<int?>("CVRefId1")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CVRefId2")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("DeployStageId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("NextDeployStageEstimatedDate")
+                    b.Property<DateTime>("NextEstimatedStatusDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("NextDeployStageId")
+                    b.Property<int>("NextStatusId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("StatusId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("TransactionDate")
@@ -1275,7 +1357,35 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("CVRefId1");
 
-                    b.ToTable("CVDeploys");
+                    b.ToTable("Deploys");
+                });
+
+            modelBuilder.Entity("core.Entities.Process.DeployStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NextStageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("StageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("StatusName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("WorkingDaysReqdForNextStage")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StatusName")
+                        .IsUnique();
+
+                    b.ToTable("DeployStatus");
                 });
 
             modelBuilder.Entity("core.Entities.Tasks.Task", b =>
@@ -1908,6 +2018,17 @@ namespace infra.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
+                {
+                    b.HasOne("core.Entities.HR.CVRef", "CVRef")
+                        .WithOne()
+                        .HasForeignKey("core.Entities.HR.SelectionDecision", "CVRefId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CVRef");
+                });
+
             modelBuilder.Entity("core.Entities.Identity.Address", b =>
                 {
                     b.HasOne("core.Entities.Identity.AppUser", "AppUser")
@@ -2158,19 +2279,17 @@ namespace infra.Data.Migrations
                         .HasForeignKey("OrderItemAssessmentId");
                 });
 
-            modelBuilder.Entity("core.Entities.Process.CVDeploy", b =>
+            modelBuilder.Entity("core.Entities.Process.Deploy", b =>
                 {
                     b.HasOne("core.Entities.HR.CVRef", "CVRef")
                         .WithMany()
                         .HasForeignKey("CVRefId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("core.Entities.HR.CVRef", null)
                         .WithMany("Deploys")
-                        .HasForeignKey("CVRefId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CVRefId1");
 
                     b.Navigation("CVRef");
                 });
