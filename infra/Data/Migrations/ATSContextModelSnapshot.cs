@@ -45,11 +45,12 @@ namespace infra.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("AadharNo")
-                        .IsRequired()
-                        .HasMaxLength(12)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Add")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Address2")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("AppUserId")
@@ -58,7 +59,13 @@ namespace infra.Data.Migrations
                     b.Property<string>("City")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Country")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DOB")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DOJ")
@@ -69,13 +76,42 @@ namespace infra.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("LastActive")
+                    b.Property<string>("Email")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FamilyName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("KnownAs")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastActive")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("LastWorkingDay")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Nationality")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PlaceOfBirth")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Remarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SecondName")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
@@ -558,6 +594,113 @@ namespace infra.Data.Migrations
                     b.ToTable("CheckListItemHRs");
                 });
 
+            modelBuilder.Entity("core.Entities.HR.Employment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ApplicationNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CVRefId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CandidateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CandidateName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Charges")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ContractPeriodInMonths")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("FoodAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("FoodProvidedFree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("HousingAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("HousingProvidedFree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LeaveAirfareEntitlementAfterMonths")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LeavePerYearInDays")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("OfferAcceptanceUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("OfferAcceptedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OfferAttachmentUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OtherAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Salary")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SalaryCurrency")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SelectedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SelectionDecisionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TransportAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("TransportProvidedFree")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CVRefId")
+                        .IsUnique();
+
+                    b.HasIndex("SelectionDecisionId")
+                        .IsUnique();
+
+                    b.ToTable("Employments");
+                });
+
             modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
                 {
                     b.Property<int>("Id")
@@ -582,6 +725,9 @@ namespace infra.Data.Migrations
                     b.Property<string>("CategoryName")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("EmploymentId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("INTEGER");
 
@@ -600,6 +746,9 @@ namespace infra.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CVRefId")
+                        .IsUnique();
+
+                    b.HasIndex("EmploymentId")
                         .IsUnique();
 
                     b.ToTable("SelectionDecisions");
@@ -1112,6 +1261,51 @@ namespace infra.Data.Migrations
                     b.ToTable("ContractReviewItems");
                 });
 
+            modelBuilder.Entity("core.Entities.Orders.JobDescription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ExpDesiredMax")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ExpDesiredMin")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("JobDescInBrief")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaxAge")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MinAge")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("OrderItemId1")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("QualificationDesired")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderItemId1");
+
+                    b.ToTable("JobDescriptions");
+                });
+
             modelBuilder.Entity("core.Entities.Orders.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -1133,6 +1327,9 @@ namespace infra.Data.Migrations
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("EstimatedRevenue")
                         .HasColumnType("INTEGER");
@@ -1217,6 +1414,9 @@ namespace infra.Data.Migrations
                     b.Property<string>("IndustryName")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("JobDescriptionId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("MaxCVs")
                         .HasColumnType("INTEGER");
 
@@ -1230,6 +1430,9 @@ namespace infra.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("RemunerationId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("RequireAssess")
@@ -1254,9 +1457,15 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("JobDescriptionId")
+                        .IsUnique();
+
                     b.HasIndex("OrderId");
 
                     b.HasIndex("OrderItemId");
+
+                    b.HasIndex("RemunerationId")
+                        .IsUnique();
 
                     b.ToTable("OrderItems");
                 });
@@ -1325,6 +1534,75 @@ namespace infra.Data.Migrations
                     b.HasIndex("OrderItemAssessmentId");
 
                     b.ToTable("OrderItemAssessmentQs");
+                });
+
+            modelBuilder.Entity("core.Entities.Orders.Remuneration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ContractPeriodInMonths")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FoodAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("FoodProvidedFree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("HousingAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("HousingProvidedFree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LeaveAirfareEntitlementAfterMonths")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LeavePerYearInDays")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("OrderItemId1")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OtherAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SalaryCurrency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SalaryMax")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SalaryMin")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TransportAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("TransportProvidedFree")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderItemId1");
+
+                    b.ToTable("Remunerations");
                 });
 
             modelBuilder.Entity("core.Entities.Process.Deploy", b =>
@@ -1567,6 +1845,34 @@ namespace infra.Data.Migrations
                     b.ToTable("Candidates");
                 });
 
+            modelBuilder.Entity("core.Entities.Users.EmployeePhone", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("MobileNo")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNo")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeePhones");
+                });
+
             modelBuilder.Entity("core.Entities.Users.EntityAddress", b =>
                 {
                     b.Property<int>("Id")
@@ -1753,9 +2059,6 @@ namespace infra.Data.Migrations
                     b.Property<int>("CandidateId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<bool>("IsMain")
                         .HasColumnType("INTEGER");
 
@@ -1772,13 +2075,7 @@ namespace infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CandidateId")
-                        .HasFilter("[IsValid]=1");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("PhoneNo")
-                        .IsUnique();
+                    b.HasIndex("CandidateId");
 
                     b.ToTable("UserPhones");
                 });
@@ -1847,67 +2144,6 @@ namespace infra.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("core.Entities.Admin.Employee", b =>
-                {
-                    b.OwnsOne("core.Entities.Admin.Person", "Person", b1 =>
-                        {
-                            b1.Property<int>("EmployeeId")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<string>("AadharNo")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<DateTime>("DOB")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Email")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("FamilyName")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("FirstName")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Gender")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("KnownAs")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("Nationality")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("PlaceOfBirth")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("PpNo")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("SecondName")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("UserName")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("UserType")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.HasKey("EmployeeId");
-
-                            b1.ToTable("Employees");
-
-                            b1.WithOwner()
-                                .HasForeignKey("EmployeeId");
-                        });
-
-                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("core.Entities.Admin.EmployeeHRSkill", b =>
@@ -2018,6 +2254,17 @@ namespace infra.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("core.Entities.HR.Employment", b =>
+                {
+                    b.HasOne("core.Entities.HR.SelectionDecision", "SelectionDecision")
+                        .WithOne()
+                        .HasForeignKey("core.Entities.HR.Employment", "SelectionDecisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SelectionDecision");
+                });
+
             modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
                 {
                     b.HasOne("core.Entities.HR.CVRef", "CVRef")
@@ -2026,7 +2273,15 @@ namespace infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("core.Entities.HR.Employment", "Employment")
+                        .WithOne()
+                        .HasForeignKey("core.Entities.HR.SelectionDecision", "EmploymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("CVRef");
+
+                    b.Navigation("Employment");
                 });
 
             modelBuilder.Entity("core.Entities.Identity.Address", b =>
@@ -2083,6 +2338,15 @@ namespace infra.Data.Migrations
                         .HasForeignKey("core.Entities.Orders.ContractReviewItem", "OrderItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("OrderItem");
+                });
+
+            modelBuilder.Entity("core.Entities.Orders.JobDescription", b =>
+                {
+                    b.HasOne("core.Entities.Orders.OrderItem", "OrderItem")
+                        .WithMany()
+                        .HasForeignKey("OrderItemId1");
 
                     b.Navigation("OrderItem");
                 });
@@ -2165,6 +2429,11 @@ namespace infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("core.Entities.Orders.JobDescription", "JobDescription")
+                        .WithOne()
+                        .HasForeignKey("core.Entities.Orders.OrderItem", "JobDescriptionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("core.Entities.Orders.Order", null)
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
@@ -2176,92 +2445,10 @@ namespace infra.Data.Migrations
                         .HasForeignKey("OrderItemId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsOne("core.Entities.Orders.JobDescription", "JobDescription", b1 =>
-                        {
-                            b1.Property<int>("OrderItemId")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("ExpDesiredMax")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("ExpDesiredMin")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<string>("JobDescInBrief")
-                                .IsRequired()
-                                .HasMaxLength(250)
-                                .HasColumnType("TEXT");
-
-                            b1.Property<int>("MaxAge")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("MinAge")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<string>("QualificationDesired")
-                                .HasColumnType("TEXT");
-
-                            b1.HasKey("OrderItemId");
-
-                            b1.ToTable("JobDescriptions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("OrderItemId");
-                        });
-
-                    b.OwnsOne("core.Entities.Orders.Remuneration", "Remuneration", b1 =>
-                        {
-                            b1.Property<int>("OrderItemId")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("ContractPeriodInMonths")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("FoodAllowance")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<bool>("FoodProvidedFree")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("HousingAllowance")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<bool>("HousingProvidedFree")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("LeaveAirfareEntitlementAfterMonths")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("LeavePerYearInDays")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("OtherAllowance")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<string>("SalaryCurrency")
-                                .IsRequired()
-                                .HasMaxLength(3)
-                                .HasColumnType("TEXT");
-
-                            b1.Property<int>("SalaryMax")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("SalaryMin")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<int>("TransportAllowance")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<bool>("TransportProvidedFree")
-                                .HasColumnType("INTEGER");
-
-                            b1.HasKey("OrderItemId");
-
-                            b1.ToTable("Remunerations");
-
-                            b1.WithOwner()
-                                .HasForeignKey("OrderItemId");
-                        });
+                    b.HasOne("core.Entities.Orders.Remuneration", "Remuneration")
+                        .WithOne()
+                        .HasForeignKey("core.Entities.Orders.OrderItem", "RemunerationId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Assigned");
 
@@ -2277,6 +2464,15 @@ namespace infra.Data.Migrations
                     b.HasOne("core.Entities.Orders.OrderItemAssessment", null)
                         .WithMany("OrderItemAssessmentQs")
                         .HasForeignKey("OrderItemAssessmentId");
+                });
+
+            modelBuilder.Entity("core.Entities.Orders.Remuneration", b =>
+                {
+                    b.HasOne("core.Entities.Orders.OrderItem", "OrderItem")
+                        .WithMany()
+                        .HasForeignKey("OrderItemId1");
+
+                    b.Navigation("OrderItem");
                 });
 
             modelBuilder.Entity("core.Entities.Process.Deploy", b =>
@@ -2315,6 +2511,15 @@ namespace infra.Data.Migrations
                         .WithMany("Candidates")
                         .HasForeignKey("CVRefId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("core.Entities.Users.EmployeePhone", b =>
+                {
+                    b.HasOne("core.Entities.Admin.Employee", null)
+                        .WithMany("UserPhones")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("core.Entities.Users.EntityAddress", b =>
@@ -2360,10 +2565,6 @@ namespace infra.Data.Migrations
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("core.Entities.Admin.Employee", null)
-                        .WithMany("UserPhones")
-                        .HasForeignKey("EmployeeId");
                 });
 
             modelBuilder.Entity("core.Entities.Users.UserProfession", b =>

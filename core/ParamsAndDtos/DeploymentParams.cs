@@ -1,4 +1,5 @@
 using System;
+using core.Params;
 
 namespace core.ParamsAndDtos
 {

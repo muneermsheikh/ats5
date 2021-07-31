@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using api.Errors;
 using core.Entities.HR;
 using core.Interfaces;
 using core.ParamsAndDtos;
@@ -19,7 +20,7 @@ namespace api.Controllers
           }
 
           [HttpGet]
-          public async Task<ActionResult<Pagination<SelectionDecision>>> GetSelectionDecisions(SelDecisionParams selDecisionParams)
+          public async Task<ActionResult<Pagination<SelectionDecision>>> GetSelectionDecisions(SelDecisionSpecParams selDecisionParams)
           {
                var spec = new SelectionDecisionSpecs(selDecisionParams);
                var specCount = new SelectionDecisionForCountSpecs(selDecisionParams);
@@ -32,9 +33,13 @@ namespace api.Controllers
 
 
           [HttpPost]
-          public async Task<ActionResult<bool>> RegisterSelectionDecisions(ICollection<SelectionDecisionToRegisterDto> dtos)
+          public async Task<ActionResult<IReadOnlyList<SelectionDecision>>> RegisterSelectionDecisions(ICollection<SelectionDecisionToRegisterDto> dtos)
           {
-               return await _service.RegisterSelections(dtos);
+               var decs = await _service.RegisterSelections(dtos);
+
+               if (decs != null) return Ok(decs);
+
+               return BadRequest(new ApiResponse(400, "failed to update the selections"));
           }
 
           [HttpPut]

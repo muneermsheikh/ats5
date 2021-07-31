@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Entities.Orders;
+using core.Params;
 using core.ParamsAndDtos;
 
 namespace core.Interfaces
@@ -8,11 +9,10 @@ namespace core.Interfaces
     public interface IOrderService
         {
             Task<Order> CreateOrderAsync(OrderToCreateDto dto);
-            void EditOrder(Order order);
-            void DeleteOrder(Order order);
-            Task<IReadOnlyList<Order>> GetOrdersForUserAsync(int customerId);
-            Task<IReadOnlyList<Order>> GetOrdersAllAsync();
-            Task<Order> GetOrderByIdAsync(int id);
+            Task<bool> EditOrder(Order order);
+            Task<bool> DeleteOrder(Order order);
+            Task<Pagination<OrderToReturnDto>> GetOrdersAllAsync(OrdersSpecParams orderSpecParams);
+
         //order items
             Task<IReadOnlyList<OrderItem>> GetOrderItemsByOrderIdAsync(int OrderId);
             Task<OrderItem> GetOrderItemByOrderItemIdAsync(int Id);
@@ -20,7 +20,7 @@ namespace core.Interfaces
             void AddOrderItem(OrderItem orderItem);
             void EditOrderItem(OrderItem orderItem);
             bool EditOrderItemWithNavigationObjects(OrderItem modelItem);
-            void DeleteOrderItem (OrderItem orderItem);
+            Task<bool> DeleteOrderItem (OrderItem orderItem);
 
         //Job descriptions
             Task<ICollection<JobDescription>> GetJobDescriptionsByOrderIdAsync(int Id);
@@ -31,11 +31,11 @@ namespace core.Interfaces
             void DeleteJobDescription (JobDescription jobDescription);
 
     // Remuneations
-            Task<RemunerationDto> GetRemunerationsByOrderIdAsync(int Id);
+            Task<IReadOnlyList<Remuneration>> GetRemunerationsByOrderIdAsync(int Id);
             Task<Remuneration> GetRemunerationOfOrderItemAsync(int Id);
             
-            void AddRemuneration(Remuneration remuneration);
-            void EditRemuneration(Remuneration remuneration);
-            void DeleteRemuneration (Remuneration remuneration);
+            Task<Remuneration> AddRemuneration(Remuneration remuneration);
+            Task<bool> EditRemuneration(Remuneration remuneration);
+            Task<bool> DeleteRemuneration (Remuneration remuneration);
     }
 }

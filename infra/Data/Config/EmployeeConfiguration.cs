@@ -19,9 +19,9 @@ namespace infra.Data.Config
             builder.HasMany(s => s.HrSkills).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(s => s.OtherSkills).WithOne().OnDelete(DeleteBehavior.Cascade);
 
+           /*
             builder.OwnsOne(o => o.Person , a => 
                { a.WithOwner(); });
-/*
             builder.OwnsOne(o => o.Address , a => 
                { a.WithOwner(); });
 */

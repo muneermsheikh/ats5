@@ -6,6 +6,7 @@ using api.Helpers;
 using AutoMapper;
 using core.Entities.Orders;
 using core.Interfaces;
+using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
 using Microsoft.AspNetCore.Authorization;
@@ -28,26 +29,12 @@ namespace api.Controllers
 
           
           [HttpGet]
-          public async Task<ActionResult<Pagination<OrderToReturnDto>>> GetOrdersAll(OrderParams orderParams)
+          public async Task<ActionResult<Pagination<OrderToReturnDto>>> GetOrdersAll(OrdersSpecParams orderParams)
           {
-               var spec = new OrdersWithItemsAndOrderingSpecs();
-               var countSpec = new OrdersWithItemsAndOrderingForCountSpecs();
-
-               var totalItems = await _orderRepo.CountAsync(spec);
-               var orders = await _orderRepo.ListAsync(spec);
-
-               var data = _mapper.Map<IReadOnlyList<OrderToReturnDto>>(orders);
-
-               return Ok(new Pagination<OrderToReturnDto>(orderParams.PageIndex,
-                    orderParams.PageSize, totalItems, data));
-          }
-
-          [HttpGet("{id}")]
-          public async Task<ActionResult<OrderToReturnDto>> GetOrderById(int id)
-          {
-               var order = await _orderService.GetOrderByIdAsync(id);
-               if (order == null) return NotFound(new ApiResponse(404));
-               return _mapper.Map<OrderToReturnDto>(order);
+               var orders = await _orderService.GetOrdersAllAsync(orderParams);
+               if (orders == null ) return NotFound (new ApiResponse(400, "No orders found"));
+               
+               return Ok(orders);
           }
 
           [HttpPost]
@@ -57,6 +44,17 @@ namespace api.Controllers
                if (order == null) return BadRequest(new ApiResponse(400, "Problem creating order"));
 
                return Ok(order);
+          }
+
+     //remunerations
+          [HttpPost("remun")]
+          public async Task<ActionResult<Remuneration>> CreateRemuneration(Remuneration remuneration)
+          {
+               var remun = await _orderService.AddRemuneration(remuneration);
+               if (remun == null) return BadRequest(new ApiResponse(400, "failed to save the remuneration detail"));
+
+               //return Ok(_mapper.Map<Remuneration, RemunerationDto>(remun));
+               return Ok(remun);
           }
      }
 }

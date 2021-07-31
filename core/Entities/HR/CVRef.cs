@@ -52,7 +52,7 @@ namespace core.Entities.HR
         [ForeignKey("OrderItemId")]
         public ICollection<OrderItem> OrderItems { get; set; }
         public ICollection<Deploy> Deploys {get; set;}
-        public SelectionDecision SelectionDecision {get; set;}
+        //public virtual SelectionDecision SelectionDecision {get; set;}
         
     }
 }

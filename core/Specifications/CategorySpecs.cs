@@ -2,18 +2,19 @@ using System;
 using System.Linq;
 using core.Entities;
 using core.Entities.Users;
-using core.ParamsAndDtos;
+using core.Params;
 
 namespace core.Specifications
 {
     public class CategorySpecs: BaseSpecification<Category>
     {
-        public CategorySpecs(CategoryParams catParams)
+        public CategorySpecs(CategorySpecParams specParams)
             : base(x => 
-                (string.IsNullOrEmpty(catParams.Search) || 
-                  x.Name.ToLower().Contains(catParams.Search.ToLower())) 
+                (string.IsNullOrEmpty(specParams.CategoryNameLike) || x.Name.ToLower().Contains(specParams.CategoryNameLike.ToLower())) &&
+                (!specParams.CategoryId.HasValue || x.Id == specParams.CategoryId )
                 )
         {
+            ApplyPaging(specParams.PageIndex * (specParams.PageSize - 1), specParams.PageSize);
             AddOrderBy(x => x.Name);
         }
 

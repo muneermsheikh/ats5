@@ -3,6 +3,7 @@ using api.Errors;
 using core.Entities.Admin;
 using core.Entities.Identity;
 using core.Interfaces;
+using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
 using infra.Data;
@@ -28,56 +29,66 @@ namespace api.Controllers
                _empRepo = empRepo;
           }
 
-     [HttpGet]
-     public async Task<ActionResult<Pagination<Employee>>> GetEmployees(EmployeeSpecParams empParams)
-     {
-          var spec = new EmployeeSpecs(empParams);
-          var countSpec = new EmployeeForCountSpecs(empParams);
-
-          var totalItems = await _empRepo.CountAsync(countSpec);
-          var emps = await _empRepo.ListAsync(spec);
-
-          //var data = _mapper.Map<IReadOnlyList<OrderToReturnDto>>(orders);
-
-          return Ok(new Pagination<Employee>(empParams.PageIndex,
-               empParams.PageSize, totalItems, emps));
-     }
-
-     [HttpPut("editEmployee")]
-     public async Task<ActionResult<bool>> EditEmployee(Employee employee)
-     {
-          _empService.EditEmployee(employee);
-
-          if (await _unitOfWork.Complete() > 0)
+          [HttpGet]
+          public async Task<ActionResult<Pagination<Employee>>> GetEmployees(EmployeeSpecParams empParams)
           {
-               //ToDo - edit identityuser details too    
-              /* foreach (var entry in _context.Employees(employee).Properties)
-               {
-                    Console.WriteLine(
-                        $"Property '{entry.Metadata.Name}'" +
-                        $" is {(entry.IsModified ? "modified" : "not modified")} " +
-                        $"Current value: '{entry.CurrentValue}' " +
-                        $"Original value: '{entry.OriginalValue}'");
+               var emps = await _empService.GetEmployeePaginated(empParams);
+               if (emps == null) return NotFound(new ApiResponse(404, "No employees found"));
+               return Ok(emps);
+          }
+
+          [HttpPut]
+          public async Task<ActionResult<bool>> EditEmployee(Employee employee)
+          {
+               var email = employee.Email;
+               if (string.IsNullOrEmpty(email)) return BadRequest(new 
+                    ApiResponse(400, "email Id for employee " + employee.FirstName + " " + employee.SecondName + " " + employee.FamilyName + 
+                    " not provided"));
+               var user = (await _userManager.FindByIdAsync(employee.AppUserId) == null);
+               if (user == false) {
+                    return BadRequest(new ApiResponse(404, "Bad Request - this employee identity is not registered - go for employee add and not edit"));
                }
-               */
-               return Ok();
+               
+               if (await _userManager.FindByEmailAsync(email) != null) {
+                    return !await _empService.EditEmployee(employee);
+               }
+
+               return BadRequest(new ApiResponse(400, "failed to update the employee"));
           }
-          return BadRequest(new ApiResponse(400, "failed to update the employee"));
-     }
 
-     [HttpDelete]
-     public async Task<ActionResult<bool>> DeleteEmployee(Employee employee)
-     {
-          _empService.DeleteEmployee(employee);
-
-          if (await _unitOfWork.Complete() > 0)
+          [HttpDelete]
+          public async Task<ActionResult<bool>> DeleteEmployee(Employee employee)
           {
-               var user = await _userManager.FindByIdAsync(employee.AppUserId);
-               if (user != null) await _userManager.DeleteAsync(user);
-               return Ok();
-          }
+               await _empService.DeleteEmployee(employee);
 
-          return BadRequest(new ApiResponse(400, "Failed to delete the employee"));
+               if (await _unitOfWork.Complete() > 0)
+               {
+                    var user = await _userManager.FindByIdAsync(employee.AppUserId);
+                    if (user != null) await _userManager.DeleteAsync(user);
+                    return Ok();
+               }
+
+               return BadRequest(new ApiResponse(400, "Failed to delete the employee"));
+          }
+     
+          [HttpPost]
+          public async Task<ActionResult<Employee>> AddNewEmployee(Employee employee)
+          {
+               var email = employee.Email;
+               if (string.IsNullOrEmpty(email)) return BadRequest(new 
+                    ApiResponse(400, "email Id for employee " + employee.FirstName + " " + employee.SecondName + " " + employee.FamilyName + 
+                    " not provided"));
+               if (await _userManager.FindByEmailAsync(email) != null)
+               {
+                    return BadRequest(new ApiValidationErrorResponse { Errors = new[] { "Email address " + email + " is in use" } });
+               }
+
+               if(string.IsNullOrEmpty(employee.Password)) {
+                    return BadRequest(new ApiResponse(400, "Password essential"));
+               }
+          
+               return await _empService.AddNewEmployee(employee);
+
+          }
      }
-}
 }

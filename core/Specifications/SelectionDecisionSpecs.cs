@@ -10,23 +10,24 @@ namespace core.Specifications
 {
     public class SelectionDecisionSpecs: BaseSpecification<SelectionDecision>
     {
-        public SelectionDecisionSpecs(SelDecisionParams cParams)
+        public SelectionDecisionSpecs(SelDecisionSpecParams specParams)
             : base(x => 
-                (!cParams.OrderId.HasValue || x.OrderId == cParams.OrderId) &&
-                (!cParams.OrderNo.HasValue || x.OrderNo == cParams.OrderNo) &&
-                (!cParams.OrderItemId.HasValue || x.OrderItemId == cParams.OrderItemId) &&
-                (!cParams.CategoryId.HasValue || x.CategoryId == cParams.CategoryId) &&
-                (string.IsNullOrEmpty(cParams.CategoryName) || x.CategoryName == cParams.CategoryName) &&
-                (!cParams.CVRefId.HasValue || x.CVRefId == cParams.CVRefId) &&
-                (!cParams.CandidateId.HasValue || x.CandidateId == cParams.CandidateId) &&
-                (!cParams.ApplicationNo.HasValue ||  x.ApplicationNo == cParams.ApplicationNo) 
+                (!specParams.OrderId.HasValue || x.OrderId == specParams.OrderId) &&
+                (!specParams.OrderNo.HasValue || x.OrderNo == specParams.OrderNo) &&
+                (!specParams.OrderItemId.HasValue || x.OrderItemId == specParams.OrderItemId) &&
+                (!specParams.CategoryId.HasValue || x.CategoryId == specParams.CategoryId) &&
+                (string.IsNullOrEmpty(specParams.CategoryName) || x.CategoryName == specParams.CategoryName) &&
+                (!specParams.CVRefId.HasValue || x.CVRefId == specParams.CVRefId) &&
+                (!specParams.CandidateId.HasValue || x.CandidateId == specParams.CandidateId) &&
+                (!specParams.ApplicationNo.HasValue ||  x.ApplicationNo == specParams.ApplicationNo)
                 )
         {
+            ApplyPaging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
             AddOrderBy(x => x.OrderId);
             AddOrderBy(x => x.OrderItemId);
         }
 
-        public SelectionDecisionSpecs(int orderItemId) 
+         public SelectionDecisionSpecs(int orderItemId) 
             : base(x => x.OrderItemId == orderItemId)
         {
         }

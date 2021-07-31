@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using core.Entities;
 using core.Entities.Users;
+using core.Params;
 
 namespace core.Specifications
 {

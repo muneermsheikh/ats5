@@ -166,8 +166,10 @@ namespace infra.Services
                }
                otherskills = otherskills.Count() > 0 ? otherskills: null;
 
-               var emp = new Employee(registerDto.AppUserId, person, registerDto.AadharNo, registerDto.Address.Add, 
-                    registerDto.Address.City, registerDto.DOJ, registerDto.Department, phs, qs, hrskills, otherskills);
+               var emp = new Employee(registerDto.Address.Gender, registerDto.Address.FirstName,
+                    registerDto.Address.SecondName, registerDto.Address.FamilyName, registerDto.DisplayName,
+                    registerDto.Address.DOB, registerDto.AadharNo, qs, registerDto.DOJ,
+                    registerDto.Department, hrskills, registerDto.Password, otherskills, registerDto.Address.Add, registerDto.Address.City);
 
                _unitOfWork.Repository<Employee>().Add(emp);
 

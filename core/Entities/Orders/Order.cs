@@ -14,11 +14,13 @@ namespace core.Entities.Orders
           {
           }
 
-          public Order(int orderNo, int customerId, string orderRef, int salesmanId, int estimatedRevenue,
-            DateTime completeBy, OrderAddress orderAddress,ICollection<OrderItem> orderItems)
+          public Order(int orderNo, int customerId, string customerName, string cityOfWorking, string orderRef, int salesmanId, 
+            int estimatedRevenue, DateTime completeBy, OrderAddress orderAddress,ICollection<OrderItem> orderItems)
           {
                OrderNo = orderNo;
                CustomerId = customerId;
+               CustomerName = customerName;
+               CityOfWorking = cityOfWorking;
                OrderAddress = orderAddress;
                OrderRef = orderRef;
                SalesmanId = salesmanId;
@@ -31,6 +33,7 @@ namespace core.Entities.Orders
         public OrderAddress OrderAddress { get; set; }
         public DateTimeOffset OrderDate { get; set; }=DateTimeOffset.Now;
         public int CustomerId { get; set; }
+        public string CustomerName {get; set;}
         public string BuyerEmail {get; set;}
         public string OrderRef { get; set; }
         public int? SalesmanId { get; set; }

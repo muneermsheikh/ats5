@@ -3,6 +3,7 @@ using api.Errors;
 using core.Entities;
 using core.Entities.MasterEntities;
 using core.Interfaces;
+using core.Params;
 using core.ParamsAndDtos;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,7 +41,7 @@ namespace api.Controllers
           }
 
           [HttpGet("categorylist")]
-          public async Task<ActionResult<Category>> GetCategoryListAsync(CategoryParams categoryParams)
+          public async Task<ActionResult<Pagination<Category>>> GetCategoryListAsync(CategorySpecParams categoryParams)
           {
                var lst = await _mastersService.GetCategoryListAsync(categoryParams);
                if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
@@ -70,15 +71,7 @@ namespace api.Controllers
                return true;
           }
 
-          [HttpGet("industrylist")]
-          public async Task<ActionResult<Industry>> GetIndustryListAsync(IndustryParams industryParams)
-          {
-               var lst = await _mastersService.GetIndustryListAsync(industryParams);
-               if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
-               return Ok(lst);
-          }
-
-     //qualifications
+          //qualifications
           [HttpPost("addqualification/{qualificationname}")]
           public async Task<ActionResult<Qualification>> AddQualification(string qualificationname)
           {
@@ -103,13 +96,20 @@ namespace api.Controllers
           }
 
           [HttpGet("qualificationlist")]
-          public async Task<ActionResult<Qualification>> GetQualificationListAsync()
+          public async Task<ActionResult<Qualification>> GetQualificationListAsync(QualificationSpecParams specParams)
           {
-               var lst = await _mastersService.GetQualificationListAsync();
+               var lst = await _mastersService.GetQualificationListAsync(specParams);
                if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
                return Ok(lst);
           }
 
+          [HttpGet("industrylist")]
+          public async Task<ActionResult<Industry>> GetIndustryListAsync(IndustrySpecParams industryParams)
+          {
+               var lst = await _mastersService.GetIndustryListAsync(industryParams);
+               if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
+               return Ok(lst);
+          }
           /*
         
         

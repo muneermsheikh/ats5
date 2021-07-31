@@ -2,9 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using core.Entities.HR;
 using core.Entities.Identity;
 using core.Entities.Orders;
 using core.Interfaces;
+using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
 using infra.Data;
@@ -20,22 +24,21 @@ namespace infra.Services
           private readonly UserManager<AppUser> _userManager;
           //private readonly IPaymentService _paymentService;
           private readonly IGenericRepository<OrderItem> _orderItemRepo;
+          private readonly IMapper _mapper;
           public OrderService(IUnitOfWork unitOfWork
                //, IPaymentService paymentService
-               , ATSContext context
-               , UserManager<AppUser> userManager
-               , IGenericRepository<OrderItem> orderItemRepo)
+               , ATSContext context, UserManager<AppUser> userManager
+               , IGenericRepository<OrderItem> orderItemRepo, IMapper mapper)
           {
                _context = context;
                //_paymentService = paymentService;
                _userManager = userManager;
                _unitOfWork = unitOfWork;
                _orderItemRepo = orderItemRepo;
+               _mapper = mapper;
           }
 
           public async Task<Order> CreateOrderAsync(OrderToCreateDto dto) 
-          //DateTime orderDate, string orderRef, int customerId, 
-                //DateTime completeBy, int? salesmanId, string remarks, ICollection<OrderItem> orderitems)
           {
 
                string salesmanName = "";
@@ -57,7 +60,7 @@ namespace infra.Services
                     var industryName = await IndustryNameFromId(item.IndustryId);
                     items.Add(new OrderItem(item.SrNo, item.CategoryId, categoryName, item.IndustryId, 
                          industryName, item.SourceFrom, item.Quantity, item.MinCVs, item.MaxCVs,
-                         item.Ecnr, item.RequireAssess, item.CompleteBefore, item.Charges));
+                         item.Ecnr, item.RequireAssess, item.CompleteBefore, item.Charges, item.JobDescription, item.Remuneration));
                     subtotal = items.Sum(item => item.Charges * item.Quantity) + (items.Sum(item => item.FeeFromClientINR * item.Quantity));
                }
 
@@ -65,8 +68,8 @@ namespace infra.Services
                var orderNo = await _context.Orders.MaxAsync(x => (int?)x.OrderNo) ?? 1000;
                orderNo++;
 
-              var order = new Order(orderNo, dto.CustomerId, dto.OrderRef, (int)dto.SalesmanId, subtotal, 
-                    dto.CompleteBy, dto.OrderAddress, items);
+              var order = new Order(orderNo, dto.CustomerId, dto.CustomerName,  dto.CityOfEmployment, dto.OrderRef, 
+                    (int)dto.SalesmanId, subtotal,  dto.CompleteBy, dto.OrderAddress, items);
                order.SalesmanName = salesmanName;
                order.CityOfWorking = cus.City;
                order.Country = cus.Country;
@@ -89,20 +92,6 @@ namespace infra.Services
                return await _unitOfWork.Repository<DeliveryMethod>().ListAllAsync();
           }
 
-          public async Task<Order> GetOrderByIdAsync(int id)
-          {
-               var spec = new OrdersWithItemsAndOrderingSpecs(id);
-
-               return await _unitOfWork.Repository<Order>().GetEntityWithSpec(spec);
-          }
-
-          public async Task<IReadOnlyList<Order>> GetOrdersForUserAsync(int customerId)
-          {
-               var spec = new OrdersWithItemsAndOrderingSpecs(customerId);
-
-               return await _unitOfWork.Repository<Order>().ListAsync(spec);
-          }
-
           public async Task<IReadOnlyList<Order>> GetOrdersByEmailAsync(string email)
           {
                var spec = new OrdersWithItemsAndOrderingSpecs(email);
@@ -110,14 +99,20 @@ namespace infra.Services
                return await _unitOfWork.Repository<Order>().ListAsync(spec);
           }
 
-          public async Task<IReadOnlyList<Order>> GetOrdersAllAsync()
+          public async Task<Pagination<OrderToReturnDto>> GetOrdersAllAsync(OrdersSpecParams orderParams)
           {
-               var spec = new OrdersWithItemsAndOrderingSpecs();
+               var spec = new OrdersWithItemsAndOrderingSpecs(orderParams);
+               var countSpec = new OrdersWithItemsAndOrderingForCountSpecs(orderParams);
+               var totalItems = await _unitOfWork.Repository<Order>().CountAsync(countSpec);
+               var orders = await _unitOfWork.Repository<Order>().ListAsync(spec);
 
-               return await _unitOfWork.Repository<Order>().ListAsync(spec);
+               var data = _mapper.Map<IReadOnlyList<OrderToReturnDto>>(orders);
+
+               return new Pagination<OrderToReturnDto>(orderParams.PageIndex, orderParams.PageSize, totalItems, data);
+               
           }
 
-          public void EditOrder(Order order)
+          public async Task<bool> EditOrder(Order order)
           {
                //thanks to @slauma of stackoverflow
                var existingOrder = _context.Orders.Where(p => p.Id == order.Id)
@@ -183,11 +178,13 @@ namespace infra.Services
                 }
                 _context.Entry(existingOrder).State = EntityState.Modified;
             }
+               return await _context.SaveChangesAsync() > 0;
           }
 
-          public void DeleteOrder(Order order)
+          public async Task<bool> DeleteOrder(Order order)
           {
                _context.Entry(order).State = EntityState.Deleted;
+               return await _context.SaveChangesAsync() > 0;
           }
           private async Task<string> CategoryNameFromId(int id)
           {
@@ -202,8 +199,13 @@ namespace infra.Services
           private async Task<string> EmployeeNameEmployeeId(int id)
           {
                var nm = await _context.Employees.Where(x => x.Id == id)
-                    .Select(x => new {x.Person.FirstName, x.Person.FamilyName}).FirstOrDefaultAsync();
-               return nm.FirstName + " " + nm.FamilyName;
+                    .Select(x => new {x.FirstName, x.FamilyName}).FirstOrDefaultAsync();
+               string employeename="";
+               if (!string.IsNullOrEmpty(nm.FirstName) ) {
+                    employeename = nm.FirstName + " " + nm.FamilyName ?? "";
+               }
+
+               return employeename;
           }
 
           public async Task<IReadOnlyList<OrderItem>> GetOrderItemsByOrderIdAsync(int orderId)
@@ -275,19 +277,24 @@ namespace infra.Services
                throw new NotImplementedException();
           }
 
-          public void DeleteOrderItem(OrderItem orderItem)
+          public async Task<bool> DeleteOrderItem(OrderItem orderItem)
           {
-               throw new NotImplementedException();
+               var spec = new CVRefSpecs(new CVRefSpecParams{OrderItemId=orderItem.Id});
+               var cvref = await _unitOfWork.Repository<CVRef>().GetEntityWithSpec(spec);
+               if (cvref !=null) return false;
+
+               _unitOfWork.Repository<OrderItem>().Delete(orderItem);
+               return await _unitOfWork.Complete() > 0;
           }
 
-          public Task<ICollection<JobDescription>> GetJobDescriptionsByOrderIdAsync(int Id)
+          public async Task<ICollection<JobDescription>> GetJobDescriptionsByOrderIdAsync(int orderId)
           {
-               throw new NotImplementedException();
+              return await _context.JobDescriptions.Where(x => x.OrderId == orderId).ToListAsync();
           }
 
-          public Task<JobDescription> GetJobDescriptionByOrderItemIdAsync(int Id)
+          public async Task<JobDescription> GetJobDescriptionByOrderItemIdAsync(int Id)
           {
-               throw new NotImplementedException();
+               return await _context.JobDescriptions.Where(x => x.OrderItemId == Id).FirstOrDefaultAsync();
           }
 
           public void AddJobDescription(JobDescription jobDescription)
@@ -305,9 +312,11 @@ namespace infra.Services
                throw new NotImplementedException();
           }
 
-          public Task<RemunerationDto> GetRemunerationsByOrderIdAsync(int Id)
+          public async Task<IReadOnlyList<Remuneration>> GetRemunerationsByOrderIdAsync(int Id)
           {
-               throw new NotImplementedException();
+               var spec = new RemunerationSpecs(new RemunerationSpecParams{OrderId = Id});
+               var remun = await _unitOfWork.Repository<Remuneration>().ListAsync(spec);
+               return remun;
           }
 
           public Task<Remuneration> GetRemunerationOfOrderItemAsync(int Id)
@@ -315,19 +324,27 @@ namespace infra.Services
                throw new NotImplementedException();
           }
 
-          public void AddRemuneration(Remuneration remuneration)
+          public async Task<Remuneration> AddRemuneration(Remuneration remuneration)
           {
-               throw new NotImplementedException();
+               _unitOfWork.Repository<Remuneration>().Add(remuneration);
+               if (await _unitOfWork.Complete() > 0) {
+                    return await _unitOfWork.Repository<Remuneration>().GetEntityWithSpec(
+                         new RemunerationSpecs(remuneration.OrderItemId));
+               } else {
+                    return null;
+               }
           }
 
-          public void EditRemuneration(Remuneration remuneration)
+          public async Task<bool> EditRemuneration(Remuneration remuneration)
           {
-               throw new NotImplementedException();
+               _unitOfWork.Repository<Remuneration>().Update(remuneration);
+               return await _unitOfWork.Complete() > 0;
           }
 
-          public void DeleteRemuneration(Remuneration remuneration)
+          public async Task<bool> DeleteRemuneration(Remuneration remuneration)
           {
-               throw new NotImplementedException();
+               _unitOfWork.Repository<Remuneration>().Delete(remuneration);
+               return await _unitOfWork.Complete() > 0;
           }
      }
 

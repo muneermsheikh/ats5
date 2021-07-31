@@ -7,7 +7,7 @@ namespace core.Interfaces
 {
     public interface ISelectionDecisionService
     {
-         Task<bool> RegisterSelections(ICollection<SelectionDecisionToRegisterDto> selectionDecisions);
+         Task<IReadOnlyList<SelectionDecision>> RegisterSelections(ICollection<SelectionDecisionToRegisterDto> selectionDecisions);
          Task<bool> EditSelection(SelectionDecision selectionDecision);
          Task<bool> DeleteSelection(SelectionDecision selectionDecision);
          

@@ -9,7 +9,7 @@ namespace infra.Data.Config
      {
         public void Configure(EntityTypeBuilder<SelectionDecision> builder)
         {
-            builder.HasIndex(x => x.CVRefId).IsUnique();
+            //builder.HasIndex(x => x.CVRefId).IsUnique();
             builder.HasOne(p => p.CVRef).WithOne().OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(p => p.Employment).WithOne().OnDelete(DeleteBehavior.Cascade);
         }

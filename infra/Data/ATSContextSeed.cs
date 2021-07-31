@@ -164,6 +164,27 @@ namespace infra.Data
                     }
                     await context.SaveChangesAsync();
                 }
+                
+                if (context.CVRefs.Any()) {
+                    if(!context.SelectionDecisions.Any()) {
+                        var jsonData = File.ReadAllText("../infra/data/SeedData/SelectionDecisionSeedData.json");
+                        var fileData = JsonSerializer.Deserialize<List<SelectionDecision>>(jsonData);
+                        foreach(var item in fileData) {
+                            context.SelectionDecisions.Add(item);
+                        }
+                        await context.SaveChangesAsync();
+                    }
+                    if (context.SelectionDecisions.Any()) {
+                        if(!context.Employments.Any()) {
+                        var jsonData = File.ReadAllText("../infra/data/SeedData/EmploymentSeedData.json");
+                        var fileData = JsonSerializer.Deserialize<List<Employment>>(jsonData);
+                        foreach(var item in fileData) {
+                            context.Employments.Add(item);
+                        }
+                        await context.SaveChangesAsync();
+                        }
+                    }
+                }
 
             } catch (Exception ex)
             {

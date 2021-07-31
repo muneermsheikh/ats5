@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using core.Entities;
 using core.Entities.Users;
+using core.Params;
 
 namespace core.Specifications
 {
@@ -30,16 +31,13 @@ namespace core.Specifications
                   x.Email.ToLower() == candParams.Email.ToLower()) 
                 )
           {
-              AddInclude(x => x.EntityAddresses);
+              if (candParams.IncludeEntityAddresses) AddInclude(x => x.EntityAddresses);
+              if (candParams.IncludeAttachments) AddInclude(x => x.UserAttachments);
+              if (candParams.IncludeUserPassorts) AddInclude(x => x.UserPassports);
+              if (candParams.IncludeUserProfessions) AddInclude(x => x.UserProfessions);
+              if (candParams.IncludeUserPhones) AddInclude(x => x.UserPhones);
+              if (candParams.IncludeUserQualifications) AddInclude(x => x.UserQualifications);
               
-              AddInclude(x => x.UserAttachments);
-              AddInclude(x => x.UserPassports);
-              AddInclude(x => x.UserProfessions);
-              AddInclude(x => x.UserPhones);
-              AddInclude(x => x.UserQualifications);
-              
-              AddOrderBy(x => x.ApplicationNo);
-
               ApplyPaging(candParams.PageSize * (candParams.PageIndex - 1), candParams.PageSize);
 
               if (!string.IsNullOrEmpty(candParams.Sort)) {

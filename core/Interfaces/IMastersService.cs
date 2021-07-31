@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Entities;
 using core.Entities.MasterEntities;
+using core.Params;
 using core.ParamsAndDtos;
 
 namespace core.Interfaces
@@ -11,20 +12,20 @@ namespace core.Interfaces
         Task<Category> AddCategory(string categoryName);
         Task<bool> EditCategoryAsync(Category category);
         Task<bool> DeleteCategoryAsync(Category category);
-        Task<IReadOnlyList<Category>> GetCategoryListAsync(CategoryParams categoryParams);
+        Task<Pagination<Category>> GetCategoryListAsync(CategorySpecParams categoryParams);
 
     //industry
         Task<Industry> AddIndustry(string industryName);
         Task<bool> EditIndustryAsync(Industry industry);
         Task<bool> DeleteIndustryyAsync(Industry industry);
-        Task<IReadOnlyList<Industry>> GetIndustryListAsync(IndustryParams industryParams);
+        Task<Pagination<Industry>> GetIndustryListAsync(IndustrySpecParams industryParams);
         //Task<IReadOnlyList<Industry>> GetIndustryListOfACategoryAsync(IndustryParams industryParams);
         
     //Qualifications
         Task<Qualification> AddQualification(string qualificationName);
         Task<bool> EditQualificationAsync(Qualification qualification);
         Task<bool> DeleteQualificationAsync(Qualification qualification);
-        Task<IReadOnlyList<Qualification>> GetQualificationListAsync();
+        Task<Pagination<Qualification>> GetQualificationListAsync(QualificationSpecParams specParams);
 
     //ReviewItemStatus.Description for Contract REVIEW RESULTS
         Task<ReviewItemData> AddReviewItemData(string reviewDescriptionName);

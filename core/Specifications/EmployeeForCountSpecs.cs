@@ -3,6 +3,7 @@ using System.Linq;
 using core.Entities;
 using core.Entities.Admin;
 using core.Entities.Users;
+using core.Params;
 using core.ParamsAndDtos;
 
 namespace core.Specifications
@@ -12,8 +13,8 @@ namespace core.Specifications
         public EmployeeForCountSpecs(EmployeeSpecParams empParams)
             : base(x => 
                 (string.IsNullOrEmpty(empParams.Search) || 
-                  (x.Person.FirstName.ToLower().ToLower()
-                  + x.Person.FamilyName.ToLower()).Contains(empParams.Search.ToLower())) &&
+                  (x.FirstName.ToLower().ToLower()
+                  + x.FamilyName.ToLower()).Contains(empParams.Search.ToLower())) &&
                 (string.IsNullOrEmpty(empParams.City) ||
                     x.City.ToLower() == empParams.City) &&
                 (!empParams.EmployeeId.HasValue ||

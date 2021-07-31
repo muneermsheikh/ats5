@@ -50,6 +50,7 @@ namespace infra.Data
           public DbSet<EmployeeQualification> EmployeeQualifications {get; set;}
           public DbSet<EmployeeHRSkill> EmployeeHRSkills {get; set;}
           public DbSet<EmployeeOtherSkill> EmployeeOtherSkills {get; set;}
+          public DbSet<EmployeePhone> EmployeePhones {get; set;}
           public DbSet<Industry> Industries {get; set;}
           public DbSet<JobDescription> JobDescriptions {get; set;}
           public DbSet<Qualification> Qualifications {get; set;}

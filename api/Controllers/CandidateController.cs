@@ -5,6 +5,7 @@ using AutoMapper;
 using core.Entities.Identity;
 using core.Entities.Users;
 using core.Interfaces;
+using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
 using Microsoft.AspNetCore.Identity;

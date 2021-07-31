@@ -1,11 +1,23 @@
 using System;
 using core.Entities.Orders;
+using core.Params;
 
 namespace core.Specifications
 {
     public class OrdersWithItemsAndOrderingForCountSpecs: BaseSpecification<Order>
     {
-        public OrdersWithItemsAndOrderingForCountSpecs(int id) : base(o => o.Id == id)
+        public OrdersWithItemsAndOrderingForCountSpecs(OrdersSpecParams specParams) 
+            : base(x => 
+            (!specParams.Id.HasValue || x.Id == specParams.Id) &&
+                (!specParams.CustomerId.HasValue || x.CustomerId  == specParams.CustomerId) &&
+                (!specParams.Status.HasValue || (int)x.Status == specParams.Status) 
+                /* &&
+                (!specParams.OrderDateFrom.HasValue && specParams.OrderDateUpto.HasValue || 
+                    x.OrderDate.Date ==specParams.OrderDateFrom) &&
+                (!specParams.OrderDateFrom.HasValue && !specParams.OrderDateUpto.HasValue ||
+                    x.OrderDate.Date <= specParams.OrderDateUpto && x.OrderDate.Date >= specParams.OrderDateFrom)
+                */
+            )
         {
         }
 

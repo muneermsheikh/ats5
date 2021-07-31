@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using core.Entities;
 using core.Entities.MasterEntities;
 using core.Interfaces;
+using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
 using infra.Data;
@@ -13,11 +14,12 @@ namespace infra.Services
      public class MastersService : IMastersService
      {
           private readonly IUnitOfWork _unitOfWork;
+
           private readonly ATSContext _context;
-          public MastersService(IUnitOfWork unitOfWork, ATSContext context)
+          public MastersService(ATSContext context, IUnitOfWork unitOfWork)
           {
-               _context = context;
                _unitOfWork = unitOfWork;
+               _context = context;
           }
 
           public async Task<Category> AddCategory(string categoryName)
@@ -57,7 +59,7 @@ namespace infra.Services
           {
                var srno = await _context.ReviewItemDatas.MaxAsync(x => x.SrNo) + 1;
                var entity = new ReviewItemData(srno, reviewDescriptionName);
-               
+
                _unitOfWork.Repository<ReviewItemData>().Add(entity);
                if (await _unitOfWork.Complete() > 0) return entity;
                return null;
@@ -164,11 +166,15 @@ namespace infra.Services
                return (await _unitOfWork.Complete() > 0);
           }
 
-          public async Task<IReadOnlyList<Category>> GetCategoryListAsync(CategoryParams categoryParams)
+          public async Task<Pagination<Category>> GetCategoryListAsync(CategorySpecParams specParams)
           {
-               var spec = new CategorySpecs(categoryParams);
+               var spec = new CategorySpecs(specParams);
+               var specCount = new CategoryForCountSpecs(specParams);
+               var totalCount = await _unitOfWork.Repository<Category>().CountAsync(specCount);
                var lst = await _unitOfWork.Repository<Category>().ListAsync(spec);
-               return lst;
+               //var data = _mapper.Map<IReadOnlyList<CategoryToReturnDto>>(lst);
+
+               return new Pagination<Category>(specParams.PageIndex, specParams.PageSize, totalCount, lst);
           }
 
           public Task<IReadOnlyList<ChecklistHRData>> GetChecklistHRDataListAsync()
@@ -176,17 +182,25 @@ namespace infra.Services
                throw new System.NotImplementedException();
           }
 
-          public async Task<IReadOnlyList<Industry>> GetIndustryListAsync(IndustryParams industryParams)
+          public async Task<Pagination<Industry>> GetIndustryListAsync(IndustrySpecParams specParams)
           {
-               var spec = new IndustrySpecs(industryParams);
+               var spec = new IndustrySpecs(specParams);
+               var specCount = new IndustryForCountSpecs(specParams);
+               var totalCount = await _unitOfWork.Repository<Industry>().CountAsync(specCount);
                var lst = await _unitOfWork.Repository<Industry>().ListAsync(spec);
-               return lst;
-
+               //var data = _mapper.Map<IReadOnlyList<IndustryToReturnDto>>(lst);
+ 
+               return new Pagination<Industry>(specParams.PageIndex, specParams.PageSize, totalCount, lst);
           }
 
-          public async Task<IReadOnlyList<Qualification>> GetQualificationListAsync()
+          public async Task<Pagination<Qualification>> GetQualificationListAsync(QualificationSpecParams specParams)
           {
-               return await _unitOfWork.Repository<Qualification>().ListAllAsync();
+               var spec = new QualificationSpecs(specParams);
+               var specCount = new QualificationForCountSpecs(specParams);
+               var totalCount = await _unitOfWork.Repository<Qualification>().CountAsync(specCount);
+               var lst = await _unitOfWork.Repository<Qualification>().ListAsync(spec);
+
+               return new Pagination<Qualification>(specParams.PageIndex, specParams.PageSize, totalCount, lst);
           }
 
           public async Task<IReadOnlyList<ReviewItemData>> GetReviewItemDataDescriptionListAsync()

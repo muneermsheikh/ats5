@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace core.Entities.Orders
 {
-    public class Remuneration
+    public class Remuneration: BaseEntity
     {
           public Remuneration()
           {
@@ -30,6 +30,13 @@ namespace core.Entities.Orders
           }
 
         [Required]
+        public int OrderItemId {get; set;}
+        [Required]
+        public int OrderId {get; set;}
+        [Required]
+        public int OrderNo {get; set;}
+        public int CategoryId {get; set;}
+        [Required]
         [MinLength(3), MaxLength(3)]
         public string SalaryCurrency { get; set; }
         public int SalaryMin { get; set; }
@@ -46,6 +53,7 @@ namespace core.Entities.Orders
         public int OtherAllowance { get; set; }
         public int LeavePerYearInDays { get; set; }
         public int LeaveAirfareEntitlementAfterMonths { get; set; }
+        public OrderItem OrderItem {get; set;}
         
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using core.Entities.HR;
+using core.Params;
 
 namespace core.ParamsAndDtos
 {

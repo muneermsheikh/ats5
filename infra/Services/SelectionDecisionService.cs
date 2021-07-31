@@ -36,25 +36,34 @@ namespace infra.Services
           }
 
 
-          public async Task<bool> RegisterSelections(ICollection<SelectionDecisionToRegisterDto> selectionDecisions)
+          public async Task<IReadOnlyList<SelectionDecision>> RegisterSelections(ICollection<SelectionDecisionToRegisterDto> selectionDecisions)
           {
                var updatedRegisterDto = await _commonServices.PopulateSelectionDecisionsToRegisterDto(selectionDecisions);
+               if (updatedRegisterDto == null || updatedRegisterDto.Count == 0) return null;
                foreach (var dto in updatedRegisterDto)
                {
+                    var employment = await _commonServices.PopulateEmploymentFromCVRefId(dto.CVRefId, dto.Salary, dto.Charges, dto.DecisionDate);
                     var selDecision = new SelectionDecision(dto.CVRefId, dto.OrderItemId, dto.CategoryId, dto.CategoryName,
                         dto.OrderId, dto.OrderNo, dto.ApplicationNo, dto.CandidateId, dto.CandidateName, dto.DecisionDate,
-                        dto.SelectionStatusId, dto.Remarks);
+                        dto.SelectionStatusId, dto.Remarks, employment);
 
                     var deployTrans = new Deploy(dto.CVRefId, dto.DecisionDate, (int)EnumDeployStatus.Selected);
-                    var employment = await _commonServices.PopulateEmploymentFromCVRefId(dto.CVRefId, dto.Salary, dto.Charges, dto.DecisionDate);
                     
                     _unitOfWork.Repository<SelectionDecision>().Add(selDecision);
                     _unitOfWork.Repository<Deploy>().Add(deployTrans);
-                    _unitOfWork.Repository<Employment>().Add(employment);
+                    //_unitOfWork.Repository<Employment>().Add(employment);
                     //todo - issue advisories to candidates and hr staff, accounts, process
                }
 
-               return await _unitOfWork.Complete() > 0;
+               if (await _unitOfWork.Complete() > 0) {
+                    var lst = selectionDecisions.Select(x => x.CVRefId).ToArray();
+                    var sparams = new SelDecisionSpecParams{CVRefIds = lst};
+                    var specs = new SelectionDecisionSpecs(sparams);
+                    var data = await _unitOfWork.Repository<SelectionDecision>().ListAsync(specs);
+                    return data;
+               } else {
+                    return null;
+               }
 
           }
      }

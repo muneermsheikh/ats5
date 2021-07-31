@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using core.Entities.Orders;
 
 namespace core.Entities.HR
@@ -46,6 +47,7 @@ namespace core.Entities.HR
           }
 
         public int CVRefId { get; set; }
+        public int SelectionDecisionId {get; set;}
         public DateTime SelectedOn { get; set; }
         public int Charges {get; set;}
         public string SalaryCurrency { get; set; }
@@ -64,7 +66,6 @@ namespace core.Entities.HR
         public DateTime OfferAcceptedOn { get; set; }
         public string OfferAttachmentUrl { get; set; }
         public string OfferAcceptanceUrl { get; set; }
-
         //related - to delete once navigation properties can be activated
         public string CategoryName { get; set; }
         public int OrderItemId { get; set; }
@@ -77,6 +78,9 @@ namespace core.Entities.HR
         public int ApplicationNo { get; set; }
         public string CandidateName { get; set; }
         public string CompanyName { get; set; }
+
+        [ForeignKey("SelectionDecisionId")]
+        public SelectionDecision SelectionDecision {get; set;}
 
     }
 }

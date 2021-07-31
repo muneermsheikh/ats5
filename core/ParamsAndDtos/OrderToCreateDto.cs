@@ -13,6 +13,7 @@ namespace core.ParamsAndDtos
           [Required]
           public int CustomerId { get; set; }
           public string CustomerName { get; set; }
+          public string CityOfEmployment { get; set; }
           public DateTime CompleteBy { get; set; }
           public int? SalesmanId { get; set; }
           public OrderAddress OrderAddress { get; set; }

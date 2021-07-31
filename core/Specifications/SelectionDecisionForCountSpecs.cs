@@ -10,7 +10,7 @@ namespace core.Specifications
 {
     public class SelectionDecisionForCountSpecs: BaseSpecification<SelectionDecision>
     {
-        public SelectionDecisionForCountSpecs(SelDecisionParams cParams)
+        public SelectionDecisionForCountSpecs(SelDecisionSpecParams cParams)
             : base(x => 
                 (!cParams.OrderId.HasValue || x.OrderId == cParams.OrderId) &&
                 (!cParams.OrderNo.HasValue || x.OrderNo == cParams.OrderNo) &&

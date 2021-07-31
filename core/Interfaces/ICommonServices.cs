@@ -14,5 +14,6 @@ namespace core.Interfaces
          Task<CommonDataDto> CommonDataFromOrderDetailIdAndCandidateId(int orderDetailId, int candidateId);
          Task<ICollection<SelectionDecisionToRegisterDto>> PopulateSelectionDecisionsToRegisterDto(ICollection<SelectionDecisionToRegisterDto> dto);
          Task<Employment> PopulateEmploymentFromCVRefId(int cvrefid, int salary, int charges, DateTime selectedOn);
+         Task<CommonDataDto> PendingDeployments();
     }
 }

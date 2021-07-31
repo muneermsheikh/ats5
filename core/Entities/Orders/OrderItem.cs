@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using core.Entities.Admin;
 using core.Entities.HR;
 
@@ -12,7 +13,7 @@ namespace core.Entities.Orders
           }
           public OrderItem(int srNo, int categoryId, string categoryName, int industryId, string industryName, 
             string sourceFrom, int quantity, int minCVs, int maxCVs, bool ecnr, bool requireAssess, DateTime completeBefore, 
-            int charges)
+            int charges, JobDescription jd, Remuneration remun)
           {
                SrNo = srNo;
                CategoryId = categoryId;
@@ -27,6 +28,8 @@ namespace core.Entities.Orders
                RequireAssess = requireAssess;
                CompleteBefore = completeBefore;
                Charges = charges;
+               JobDescription = jd;
+               Remuneration = remun;
           }
 
           public OrderItem(int orderId, int srNo, int categoryId, string categoryName, int industryId, string industryName, 
@@ -76,8 +79,12 @@ namespace core.Entities.Orders
         public EnumReviewItemStatus ReviewItemStatusId { get; set; }=EnumReviewItemStatus.NotReviewed;
         public virtual Employee Assigned { get; set; }
         public Category Category { get; set; }
-        public JobDescription JobDescription { get; set; }
-        public Remuneration Remuneration { get; set; }
+        public int? JobDescriptionId {get; set;}
+        [ForeignKey("JobDescriptionId")]
+        public virtual JobDescription JobDescription { get; set; }
+        public int? RemunerationId {get; set;}
+        [ForeignKey("RemunerationId")]
+        public virtual Remuneration Remuneration { get; set; }
         public ContractReviewItem ContractReviewItem { get; set; }
         //public Order Order { get; set; }
         public ICollection<CVRef> CVRefs { get; set; }
