@@ -1,20 +1,15 @@
-using System;
-using System.Linq;
-using core.Entities;
-using core.Entities.Identity;
-using core.Entities.Users;
+using core.Entities.Admin;
 
 namespace core.Specifications
 {
-    public class MessageCountSpecs: BaseSpecification<Message>
+     public class MessageCountSpecs: BaseSpecification<Message>
     {
-        public MessageCountSpecs(MessageSpecParams msgParams)
+        public MessageCountSpecs(MessageSpecParams specParams)
             : base(x => 
-                (msgParams.SenderId != 0  || 
-                  x.SenderId == msgParams.SenderId) &&
-                (msgParams.RecipientId != 0 ||
-                  x.RecipientId == msgParams.RecipientId)
-                )
+                (specParams.SenderId != 0  || x.SenderId == specParams.SenderId) &&
+                (specParams.RecipientId != 0 || x.RecipientId == specParams.RecipientId) &&
+                (specParams.MessageSentOn.Year > 2000 || x.MessageSent.Date == specParams.MessageSentOn.Date)
+            )
         {
         }
 

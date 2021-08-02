@@ -55,6 +55,8 @@ namespace api
                          .WithOrigins("https://localhost:4200");
                     });
                });
+
+               services.Configure<MailSettings>(_config.GetSection("MailSettings"));
           }
 
           // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

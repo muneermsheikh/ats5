@@ -1,10 +1,10 @@
 using System.Reflection;
 using core.Entities;
 using core.Entities.Admin;
+using core.Entities.Attachments;
 using core.Entities.HR;
-using core.Entities.Identity;
 using core.Entities.MasterEntities;
-using core.Entities.Message;
+using core.Entities.Messages;
 using core.Entities.Orders;
 using core.Entities.Process;
 using core.Entities.Tasks;
@@ -23,7 +23,8 @@ namespace infra.Data
           {
           }
 
-    
+
+          public DbSet<FileOnFileSystem> FilesOnFileSystem {get; set;}
           //general
           public DbSet<Customer> Customers {get; set;}
           public DbSet<CustomerIndustry> CustomerIndustries {get; set;}

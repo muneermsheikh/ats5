@@ -30,7 +30,7 @@ namespace core.Entities.HR
           }
 
         public int CVRefId { get; set; }
-        public int EmploymentId {get; set;}
+        //public int? EmploymentId {get; set;}
         public int OrderItemId { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName {get; set;}
@@ -43,8 +43,8 @@ namespace core.Entities.HR
         public int SelectionStatusId { get; set; }
         [ForeignKey("CVRefId")]
         public virtual CVRef CVRef {get; set;}
-        [ForeignKey("EmploymentId")]
-        public virtual Employment Employment {get; set;}
+        //[ForeignKey("EmploymentId")]
+        public Employment Employment {get; set;}
         public string Remarks {get; set;}
     }
 }

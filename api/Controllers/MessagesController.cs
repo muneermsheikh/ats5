@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Extensions;
 using AutoMapper;
-using core.Entities.Identity;
+using core.Entities.Admin;
 using core.Interfaces;
 using core.ParamsAndDtos;
 using core.Specifications;
@@ -18,7 +18,20 @@ namespace api.Controllers
           {
                _mapper = mapper;
                _unitOfWork = unitOfWork;
+          }
 
+          [HttpPost]
+          public async Task<ActionResult<MessageDto>> SendNewMessage([FromQuery] Message message)
+          {
+               _unitOfWork.Repository<Message>().Add(message);
+               if (await _unitOfWork.Complete() > 0) {
+                    var parms = new MessageSpecParams{SenderId=1, RecipientId=1, MessageSentOn=message.MessageSent};
+                    var specs = new MessagesSpecs(parms);
+                    var msg = await _unitOfWork.Repository<Message>().GetEntityWithSpec(specs);
+                    return _mapper.Map<MessageDto>(msg);
+               } else {
+                    return null;
+               }
           }
 
           [HttpGet]

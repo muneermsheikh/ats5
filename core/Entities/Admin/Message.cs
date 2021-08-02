@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using core.Entities.Identity;
 
-namespace core.Entities.Identity
+namespace core.Entities.Admin
 {
-     [NotMapped]
      public class Message: BaseEntity
     {
         public int SenderId { get; set; }

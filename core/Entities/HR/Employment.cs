@@ -79,8 +79,8 @@ namespace core.Entities.HR
         public string CandidateName { get; set; }
         public string CompanyName { get; set; }
 
-        [ForeignKey("SelectionDecisionId")]
-        public SelectionDecision SelectionDecision {get; set;}
+        //[ForeignKey("SelectionDecisionId")]
+        //public SelectionDecision SelectionDecision {get; set;}
 
     }
 }

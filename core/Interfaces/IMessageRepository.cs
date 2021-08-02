@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Entities.Identity;
-using core.Entities.Message;
 using core.ParamsAndDtos;
+using core.Entities.Messages;
+using core.Entities.Admin;
 
 namespace core.Interfaces
 {

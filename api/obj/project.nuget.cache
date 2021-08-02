@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5Htn/fMkrrZCqYoGpTKB/l0UpNvRWk0a6daYbSpDsbNltolB7X9udfsz+IkJe9UmBqNXGxkjRGbx7EUSjBJ5dw==",
+  "dgSpecHash": "V8NdthtGvp+RMp3RpsE4mVsB6GsH3kdAFNnribR4Jk7f9rhFq9aaHo6xmnUjsZbPJLsfvw0nqJ2A5ljbK7NCiw==",
   "success": true,
-  "projectFilePath": "D:\\ats5\\api\\api.csproj",
+  "projectFilePath": "d:\\ats5\\api\\api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hp\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.1\\automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",
@@ -12,6 +12,7 @@
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication.cookies\\2.1.0\\microsoft.aspnetcore.authentication.cookies.2.1.0.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication.core\\2.1.0\\microsoft.aspnetcore.authentication.core.2.1.0.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\5.0.1\\microsoft.aspnetcore.authentication.jwtbearer.5.0.1.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication.openidconnect\\5.0.1\\microsoft.aspnetcore.authentication.openidconnect.5.0.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\5.0.1\\microsoft.aspnetcore.cryptography.internal.5.0.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.cryptography.keyderivation\\5.0.1\\microsoft.aspnetcore.cryptography.keyderivation.5.0.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.dataprotection\\2.1.0\\microsoft.aspnetcore.dataprotection.2.1.0.nupkg.sha512",

@@ -2110,11 +2110,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\ats5\\infra\\infra.csproj",
+      "projectUniqueName": "d:\\ats5\\infra\\infra.csproj",
       "projectName": "infra",
-      "projectPath": "D:\\ats5\\infra\\infra.csproj",
+      "projectPath": "d:\\ats5\\infra\\infra.csproj",
       "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-      "outputPath": "D:\\ats5\\infra\\obj\\",
+      "outputPath": "d:\\ats5\\infra\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2129,8 +2129,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "D:\\ats5\\core\\core.csproj": {
-              "projectPath": "D:\\ats5\\core\\core.csproj"
+            "d:\\ats5\\core\\core.csproj": {
+              "projectPath": "d:\\ats5\\core\\core.csproj"
             }
           }
         }

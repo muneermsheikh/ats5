@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "t996HsQ02sth/ILeLNgS0xM9Xq+P6+82Bs+wYMwluGraqqWH2jLs4m5y0OiUJ1LFzZVqLzXdoy7UwyYuWne2Pw==",
+  "dgSpecHash": "bgxccyt5hLgMjVJu2o73lN0GdwLK+TIUvyy8NK8sHDigRw1No4Z6UpdB0L7KJIVieDCrJr5gms2fcII08rVAUw==",
   "success": true,
-  "projectFilePath": "D:\\ats5\\infra\\infra.csproj",
+  "projectFilePath": "d:\\ats5\\infra\\infra.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hp\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.1\\automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",

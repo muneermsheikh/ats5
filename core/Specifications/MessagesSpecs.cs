@@ -1,26 +1,21 @@
-using System;
-using System.Linq;
-using System.Linq.Expressions;
-using core.Entities;
-using core.Entities.Identity;
-using core.Entities.Users;
+using core.Entities.Admin;
 
 namespace core.Specifications
 {
      public class MessagesSpecs : BaseSpecification<Message>
      {
-          public MessagesSpecs(MessageSpecParams messageParams)
+          public MessagesSpecs(MessageSpecParams specParams)
             : base(x => 
-                (messageParams.SenderId != 0  || 
-                  x.SenderId == messageParams.SenderId) &&
-                (messageParams.RecipientId != 0 ||
-                  x.RecipientId == messageParams.RecipientId)
-                )
+                (specParams.SenderId != 0  || x.SenderId == specParams.SenderId) &&
+                (specParams.RecipientId != 0 || x.RecipientId == specParams.RecipientId) &&
+                (specParams.MessageSentOn.Year > 2000 || x.MessageSent.Date == specParams.MessageSentOn.Date)
+            )
+            
           {
-              ApplyPaging(messageParams.PageSize * (messageParams.PageIndex - 1), messageParams.PageSize);
+              ApplyPaging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
 
-              if (!string.IsNullOrEmpty(messageParams.Sort)) {
-                switch(messageParams.Sort.ToLower()) {
+              if (!string.IsNullOrEmpty(specParams.Sort)) {
+                switch(specParams.Sort.ToLower()) {
                   case "messagesenteasc":
                     AddOrderBy(x => x.MessageSent);
                     break;

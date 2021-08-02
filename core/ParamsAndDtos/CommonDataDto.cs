@@ -12,7 +12,7 @@ namespace core.ParamsAndDtos
         public int OrderId {get; set;}
         public int CategoryId {get; set;}
         public string CategoryName { get; set; }
-        public int DeployStatus {get; set;}
-        public DateTime DeployStatusDate {get; set;}
+        public int DeployStageId {get; set;}
+        public DateTime DeployStageDate {get; set;}
     }
 }

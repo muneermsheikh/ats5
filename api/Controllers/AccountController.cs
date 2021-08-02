@@ -23,12 +23,14 @@ namespace api.Controllers
           private readonly ITokenService _tokenService;
           private readonly IMapper _mapper;
           private readonly IUserService _userService;
+          private readonly RoleManager<IdentityRole> _roleManager;
 
           public AccountController(
                UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
-              ITokenService tokenService, 
+               RoleManager<IdentityRole> roleManager, ITokenService tokenService,
               IMapper mapper, IUserService userService)
           {
+               _roleManager = roleManager;
                _userService = userService;
                _mapper = mapper;
                _tokenService = tokenService;
@@ -44,7 +46,7 @@ namespace api.Controllers
                return new core.ParamsAndDtos.UserDto
                {
                     Email = user.Email,
-                    Token =  _tokenService.CreateToken(user),
+                    Token = _tokenService.CreateToken(user),
                     DisplayName = user.DisplayName
                };
           }
@@ -109,25 +111,32 @@ namespace api.Controllers
                }
 
                //for customer and vendor official, customer Id is mandatory
-               if (registerDto.UserType.ToLower() =="employee" && string.IsNullOrEmpty(registerDto.AadharNo)) {
-                    return BadRequest(new ApiResponse (400, "for employees, Aadhar number is mandatory"));
+               if (registerDto.UserType.ToLower() == "employee" && string.IsNullOrEmpty(registerDto.AadharNo))
+               {
+                    return BadRequest(new ApiResponse(400, "for employees, Aadhar number is mandatory"));
                }
 
-               if (registerDto.UserType.ToLower()=="official" && (int)registerDto.CompanyId==0) {
+               if (registerDto.UserType.ToLower() == "official" && (int)registerDto.CompanyId == 0)
+               {
                     return BadRequest(new ApiResponse(400, "For officials, customer Id is essential"));
                }
-               
-               if (registerDto.UserPhones !=null && registerDto.UserPhones.Count() > 0) {
-                    foreach(var ph in registerDto.UserPhones) {
+
+               if (registerDto.UserPhones != null && registerDto.UserPhones.Count() > 0)
+               {
+                    foreach (var ph in registerDto.UserPhones)
+                    {
                          if (ph.PhoneNo == "" && ph.MobileNo == "") return BadRequest(new ApiResponse(400, "either phone no or mobile no must be mentioned"));
                     }
                }
 
                var objPP = new UserPassport();
 
-               if(string.IsNullOrEmpty(registerDto.PpNo)) {
+               if (string.IsNullOrEmpty(registerDto.PpNo))
+               {
                     objPP = null;
-               } else {
+               }
+               else
+               {
                     objPP = new UserPassport(registerDto.PpNo, registerDto.Nationality, registerDto.PPValidity);
                }
 
@@ -156,11 +165,11 @@ namespace api.Controllers
                var userAdded = await _userManager.FindByEmailAsync(registerDto.Email);
                //user registered. 
 
-               
+
                var lstPP = new List<UserPassport>();
                lstPP.Add(objPP);
-               registerDto.UserPassports=lstPP;
-               
+               registerDto.UserPassports = lstPP;
+
                registerDto.AppUserId = userAdded.Id;
 
                if (registerDto.UserPhones != null)
@@ -169,9 +178,9 @@ namespace api.Controllers
                                group p by p.PhoneNo into g
                                where g.Count() > 1
                                select g.Key);
-                    if (qry != null) registerDto.UserPhones=null;     //disallow if any duplicate numbers
+                    if (qry != null) registerDto.UserPhones = null;     //disallow if any duplicate numbers
                }
-               
+
                //depending upon usertype, create other entities
                switch (registerDto.UserType.ToLower())
                {
@@ -193,7 +202,105 @@ namespace api.Controllers
 
                return userDtoToReturn;
           }
- 
+
+          [HttpDelete("user/{useremail}")]
+          public async Task<ActionResult<bool>> DeleteIdentityUser (string email)
+          {
+               
+          }
+//userRoles
+
+          [HttpPost("userrole/{userEmail}/{newRole}")]
+          public async Task<ActionResult<bool>> AddNewRoleToUser(string userEmail, string newRole)
+          {
+               var user = await _userManager.FindByEmailAsync(userEmail);
+               if (user==null) {
+                    return BadRequest(new ApiResponse(400, "no user with the selected email exists"));
+               }
+               var roleExists = await _roleManager.RoleExistsAsync(newRole);
+               if (!roleExists) return BadRequest(new ApiResponse(400, "the role " + newRole + " does not exist"));
+
+               var roleAdded = await _userManager.AddToRoleAsync(user, newRole);
+
+               return roleAdded.Succeeded;
+          }
+
+          [HttpPut("userrole/{userEmail}/{oldRoleName}/{newRoleName}")]
+          public async Task<ActionResult<bool>> EditUserRole(string userEmail, string oldRoleName, string newRoleName)
+          {
+               var user = await _userManager.FindByEmailAsync(userEmail);
+               if (user==null) {
+                    return BadRequest(new ApiResponse(400, "no user with the selected email exists"));
+               }
+               var roleExists = await _roleManager.RoleExistsAsync(newRoleName);
+               if (!roleExists) return BadRequest(new ApiResponse(400, "the role " + newRoleName + " does not exist"));
+
+               var roleAdded = await _userManager.RemoveFromRoleAsync(user,oldRoleName);
+               if (roleAdded.Succeeded) await _userManager.AddToRoleAsync(user, newRoleName);
+
+               return roleAdded.Succeeded;
+          }
+
+          [HttpGet("userswithgivenrole/{rolename}")]
+          public async Task<ActionResult<IReadOnlyList<AppUser>>> GetIdentityUsersWithARole(string roleName)
+          {
+               var users = await _userManager.GetUsersInRoleAsync(roleName);
+               if (users == null) return NotFound(new ApiResponse(404, "No users found with role '" + roleName + "'"));
+               return Ok(users);
+          }
+
+          [HttpGet("userwithroles/{useremail}")]
+          public async Task<ActionResult<IReadOnlyList<AppUserRole>>> GetIdentityUserWithRoles(string useremail)
+          {
+               var user = await _userManager.FindByEmailAsync(useremail);
+               if (user == null) return NotFound(new ApiResponse(404, "User not found"));
+               return Ok(user.UserRoles);
+          }
+
+          [HttpGet("userhastherole/{useremail}/{rolename}")]
+          public async Task<ActionResult<bool>> UserHasTheRole(string useremail, string roleName)
+          {
+               var user = await _userManager.FindByEmailAsync(useremail);
+               if (user == null) return NotFound(new ApiResponse(404, "user not found"));
+               return await _userManager.IsInRoleAsync(user, roleName);
+          }
+          
+          [HttpGet("deleteuserrole/{useremail}/{rolename}")]
+          public async Task<ActionResult<bool>> DeleteUserRole(string useremail, string roleName)
+          {
+               var user = await _userManager.FindByEmailAsync(useremail);
+               if (user == null) return NotFound(new ApiResponse(404, "user not found"));
+               var result = await _userManager.RemoveFromRoleAsync(user, roleName);
+               return result.Succeeded;
+          }
+          
+//Roles
+          [HttpPut("role/{existingRoleName}/{newRoleName}")]
+          public async Task<ActionResult<bool>> EditRole(string existingRoleName, string newRoleName)
+          {
+               var role = await _roleManager.FindByNameAsync(existingRoleName);
+               if (role==null) return BadRequest(new ApiResponse(400, "The requested role does not exist"));
+               role.Name=newRoleName;
+               if (await _roleManager.UpdateAsync(role) == null) {
+                    return BadRequest(new ApiResponse(404, "failed to update the role " + existingRoleName));
+               } else {
+                    return Ok();
+               }
+          }
+
+          [HttpPost("role/{newRole}")]
+          public async Task<ActionResult<bool>> AddNewRole(string newRole)
+          {
+                var roleExists = await _roleManager.RoleExistsAsync(newRole);
+                if (!roleExists)
+                {
+                    IdentityResult result = await _roleManager.CreateAsync(new IdentityRole(newRole));
+                    return Ok(true);
+                } else {
+                     return BadRequest(new ApiResponse(404, "the role '" + newRole + "' already exists"));
+                }
+          }
+
 
      }
 }

@@ -19,9 +19,11 @@ namespace core.Specifications
                 (string.IsNullOrEmpty(specParams.CategoryName) || x.CategoryName == specParams.CategoryName) &&
                 (!specParams.CVRefId.HasValue || x.CVRefId == specParams.CVRefId) &&
                 (!specParams.CandidateId.HasValue || x.CandidateId == specParams.CandidateId) &&
-                (!specParams.ApplicationNo.HasValue ||  x.ApplicationNo == specParams.ApplicationNo)
+                (!specParams.ApplicationNo.HasValue ||  x.ApplicationNo == specParams.ApplicationNo) &&
+                (specParams.CVRefIds.Length==0 || specParams.CVRefIds.Contains(x.CVRefId))
                 )
         {
+            if(specParams.IncludeEmploymentData) AddInclude(x => x.Employment);
             ApplyPaging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
             AddOrderBy(x => x.OrderId);
             AddOrderBy(x => x.OrderItemId);

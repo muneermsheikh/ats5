@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ats5\\api\\api.csproj": {}
+    "d:\\ats5\\api\\api.csproj": {}
   },
   "projects": {
-    "D:\\ats5\\api\\api.csproj": {
+    "d:\\ats5\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ats5\\api\\api.csproj",
+        "projectUniqueName": "d:\\ats5\\api\\api.csproj",
         "projectName": "api",
-        "projectPath": "D:\\ats5\\api\\api.csproj",
+        "projectPath": "d:\\ats5\\api\\api.csproj",
         "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-        "outputPath": "D:\\ats5\\api\\obj\\",
+        "outputPath": "d:\\ats5\\api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -26,8 +26,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "D:\\ats5\\infra\\infra.csproj": {
-                "projectPath": "D:\\ats5\\infra\\infra.csproj"
+              "d:\\ats5\\infra\\infra.csproj": {
+                "projectPath": "d:\\ats5\\infra\\infra.csproj"
               }
             }
           }
@@ -47,6 +47,10 @@
               "version": "[8.1.1, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[5.0.1, )"
+            },
+            "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
               "target": "Package",
               "version": "[5.0.1, )"
             },
@@ -97,14 +101,14 @@
         }
       }
     },
-    "D:\\ats5\\core\\core.csproj": {
+    "d:\\ats5\\core\\core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ats5\\core\\core.csproj",
+        "projectUniqueName": "d:\\ats5\\core\\core.csproj",
         "projectName": "core",
-        "projectPath": "D:\\ats5\\core\\core.csproj",
+        "projectPath": "d:\\ats5\\core\\core.csproj",
         "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-        "outputPath": "D:\\ats5\\core\\obj\\",
+        "outputPath": "d:\\ats5\\core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -163,14 +167,14 @@
         }
       }
     },
-    "D:\\ats5\\infra\\infra.csproj": {
+    "d:\\ats5\\infra\\infra.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ats5\\infra\\infra.csproj",
+        "projectUniqueName": "d:\\ats5\\infra\\infra.csproj",
         "projectName": "infra",
-        "projectPath": "D:\\ats5\\infra\\infra.csproj",
+        "projectPath": "d:\\ats5\\infra\\infra.csproj",
         "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-        "outputPath": "D:\\ats5\\infra\\obj\\",
+        "outputPath": "d:\\ats5\\infra\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -185,8 +189,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "D:\\ats5\\core\\core.csproj": {
-                "projectPath": "D:\\ats5\\core\\core.csproj"
+              "d:\\ats5\\core\\core.csproj": {
+                "projectPath": "d:\\ats5\\core\\core.csproj"
               }
             }
           }

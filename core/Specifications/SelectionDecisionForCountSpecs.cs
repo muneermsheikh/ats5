@@ -10,16 +10,17 @@ namespace core.Specifications
 {
     public class SelectionDecisionForCountSpecs: BaseSpecification<SelectionDecision>
     {
-        public SelectionDecisionForCountSpecs(SelDecisionSpecParams cParams)
+        public SelectionDecisionForCountSpecs(SelDecisionSpecParams specParams)
             : base(x => 
-                (!cParams.OrderId.HasValue || x.OrderId == cParams.OrderId) &&
-                (!cParams.OrderNo.HasValue || x.OrderNo == cParams.OrderNo) &&
-                (!cParams.OrderItemId.HasValue || x.OrderItemId == cParams.OrderItemId) &&
-                (!cParams.CategoryId.HasValue || x.CategoryId == cParams.CategoryId) &&
-                (string.IsNullOrEmpty(cParams.CategoryName) || x.CategoryName == cParams.CategoryName) &&
-                (!cParams.CVRefId.HasValue || x.CVRefId == cParams.CVRefId) &&
-                (!cParams.CandidateId.HasValue || x.CandidateId == cParams.CandidateId) &&
-                (!cParams.ApplicationNo.HasValue ||  x.ApplicationNo == cParams.ApplicationNo) 
+                (!specParams.OrderId.HasValue || x.OrderId == specParams.OrderId) &&
+                (!specParams.OrderNo.HasValue || x.OrderNo == specParams.OrderNo) &&
+                (!specParams.OrderItemId.HasValue || x.OrderItemId == specParams.OrderItemId) &&
+                (!specParams.CategoryId.HasValue || x.CategoryId == specParams.CategoryId) &&
+                (string.IsNullOrEmpty(specParams.CategoryName) || x.CategoryName == specParams.CategoryName) &&
+                (!specParams.CVRefId.HasValue || x.CVRefId == specParams.CVRefId) &&
+                (!specParams.CandidateId.HasValue || x.CandidateId == specParams.CandidateId) &&
+                (!specParams.ApplicationNo.HasValue ||  x.ApplicationNo == specParams.ApplicationNo) &&
+                (specParams.CVRefIds.Length==0 || specParams.CVRefIds.Contains(x.CVRefId))
                 )
         {
         }

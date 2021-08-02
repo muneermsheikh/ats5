@@ -25,6 +25,8 @@ namespace api.Helpers
                CreateMap<OrderItem, OrderItemToReturnDto>();
                CreateMap<Order, OrderToReturnDto>();
                CreateMap<Remuneration, RemunerationDto>();
+               CreateMap<SelectionDecision, SelectionDecisionToReturnDto>();
+               CreateMap<Employment, EmploymentToReturnDto>();
                CreateMap<RegisterDto, Candidate>()
                     .ForMember(d => d.FirstName, o => o.MapFrom(s => s.Address.FirstName))
                     .ForMember(d => d.SecondName, o => o.MapFrom(s => s.Address.SecondName))

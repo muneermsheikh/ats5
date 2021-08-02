@@ -7,8 +7,16 @@ namespace infra.Identity
 {
     public class AppIdentityDbContextSeed
     {
-        public static async Task SeedUsersAsync(UserManager<AppUser> userManager)
+        public static async Task SeedUsersAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
+            string role = "Admin";
+ 
+            var roleExist = await roleManager.RoleExistsAsync(role);
+                if (!roleExist)
+                {
+                    IdentityResult result = await roleManager.CreateAsync(new IdentityRole(role));
+                }
+
             if (!userManager.Users.Any())
             {
                 var user = new AppUser
@@ -21,7 +29,12 @@ namespace infra.Identity
                         City = "New York", State = "NY", Pin = "90210" }
                 };
 
-                await userManager.CreateAsync(user, "Pa$$w0rd");
+                IdentityResult identityResult = await userManager.CreateAsync(user, "Pa$$w0rd");
+                //await userManager.CreateAsync(user, "Pa$$w0rd");
+                if (identityResult.Succeeded)
+                {
+                    userManager.AddToRoleAsync(user, "Admin").Wait();
+                }
             }
         }
     }

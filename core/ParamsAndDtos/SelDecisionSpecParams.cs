@@ -13,5 +13,7 @@ namespace core.ParamsAndDtos
         public int? ApplicationNo { get; set; }
         public int? CVRefId { get; set; }
         public int[] CVRefIds {get; set;}
+        public bool IncludeEmploymentData {get; set;}=false;
+        public bool IncludeDeploymentDAta { get; set; }=false;
     }
 }

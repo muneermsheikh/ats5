@@ -10,6 +10,7 @@ using core.ParamsAndDtos;
 using infra.Data;
 using Microsoft.EntityFrameworkCore;
 
+// TODO - constants for deploymentStageIds
 namespace infra.Services
 {
      public class DeployService : IDeployService
@@ -45,8 +46,8 @@ namespace infra.Services
                         CustomerName = c.CustomerName, 
                         CategoryName = cat.Name, 
                         OrderNo = ordr.OrderNo,
-                        DeployStatus = d.Status.StatusId,
-                        DeployStatusDate =d.Status.TransactionDate // DateTime.ParseExact(d.Status.TransactionDate, "yyyy/MM/DD", CultureInfo.InvariantCulture);
+                        DeployStageId = d.Status.StageId,
+                        DeployStageDate =d.Status.TransactionDate // DateTime.ParseExact(d.Status.TransactionDate, "yyyy/MM/DD", CultureInfo.InvariantCulture);
                 })).ToListAsync();
 
                return qry;
@@ -54,9 +55,9 @@ namespace infra.Services
         
         public async Task<bool> AddDeploymentTransaction(Deploy deploy)
         {
-            if (await DeploymentStageInSequence(deploy) != null) {
-                return false;
-            }
+            if (deploy.TransactionDate.Year < 2000 ) deploy.TransactionDate = DateTime.Now;
+            deploy = await DeploymentStageInSequence(deploy);
+            if (deploy == null)  return false;
 
             _unitOfWork.Repository<Deploy>().Add(deploy);
             return await _unitOfWork.Complete() > 0;
@@ -101,49 +102,61 @@ namespace infra.Services
         private async Task<Deploy> DeploymentStageInSequence(Deploy deploy)
         {
             //check if deployments concluded, if so no deployments allowed
-            var lastStatus = await _context.Deploys.Where(x => x.CVRefId == deploy.CVRefId)
-                .MaxAsync(x => x.StatusId);
-            if ((EnumDeployStatus)lastStatus == EnumDeployStatus.Concluded) {
-                return null;
-            }
+            var lastStatusStageId = await _context.Deploys.Where(x => x.CVRefId == deploy.CVRefId)
+                .MaxAsync(x => (int?)x.StageId) ?? 0;
+            //var nextQuestionNo = await _context.AssessmentQsBank.MaxAsync(x => (int?)x.QNo) ?? 1;
 
-            var newDeployStatusId = deploy.StatusId;
+            if ((EnumDeployStatus)lastStatusStageId == EnumDeployStatus.Concluded) return null;
 
+            //var newDeployStatusId = deploy.StatusId;
+            //  todo - return null if flg is out of sequence
             bool ok=false;
-            switch((EnumDeployStatus)newDeployStatusId)     //following actions are not relevant to the process, hence can be out of sequence
-            {
-                case EnumDeployStatus.OfferLetterAccepted:
+            int iStageId = 0;
+            int iNextStageId = 0;
+            switch (deploy.StageId) 
+            {      //normally, next stage is not given but calculated. when it is, it is a status out of sequence, such as queries
+                      //following actions are not relevant to the process, hence can be out of sequence
+                
+                case (int) EnumDeployStatus.OfferLetterAccepted:
+                    deploy.NextStageId = (int)EnumDeployStatus.ReferredForMedical;
                     ok=true;
                     break;
-                case EnumDeployStatus.VisaQueryRaised:
+                case (int)EnumDeployStatus.VisaQueryRaised:
+                    deploy.NextStageId=(int)EnumDeployStatus.VisaReceived;
                     ok = true;
                     break;
-                case EnumDeployStatus.EmigrationQueryRaised:
+                case (int)EnumDeployStatus.EmigrationQueryRaised:
+                    deploy.NextStageId=(int)EnumDeployStatus.EmigrationGranted;
                     ok = true;
                     break;
                 default:
                     break;
             }
-
-            if(!ok) return null;
-
-            var lastDeployStageId = await _context.Deploys
-                .Where(x => x.CVRefId == deploy.CVRefId)
-                .MaxAsync(x => x.StatusId);
-            
+            if(ok) {
+                    var iDays=await _context.DeployStatus.Where(x => x.StageId==deploy.NextStageId).Select(x => x.WorkingDaysReqdForNextStage).FirstOrDefaultAsync();
+                    deploy.TransactionDate=DateTime.Today.AddDays(iDays);
+                    return deploy;
+            } 
+                //since status id is blank, offer next logical stages
             var dep = await _context.Deploys.Where(x => x.CVRefId == deploy.CVRefId)
-                .OrderByDescending(x => x.StatusId).Take(1).FirstOrDefaultAsync();
-           
-            if (dep.StatusId < lastDeployStageId) return null;
-            
-            if (dep.NextStatusId == 0) {
-                var nextstatus = await _context.DeployStatus.Where(x => x.StageId == dep.StatusId)
-                    .Select(x => new {x.NextStageId, x.WorkingDaysReqdForNextStage}).FirstOrDefaultAsync();
-                deploy.NextStatusId = nextstatus.NextStageId;    
-                deploy.NextEstimatedStatusDate = DateTime.Today.AddDays(nextstatus.WorkingDaysReqdForNextStage);
-                //TODO - add working days instead of days
+                .OrderByDescending(x => x.StageId).Take(1).FirstOrDefaultAsync();
+            if (dep == null) {
+                if (deploy.StageId != (int) EnumDeployStatus.Selected) {
+                    deploy = null;
+                    throw new Exception("Candidate not yet selected");
+                } 
+                iStageId = (int)EnumDeployStatus.Selected;
+                iNextStageId = (int)EnumDeployStatus.ReferredForMedical;
+            } else {
+                iStageId = await _context.DeployStatus.Where(x => x.StageId == dep.StageId).Select(x => x.NextStageId).FirstOrDefaultAsync();
+                iNextStageId = await _context.DeployStatus.Where(x => x.StageId == iStageId).Select(x => x.NextStageId).FirstOrDefaultAsync();
             }
-
+            var DaysToAdd = await _context.DeployStatus.Where(x => x.StageId==iStageId)
+                .Select(x => x.WorkingDaysReqdForNextStage).FirstOrDefaultAsync();
+                //TODO - add working days instead of days
+            deploy.StageId = iStageId;
+            deploy.NextStageId = iNextStageId;
+            deploy.NextEstimatedStageDate = deploy.TransactionDate.AddDays(DaysToAdd);
             return deploy;
         }
      }

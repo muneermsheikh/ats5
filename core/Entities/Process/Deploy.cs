@@ -10,19 +10,19 @@ namespace core.Entities.Process
           {
           }
 
-          public Deploy(int cVRefId, DateTime transactionDate, int statusId)
+          public Deploy(int cVRefId, DateTime transactionDate, int stageId)
           {
                CVRefId = cVRefId;
                TransactionDate = transactionDate;
-               StatusId = statusId;
+               StageId = stageId;
           }
 
-          public int CVRefId { get; set; }
+        public int CVRefId { get; set; }
         public DateTime TransactionDate { get; set; }
-        public int StatusId { get; set; }
-        public int NextStatusId { get; set; }
+        public int StageId { get; set; }
+        public int NextStageId { get; set; }
         [ForeignKey("CVRefId")]
-        public DateTime NextEstimatedStatusDate { get; set; }
+        public DateTime NextEstimatedStageDate { get; set; }
         public CVRef CVRef {get; set;}
     }
 }

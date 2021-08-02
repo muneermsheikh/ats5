@@ -36,5 +36,16 @@ namespace api.Extensions
             return user.Identity.IsAuthenticated;
         }
 
+        //roles
+        public static bool UserHasTheRole(this ClaimsPrincipal userClaim, string roleName)
+        {
+            return userClaim.IsInRole(roleName);
+        }
+
+        public static bool AddRoleToUser(this ClaimsPrincipal userClaim, string roleName)
+        {
+            return userClaim.AddRoleToUser(roleName);
+        }
+
     }
 }

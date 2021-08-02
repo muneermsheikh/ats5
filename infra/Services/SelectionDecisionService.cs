@@ -35,6 +35,16 @@ namespace infra.Services
                return await _unitOfWork.Complete() > 0;
           }
 
+          public async Task<Pagination<SelectionDecision>> GetSelectionDecisions (SelDecisionSpecParams specParams)
+          {
+               var spec = new SelectionDecisionSpecs(specParams);
+               var specCount = new SelectionDecisionForCountSpecs(specParams);
+               var decisions = await _unitOfWork.Repository<SelectionDecision>().ListAsync(spec);
+               var ct = await _unitOfWork.Repository<SelectionDecision>().CountAsync(specCount);
+
+               return new Pagination<SelectionDecision>(specParams.PageIndex, specParams.PageSize, ct, decisions);
+
+          }
 
           public async Task<IReadOnlyList<SelectionDecision>> RegisterSelections(ICollection<SelectionDecisionToRegisterDto> selectionDecisions)
           {
@@ -44,13 +54,14 @@ namespace infra.Services
                {
                     var employment = await _commonServices.PopulateEmploymentFromCVRefId(dto.CVRefId, dto.Salary, dto.Charges, dto.DecisionDate);
                     var selDecision = new SelectionDecision(dto.CVRefId, dto.OrderItemId, dto.CategoryId, dto.CategoryName,
-                        dto.OrderId, dto.OrderNo, dto.ApplicationNo, dto.CandidateId, dto.CandidateName, dto.DecisionDate,
+                        employment.OrderId, dto.OrderNo, dto.ApplicationNo, dto.CandidateId, dto.CandidateName, dto.DecisionDate,
                         dto.SelectionStatusId, dto.Remarks, employment);
-
-                    var deployTrans = new Deploy(dto.CVRefId, dto.DecisionDate, (int)EnumDeployStatus.Selected);
                     
+                    var deployTrans = new Deploy(dto.CVRefId, dto.DecisionDate, (int)EnumDeployStatus.Selected);
+                    await _deployService.AddDeploymentTransaction(deployTrans);
+
                     _unitOfWork.Repository<SelectionDecision>().Add(selDecision);
-                    _unitOfWork.Repository<Deploy>().Add(deployTrans);
+
                     //_unitOfWork.Repository<Employment>().Add(employment);
                     //todo - issue advisories to candidates and hr staff, accounts, process
                }
@@ -60,7 +71,7 @@ namespace infra.Services
                     var sparams = new SelDecisionSpecParams{CVRefIds = lst};
                     var specs = new SelectionDecisionSpecs(sparams);
                     var data = await _unitOfWork.Repository<SelectionDecision>().ListAsync(specs);
-                    return data;
+                    return  data;
                } else {
                     return null;
                }

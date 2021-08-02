@@ -12,7 +12,7 @@ namespace infra.Data.Config
           {
                builder.HasIndex(x => x.CVRefId).IsUnique();
 
-               builder.HasOne(x => x.SelectionDecision).WithOne().OnDelete(DeleteBehavior.Restrict);
+               //builder.HasOne(x => x.SelectionDecision).WithOne().OnDelete(DeleteBehavior.Restrict);
           }
      }
 }

@@ -1,4 +1,4 @@
-namespace core.Entities.Message
+namespace core.Entities.Messages
 {
     public class Connection
     {

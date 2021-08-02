@@ -112,11 +112,12 @@ namespace infra.Services
                var item = await _context.OrderItems.Where(x => x.Id == c.OrderItemId)
                     .Include(x => x.Remuneration)
                .FirstOrDefaultAsync();
+               var customerid = await _context.Orders.Where(x => x.Id == item.OrderId).Select(x => x.CustomerId).FirstOrDefaultAsync();
                var emp = new Employment {
-                    CVRefId = c.Id, OrderItemId = c.OrderItemId, OrderId = c.OrderId, OrderNo = c.OrderNo,
+                    CVRefId = c.Id, OrderItemId = c.OrderItemId, OrderId = item.OrderId, OrderNo = c.OrderNo,
                     CustomerName = c.CustomerName,  CategoryId = c.CategoryId, CategoryName = c.CategoryName,
                     CandidateId = c.CandidateId, ApplicationNo = c.ApplicationNo, CandidateName = c.CandidateName,
-                    SelectedOn = selectedOn, Charges = charges, Salary = salary
+                    SelectedOn = selectedOn, Charges = charges, Salary = salary, CustomerId = customerid
                };
                
                var r = item.Remuneration;
@@ -163,7 +164,7 @@ namespace infra.Services
                          CustomerName = c.CustomerName, 
                          CategoryName = cat.Name, 
                          OrderNo = ordr.OrderNo,
-                         DeployStatus = d.Status.StatusId
+                         DeployStageId = d.Status.StageId
                     })).FirstOrDefaultAsync();
 
                return qry;

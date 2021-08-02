@@ -198,6 +198,91 @@ namespace infra.Data.Migrations
                     b.ToTable("EmployeeQualifications");
                 });
 
+            modelBuilder.Entity("core.Entities.Admin.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DateRead")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("MessageSent")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("RecipientDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RecipientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RecipientId1")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RecipientUsername")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("SenderDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SenderId1")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderUsername")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientId1");
+
+                    b.HasIndex("SenderId1");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("core.Entities.Attachments.FileOnFileSystem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Extension")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FilePath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UploadedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FilesOnFileSystem");
+                });
+
             modelBuilder.Entity("core.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -725,9 +810,6 @@ namespace infra.Data.Migrations
                     b.Property<string>("CategoryName")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("EmploymentId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("OrderId")
                         .HasColumnType("INTEGER");
 
@@ -746,9 +828,6 @@ namespace infra.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CVRefId")
-                        .IsUnique();
-
-                    b.HasIndex("EmploymentId")
                         .IsUnique();
 
                     b.ToTable("SelectionDecisions");
@@ -893,57 +972,17 @@ namespace infra.Data.Migrations
                     b.ToTable("AppUser");
                 });
 
-            modelBuilder.Entity("core.Entities.Identity.Message", b =>
+            modelBuilder.Entity("core.Entities.Identity.AppUserRole", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
+                    b.Property<string>("RoleId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DateRead")
+                    b.Property<string>("UserId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("MessageSent")
-                        .HasColumnType("TEXT");
+                    b.HasIndex("UserId");
 
-                    b.Property<bool>("RecipientDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RecipientId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("RecipientId1")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RecipientUsername")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("SenderDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("SenderId1")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SenderUsername")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipientId1");
-
-                    b.HasIndex("SenderId1");
-
-                    b.ToTable("Messages");
+                    b.ToTable("AppUserRole");
                 });
 
             modelBuilder.Entity("core.Entities.Industry", b =>
@@ -1145,7 +1184,7 @@ namespace infra.Data.Migrations
                     b.ToTable("SkillDatas");
                 });
 
-            modelBuilder.Entity("core.Entities.Message.Connection", b =>
+            modelBuilder.Entity("core.Entities.Messages.Connection", b =>
                 {
                     b.Property<string>("ConnectionId")
                         .HasColumnType("TEXT");
@@ -1163,7 +1202,7 @@ namespace infra.Data.Migrations
                     b.ToTable("Connections");
                 });
 
-            modelBuilder.Entity("core.Entities.Message.Group", b =>
+            modelBuilder.Entity("core.Entities.Messages.Group", b =>
                 {
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
@@ -1617,13 +1656,13 @@ namespace infra.Data.Migrations
                     b.Property<int?>("CVRefId1")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("NextEstimatedStatusDate")
+                    b.Property<DateTime>("NextEstimatedStageDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("NextStatusId")
+                    b.Property<int>("NextStageId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("StatusId")
+                    b.Property<int>("StageId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("TransactionDate")
@@ -2173,6 +2212,23 @@ namespace infra.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("core.Entities.Admin.Message", b =>
+                {
+                    b.HasOne("core.Entities.Identity.AppUser", "Recipient")
+                        .WithMany("MessagesReceived")
+                        .HasForeignKey("RecipientId1")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("core.Entities.Identity.AppUser", "Sender")
+                        .WithMany("MessagesSent")
+                        .HasForeignKey("SenderId1")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Recipient");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("core.Entities.CustomerIndustry", b =>
                 {
                     b.HasOne("core.Entities.Customer", null)
@@ -2256,13 +2312,11 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.HR.Employment", b =>
                 {
-                    b.HasOne("core.Entities.HR.SelectionDecision", "SelectionDecision")
-                        .WithOne()
+                    b.HasOne("core.Entities.HR.SelectionDecision", null)
+                        .WithOne("Employment")
                         .HasForeignKey("core.Entities.HR.Employment", "SelectionDecisionId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("SelectionDecision");
                 });
 
             modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
@@ -2273,15 +2327,7 @@ namespace infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("core.Entities.HR.Employment", "Employment")
-                        .WithOne()
-                        .HasForeignKey("core.Entities.HR.SelectionDecision", "EmploymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("CVRef");
-
-                    b.Navigation("Employment");
                 });
 
             modelBuilder.Entity("core.Entities.Identity.Address", b =>
@@ -2293,24 +2339,18 @@ namespace infra.Data.Migrations
                     b.Navigation("AppUser");
                 });
 
-            modelBuilder.Entity("core.Entities.Identity.Message", b =>
+            modelBuilder.Entity("core.Entities.Identity.AppUserRole", b =>
                 {
-                    b.HasOne("core.Entities.Identity.AppUser", "Recipient")
+                    b.HasOne("core.Entities.Identity.AppUser", "User")
                         .WithMany()
-                        .HasForeignKey("RecipientId1");
+                        .HasForeignKey("UserId");
 
-                    b.HasOne("core.Entities.Identity.AppUser", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId1");
-
-                    b.Navigation("Recipient");
-
-                    b.Navigation("Sender");
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("core.Entities.Message.Connection", b =>
+            modelBuilder.Entity("core.Entities.Messages.Connection", b =>
                 {
-                    b.HasOne("core.Entities.Message.Group", null)
+                    b.HasOne("core.Entities.Messages.Group", null)
                         .WithMany("Connections")
                         .HasForeignKey("GroupName");
                 });
@@ -2624,12 +2664,21 @@ namespace infra.Data.Migrations
                     b.Navigation("ChecklistItemHRs");
                 });
 
+            modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
+                {
+                    b.Navigation("Employment");
+                });
+
             modelBuilder.Entity("core.Entities.Identity.AppUser", b =>
                 {
                     b.Navigation("Address");
+
+                    b.Navigation("MessagesReceived");
+
+                    b.Navigation("MessagesSent");
                 });
 
-            modelBuilder.Entity("core.Entities.Message.Group", b =>
+            modelBuilder.Entity("core.Entities.Messages.Group", b =>
                 {
                     b.Navigation("Connections");
                 });

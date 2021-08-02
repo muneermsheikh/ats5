@@ -10,6 +10,7 @@ namespace core.Interfaces
          Task<IReadOnlyList<SelectionDecision>> RegisterSelections(ICollection<SelectionDecisionToRegisterDto> selectionDecisions);
          Task<bool> EditSelection(SelectionDecision selectionDecision);
          Task<bool> DeleteSelection(SelectionDecision selectionDecision);
+         Task<Pagination<SelectionDecision>> GetSelectionDecisions (SelDecisionSpecParams specParams);
          
     }
 }
