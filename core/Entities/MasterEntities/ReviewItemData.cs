@@ -2,17 +2,19 @@ namespace core.Entities.MasterEntities
 {
     public class ReviewItemData: BaseEntity
     {
-          public ReviewItemData()
-          {
-          }
+        public ReviewItemData()
+        {
+        }
 
-          public ReviewItemData(int srNo, string reviewDescription)
-          {
-               SrNo = srNo;
-               ReviewDescription = reviewDescription;
-          }
+        public ReviewItemData(int srNo, string reviewParameter)
+        {
+            SrNo = srNo;
+            ReviewParameter = reviewParameter;
+        }
 
-          public int SrNo { get; set; }
-        public string ReviewDescription { get; set; }
+        public int SrNo { get; set; }
+        public string ReviewParameter { get; set; }
+        public bool Response {get; set;}
+        public bool IsMandatoryTrue {get; set;}
     }
 }

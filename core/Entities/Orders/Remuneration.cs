@@ -36,6 +36,7 @@ namespace core.Entities.Orders
         [Required]
         public int OrderNo {get; set;}
         public int CategoryId {get; set;}
+        public int WorkHours { get; set; }
         [Required]
         [MinLength(3), MaxLength(3)]
         public string SalaryCurrency { get; set; }
@@ -46,10 +47,13 @@ namespace core.Entities.Orders
         public int ContractPeriodInMonths { get; set; }=24;
         public bool HousingProvidedFree { get; set; }
         public int HousingAllowance { get; set; }
+        public bool HousingNotProvided { get; set; }
         public bool FoodProvidedFree { get; set; }
         public int FoodAllowance { get; set; }
+        public bool FoodNotProvided { get; set; }
         public bool TransportProvidedFree { get; set; }
         public int TransportAllowance { get; set; }
+        public bool TransportNotProvided { get; set; }
         public int OtherAllowance { get; set; }
         public int LeavePerYearInDays { get; set; }
         public int LeaveAirfareEntitlementAfterMonths { get; set; }

@@ -1,8 +1,8 @@
 [
-     {"cVRefId": 1, "orderItemId": 1, "categoryId": 1, "categoryName": "unknown", "OrderId": 1, "OrderNo": 1001, 
-          "applicatonNo": 10001, "candidateId": 1, "candidateName": "candidate name", "decisionDate": "2020-01-05T10:00:00",
-          "selectionStatusId": 1, "remarks": "seeded data"}, 
-     {"cVRefId": 2, "orderItemId": 1, "categoryId": 1, "categoryName": "unknown", "OrderId": 1, "OrderNo": 1001, 
-          "applicatonNo": 10002, "candidateId": 1, "candidateName": "candidate name 2", "decisionDate": "2020-01-05T10:00:00",
-          "selectionStatusId": 1, "remarks": "seeded data"}
+     {"CVRefId": 1, "OrderItemId": 1, "CategoryId": 1, "CategoryName": "unknown", "OrderId": 1, "OrderNo": 1001, 
+          "ApplicatonNo": 10001, "CandidateId": 1, "CandidateName": "candidate name", "DecisionDate": "2020-01-05T10:00:00",
+          "SelectionStatusId": 1, "Remarks": "seeded data"}, 
+     {"cVRefId": 2, "OrderItemId": 1, "CategoryId": 1, "CategoryName": "unknown", "OrderId": 1, "OrderNo": 1001, 
+          "ApplicatonNo": 10002, "CandidateId": 1, "CandidateName": "candidate name 2", "DecisionDate": "2020-01-05T10:00:00",
+          "SelectionStatusId": 1, "Remarks": "seeded data"}
 ]

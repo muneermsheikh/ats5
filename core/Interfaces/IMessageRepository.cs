@@ -4,6 +4,7 @@ using core.Entities.Identity;
 using core.ParamsAndDtos;
 using core.Entities.Messages;
 using core.Entities.Admin;
+using core.Entities.EmailandSMS;
 
 namespace core.Interfaces
 {
@@ -14,9 +15,9 @@ namespace core.Interfaces
         Task<Connection> GetConnection(string connectionId);
         Task<Group> GetMessageGroup(string groupName);
         Task<Group> GetGroupForConnection(string connectionId);
-        void AddMessage(Message message);
-        void DeleteMessage(Message message);
-        Task<Message> GetMessage(int id);
+        void AddMessage(EmailMessage message);
+        void DeleteMessage(EmailMessage message);
+        Task<EmailMessage> GetMessage(int id);
         Task<Pagination<MessageDto>> GetMessagesForUser(MessageParams messageParams);
         Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recipientUsername);
     }

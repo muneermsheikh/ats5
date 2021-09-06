@@ -39,7 +39,7 @@ namespace core.Specifications
         }
 
         public CandidateForCountSpecs(string appUserId)
-        : base(x => x.AppUserIdNotEnforced == appUserId)
+        : base(x => x.AppUserId == appUserId)
         {
         }
   

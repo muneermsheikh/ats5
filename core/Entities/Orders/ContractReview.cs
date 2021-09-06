@@ -15,7 +15,7 @@ namespace core.Entities.Orders
             OrderId = enquiryId;
             ReviewedBy = reviewedBy;
             ReviewedOn = DateTime.Now;
-            ReviewStatusId = reviewStatusId;
+            RvwStatusId = reviewStatusId;
         }
 
         public ContractReview(int enquiryId, int enquiryNo, DateTime enquiryDate, 
@@ -29,7 +29,7 @@ namespace core.Entities.Orders
         }
 
             public ContractReview(int enquiryId, int enquiryNo, DateTime enquiryDate, 
-            int customerId, string customerName, ICollection<ContractReviewItem> reviewItems, int statusId)
+            int customerId, string customerName, ICollection<ContractReviewItem> reviewItems)
         {
             OrderId = enquiryId;
             OrderNo = enquiryNo;
@@ -37,7 +37,6 @@ namespace core.Entities.Orders
             CustomerId = customerId;
             CustomerName = customerName;
             ContractReviewItems=reviewItems;
-            ReviewStatusId = statusId;
         }
 
         public int OrderId { get; set; }
@@ -46,9 +45,10 @@ namespace core.Entities.Orders
         public int CustomerId {get; set;}
         public string CustomerName {get; set;}
         public int? ReviewedBy { get; set; }
-        public DateTime? ReviewedOn { get; set; } = DateTime.Now;
+        public DateTime ReviewedOn { get; set; } = DateTime.Now;
+        public int RvwStatusId { get; set; } = (int)EnumReviewStatus.NotReviewed;    //not reviewed
+        //public ReviewStatus ReviewStatus {get; set;}
+        public bool ReleasedForProduction { get; set; }=false;
         public ICollection<ContractReviewItem> ContractReviewItems {get; set; }
-        public int ReviewStatusId { get; set; } = 0;    //not reviewed
-        public ReviewStatus ReviewStatus {get; set;}
     }
 }

@@ -1,13 +1,8 @@
-using System;
-using System.Linq;
-using core.Entities;
 using core.Entities.Orders;
-using core.Entities.Users;
-using core.ParamsAndDtos;
 
 namespace core.Specifications
 {
-    public class ContractReviewSpecs: BaseSpecification<ContractReviewItem>
+     public class ContractReviewSpecs: BaseSpecification<ContractReviewItem>
     {
         public ContractReviewSpecs(ContractReviewSpecParams cParams)
             : base(x => 
@@ -23,6 +18,7 @@ namespace core.Specifications
         public ContractReviewSpecs(int orderItemId) 
             : base(x => x.OrderItemId == orderItemId)
         {
+            AddInclude(x => x.ReviewItems);
         }
         public ContractReviewSpecs(int orderid, int dummy) 
             : base(x => x.OrderId == orderid)

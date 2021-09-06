@@ -13,13 +13,20 @@ namespace core.ParamsAndDtos
         public string CandidateName {get; set;}
         public string OrderNo {get; set;}
         public string CategoryName {get; set;}
-        public DateTime ReferredOn { get; set; } = DateTime.Now;
+        public DateTime ReferredOn { get; set; }
         public EnumCVRefStatus RefStatus { get; set; }
         public ICollection<DeployDto> Deploys {get; set;}
     }
 
     public class DeployDto
     {
+        public DeployDto(int cVRefId, DateTime transactionDate, EnumDeployStatus deployStatus)
+        {
+            CVRefId = cVRefId;
+            TransactionDate = transactionDate;
+            DeployStatus = deployStatus;
+        }
+
         public int CVRefId { get; set; }
         public DateTime TransactionDate { get; set; }
         public EnumDeployStatus DeployStatus { get; set; }

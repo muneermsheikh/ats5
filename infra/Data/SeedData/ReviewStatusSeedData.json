@@ -1,8 +1,6 @@
 [
-    {"Status": "Not Reviewed"},{"Status": "Regretted-Salary Not Feasible"},
-    {"Status": "Regretted-Facilities Insufficient"},{"Status": "Regretted-Negative background of client"},
-    {"Status": "Regretted-Employment Visas not available"},
-    {"Status": "Regretted-Requirement suspect"},
-    {"Status": "Regretted-varius reasons"},
-    {"Status": "Approved"}, {"Status": "Approved with some regrets"}
+    {"Status": "Not Reviewed"},
+    {"Status": "Regretted"},
+    {"Status": "Accepted with some Regrets"},
+    {"Status": "Accepted"}
 ]

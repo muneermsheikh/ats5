@@ -9,7 +9,7 @@ namespace infra.Data.Config
      {
           public void Configure(EntityTypeBuilder<ReviewItemData> builder)
           {
-               builder.Property(p => p.ReviewDescription).IsRequired().HasMaxLength(250);
+               builder.Property(p => p.ReviewParameter).IsRequired().HasMaxLength(250);
                builder.HasIndex(p => p.SrNo).IsUnique();
           }
      }

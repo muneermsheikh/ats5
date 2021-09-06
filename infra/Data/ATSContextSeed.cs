@@ -6,10 +6,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using core.Entities;
 using core.Entities.Admin;
+using core.Entities.EmailandSMS;
 using core.Entities.HR;
 using core.Entities.MasterEntities;
 using core.Entities.Orders;
 using core.Entities.Process;
+using core.Entities.Tasks;
 using core.Entities.Users;
 using Microsoft.Extensions.Logging;
 
@@ -75,6 +77,42 @@ namespace infra.Data
                     await context.SaveChangesAsync();
                 }
 
+                if(!context.DeployStatus.Any()) {
+                    var jsonData = File.ReadAllText("../infra/data/SeedData/DeployStatusSeedData.json");
+                    var fileData = JsonSerializer.Deserialize<List<DeployStatus>>(jsonData);
+                    foreach(var item in fileData) {
+                        context.DeployStatus.Add(item);
+                    }
+                    await context.SaveChangesAsync();
+                }
+
+                if(!context.MessageComposeSources.Any()) {
+                    var jsonData = File.ReadAllText("../infra/data/SeedData/MessageComposeSourceSeedData.json");
+                    var fileData = JsonSerializer.Deserialize<List<MessageComposeSource>>(jsonData);
+                    foreach(var item in fileData) {
+                        context.MessageComposeSources.Add(item);
+                    }
+                    await context.SaveChangesAsync();
+                }
+
+                if(!context.TaskTypes.Any()) {
+                    var jsonData = File.ReadAllText("../infra/data/SeedData/TaskTypeSeedData.json");
+                    var fileData = JsonSerializer.Deserialize<List<TaskType>>(jsonData);
+                    foreach(var item in fileData) {
+                        context.TaskTypes.Add(item);
+                    }
+                    await context.SaveChangesAsync();
+                }
+
+                if(!context.MessageTypes.Any()) {
+                    var jsonData = File.ReadAllText("../infra/data/SeedData/MessageTypeSeedData.json");
+                    var fileData = JsonSerializer.Deserialize<List<MessageType>>(jsonData);
+                    foreach(var item in fileData) {
+                        context.MessageTypes.Add(item);
+                    }
+                    await context.SaveChangesAsync();
+                }
+
                 if(!context.ReviewItemDatas.Any()) {
                     var jsonData = File.ReadAllText("../infra/data/SeedData/ReviewItemDataSeedData.json");
                     var fileData = JsonSerializer.Deserialize<List<ReviewItemData>>(jsonData);
@@ -102,15 +140,6 @@ namespace infra.Data
                     await context.SaveChangesAsync();
                 }
 
-                if(!context.DeployStatus.Any()) {
-                    var jsonData = File.ReadAllText("../infra/data/SeedData/DeployStatusSeedData.json");
-                    var fileData = JsonSerializer.Deserialize<List<DeployStatus>>(jsonData);
-                    foreach(var item in fileData) {
-                        context.DeployStatus.Add(item);
-                    }
-                    await context.SaveChangesAsync();
-                }
-                
                 if(!context.SkillDatas.Any()) {
                     var jsonData = File.ReadAllText("../infra/data/SeedData/SkillSeedData.json");
                     var fileData = JsonSerializer.Deserialize<List<SkillData>>(jsonData);

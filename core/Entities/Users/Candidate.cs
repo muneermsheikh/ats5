@@ -13,15 +13,16 @@ namespace core.Entities.Users
           {
           }
 
-          public Candidate(string gender, string appUserId, int applicationNo, 
+          public Candidate(string gender, string appUserId,  bool appUserIdNotEnforced, int applicationNo, 
                 string firstName, string secondName, string familyName, string knownAs, DateTime dOB, 
                 string placeOfBirth, string aadharNo, string email, string introduction, 
-                string interests, ICollection<UserQualification> userQualifications, 
+                string interests, bool notificationDesired, ICollection<UserQualification> userQualifications, 
                 ICollection<UserProfession> userProfessions, ICollection<UserPassport> userPassports, 
                 ICollection<UserAttachment> userAttachments)
             {
                 Gender = gender;
-                AppUserIdNotEnforced = appUserId;
+                AppUserId = appUserId;
+                AppUserIdNotEnforced = appUserIdNotEnforced;
                 ApplicationNo = applicationNo;
                 FirstName = firstName;  SecondName = secondName; FamilyName=familyName;
                 KnownAs= knownAs; DOB = dOB; AadharNo=AadharNo; Email = Email;
@@ -50,6 +51,7 @@ namespace core.Entities.Users
         public string PlaceOfBirth { get; set; }
         public string AadharNo { get; set; }
         public string PpNo { get; set; } 
+        public bool Ecnr { get; set; }
         public string Nationality {get; set;}
         [EmailAddress]
         public string Email { get; set; }
@@ -60,7 +62,9 @@ namespace core.Entities.Users
         public string Introduction { get; set; }
         public string Interests { get; set; }
     //navigations
-        public string AppUserIdNotEnforced { get; set; }
+        public bool AppUserIdNotEnforced { get; set; }
+        public string AppUserId {get; set;}
+        public bool NotificationDesired {get; set;}
 
         public EnumCandidateStatus? CandidateStatus {get; set;} = EnumCandidateStatus.NotReferred;
         public ICollection<UserPhone> UserPhones {get; set;}

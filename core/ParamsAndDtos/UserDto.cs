@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace core.ParamsAndDtos
 {
     public class UserDto
@@ -5,5 +7,6 @@ namespace core.ParamsAndDtos
         public string Email { get; set; }
         public string DisplayName { get; set; }
         public string Token { get; set; }
+        public ICollection<TaskDashboardDto> dashboardTasks {get; set;}
     }
 }

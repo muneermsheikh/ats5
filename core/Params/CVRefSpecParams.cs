@@ -6,6 +6,34 @@ namespace core.Params
 {
     public class CVRefSpecParams: ParamPages
     {
+        public CVRefSpecParams()
+        {
+        }
+
+        public CVRefSpecParams(EnumCVRefStatus cVRefStatus)
+        {
+        }
+
+        public CVRefSpecParams(int? id, int? orderItemId, int? candidateId, int? categoryId, int? orderId, int? orderNo, 
+        int? applicationNo, string customerName, DateTime? referredOn, int? cVRefStatus, int[] ids, 
+        bool includeDeployments, bool includeSelection, bool includeEmployment)
+        {
+            Id = id;
+            OrderItemId = orderItemId;
+            CandidateId = candidateId;
+            CategoryId = categoryId;
+            OrderId = orderId;
+            OrderNo = orderNo;
+            ApplicationNo = applicationNo;
+            CustomerName = customerName;
+            ReferredOn = referredOn;
+            CVRefStatus = cVRefStatus;
+            Ids = ids;
+            IncludeDeployments = includeDeployments;
+            IncludeSelection = includeSelection;
+            IncludeEmployment = includeEmployment;
+        }
+
         public int? Id { get; set; }
         public int? OrderItemId { get; set; }
         public int? CandidateId {get; set;}
@@ -17,6 +45,7 @@ namespace core.Params
         public string CategoryName {get; set;}
         public string CandidateName {get; set;}
         public DateTime? ReferredOn { get; set; }
+        public int? CVRefStatus { get; set; }
         public int[] Ids {get; set;}
         public bool IncludeDeployments { get; set; }
         public bool IncludeSelection { get; set; }

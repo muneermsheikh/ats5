@@ -33,7 +33,6 @@ namespace infra.Services
 
           public async Task<bool> EditEmployee(Employee emp)
           {
-
                //thanks to @slauma of stackoverflow
                var existingEmp = _context.Employees
                    .Where(p => p.Id == emp.Id)
@@ -223,5 +222,60 @@ namespace infra.Services
 
                return new Pagination<Employee>(empParams.PageIndex, empParams.PageSize, totalItems, emps);
           }
+
+          public async Task<EmployeeDto> GetEmployeeFromIdAsync(int employeeId)
+          {
+               var emp = await _context.Employees.Where(x => x.Id == employeeId)
+                    .Select(x => new {x.FirstName, x.SecondName, x.FamilyName, x.KnownAs, x.Position, x.Email,
+                         x.AppUserId, x.UserPhones}).FirstOrDefaultAsync();
+               if (emp == null) return null;
+               var empAppUser = await _userManager.FindByIdAsync(emp.AppUserId);
+               var empusername = empAppUser == null ? "" : empAppUser.Email;
+               return new EmployeeDto {
+                    EmployeeName = emp.FirstName + " " + emp.SecondName + " " + emp.FamilyName,
+                    KnownAs = emp.KnownAs, Position = emp.Position, 
+                    OfficialPhoneNo = emp.UserPhones?.Where(x => x.IsMain && x.IsOfficial && x.IsValid).Select(x => x.PhoneNo).FirstOrDefault(),
+                    OfficialMobileNo = emp.UserPhones?.Where(x => x.IsMain && x.IsValid && x.IsOfficial).Select(x => x.MobileNo).FirstOrDefault(),
+                    OfficialEmailAddress = emp.Email,
+                    AppUserId = emp.AppUserId, UserName = empusername
+               };
+          }
+
+          public async Task<int> GetEmployeeIdFromAppUserIdAsync(string appUserId)
+          {
+               return await _context.Employees.Where(x => x.AppUserId == appUserId).Select(x => x.Id).FirstOrDefaultAsync();
+          }
+
+          public async Task<EmployeeDto> GetEmployeeBriefAsyncFromAppUserId(string appUserId)
+          {
+               var emp =  await _context.Employees.Where(x => x.AppUserId == appUserId)
+                    .Select(x => new {x.Id, x.FirstName, x.SecondName, x.FamilyName, x.KnownAs, x.Position, x.Email})
+                    .FirstOrDefaultAsync();
+               if (emp != null) {
+                    return new EmployeeDto{EmployeeId = emp.Id, EmployeeName = emp.FirstName + " " + emp.SecondName + " " + emp.FamilyName,
+                         Position = emp.Position, KnownAs = emp.KnownAs, Email = emp.Email, AppUserId = appUserId};
+               } else {
+                    return null;
+               }
+          }
+
+          public async Task<EmployeeDto> GetEmployeeBriefAsyncFromEmployeeId(int id)
+          {
+               var emp =  await _context.Employees.Where(x => x.Id == id)
+                    .Select(x => new {x.AppUserId, x.KnownAs, x.FirstName, x.SecondName, x.FamilyName, x.Position, x.Email})
+                    .FirstOrDefaultAsync();
+               if (emp != null) {
+                    return new EmployeeDto{EmployeeId = id, EmployeeName = emp.FirstName + " " + emp.SecondName + " " + emp.FamilyName,
+                         KnownAs = emp.KnownAs, Position = emp.Position, Email = emp.Email, AppUserId = emp.AppUserId};
+               } else {
+                    return null;
+               }
+          }
+
+          public async Task<string> GetEmployeeNameFromEmployeeId(int id)
+          {
+               return await _context.Employees.Where(x => x.Id == id).Select(x => x.FirstName + " " + x.FamilyName).FirstOrDefaultAsync();
+          }
+
      }
 }

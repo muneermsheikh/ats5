@@ -13,6 +13,10 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using core.Params;
+using core.Specifications;
+using infra.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -24,11 +28,14 @@ namespace api.Controllers
           private readonly IMapper _mapper;
           private readonly IUserService _userService;
           private readonly RoleManager<IdentityRole> _roleManager;
-
+          private readonly AppIdentityDbContext _identityContext;
+          private readonly ITaskService _taskService;
+          private readonly IEmployeeService _empService;
           public AccountController(
                UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
                RoleManager<IdentityRole> roleManager, ITokenService tokenService,
-              IMapper mapper, IUserService userService)
+              IMapper mapper, IUserService userService, AppIdentityDbContext identityContext,
+              ITaskService taskService, IEmployeeService empService)
           {
                _roleManager = roleManager;
                _userService = userService;
@@ -36,6 +43,9 @@ namespace api.Controllers
                _tokenService = tokenService;
                _signInManager = signInManager;
                _userManager = userManager;
+               _identityContext = identityContext;
+               _taskService = taskService;
+               _empService = empService;
           }
 
           [Authorize]
@@ -50,6 +60,7 @@ namespace api.Controllers
                     DisplayName = user.DisplayName
                };
           }
+          
 
           [HttpGet("emailexists")]
           public async Task<ActionResult<bool>> CheckEmailExistsAsync([FromQuery] string email)
@@ -93,18 +104,35 @@ namespace api.Controllers
 
                if (!result.Succeeded) return Unauthorized(new ApiResponse(401));
 
+               int loggedInEmployeeId = await _empService.GetEmployeeIdFromAppUserIdAsync(user.Id);
+               //var taskParams = new TaskParams{TaskOwnerId = loggedInEmployeeId, AssignedToId = loggedInEmployeeId, TaskStatus = "Open"};
+
+               var tasksOfLoggedInUser = await _taskService.GetDashboardTasks(loggedInEmployeeId);
+
                return new core.ParamsAndDtos.UserDto
                {
+                    dashboardTasks = tasksOfLoggedInUser,
                     Email = user.Email,
                     Token = _tokenService.CreateToken(user),
                     DisplayName = user.DisplayName
                };
           }
 
+          [HttpGet("users")]
+          public async Task<ActionResult<ICollection<UserDto>>> GetUsers (AppUserSpecParams userParams)
+          {
+               var users = await _userManager.Users.ToListAsync();
+               return  Ok(_mapper.Map<ICollection<UserDto>>(users));
+          }
+
+          
           //registers individuals. For customers and vendors, it will register the users for customers that exist
           [HttpPost("register")]
           public async Task<ActionResult<core.ParamsAndDtos.UserDto>> Register(RegisterDto registerDto)
           {
+               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               registerDto.LoggedInAppUserId = loggedInUser.Id;
+               
                if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
                {
                     return new BadRequestObjectResult(new ApiValidationErrorResponse { Errors = new[] { "Email address is in use" } });
@@ -204,27 +232,95 @@ namespace api.Controllers
           }
 
           [HttpDelete("user/{useremail}")]
-          public async Task<ActionResult<bool>> DeleteIdentityUser (string email)
+          public async Task<ActionResult<bool>> DeleteIdentityUser (string useremail)
           {
-               
-          }
-//userRoles
-
-          [HttpPost("userrole/{userEmail}/{newRole}")]
-          public async Task<ActionResult<bool>> AddNewRoleToUser(string userEmail, string newRole)
-          {
-               var user = await _userManager.FindByEmailAsync(userEmail);
+               var user = await _userManager.FindByEmailAsync(useremail);
                if (user==null) {
                     return BadRequest(new ApiResponse(400, "no user with the selected email exists"));
                }
-               var roleExists = await _roleManager.RoleExistsAsync(newRole);
-               if (!roleExists) return BadRequest(new ApiResponse(400, "the role " + newRole + " does not exist"));
+               var result = await _userManager.DeleteAsync(user);
 
-               var roleAdded = await _userManager.AddToRoleAsync(user, newRole);
+               return result.Succeeded;
+          }
+//userRoles
 
-               return roleAdded.Succeeded;
+          [Authorize]
+          [HttpGet("users-with-roles")]
+          public async Task<ActionResult<ICollection<AppUser>>> GetUsersWithRoles()
+          {
+               var users = await (from u in _identityContext.Users
+                    join r in _identityContext.UserRoles on u.Id equals r.UserId
+                    //join userroles in _identityContext.UserRoles on r.RoleId equals userroles.UserId
+                    //join rolenames in _identityContext.Roles on userroles.RoleId equals rolenames.Id
+                    orderby u.Address.FirstName
+                    select new {
+                         UserType = u.UserType,
+                         Roles = r.RoleId,
+                         Id = u.Id,
+                         FirstName = u.Address.FirstName,
+                         Username = u.UserName,
+                         Email = u.Email
+                    }).ToListAsync();
+               
+               
+               /*
+               var users = await _userManager.Users
+                    //.Include(r =>r.UserRoles)
+                    //.ThenInclude(r => r.Role)
+                    .OrderBy(u => u.UserName)
+                    
+                    .Select(u => new
+                    {
+                         UserType = u.UserType,
+                         Roles = u.UserRoles,
+                         Id = u.Id,
+                         FirstName = u.Address.FirstName,
+                         Username = u.UserName,
+                         Email = u.Email
+                         
+                         //RoleName = u.UserRoles.Select(x => x.Role.Name).ToList()
+                         //, Roles = u.UserRoles.Select(r => r.Role.Name).ToList()
+                    })
+                    
+                    .ToListAsync();
+               */
+               return Ok(users);
           }
 
+          //[Authorize(Policy = "AdminRole")]
+          [HttpPost("edit-roles/{useremail}")]
+          public async Task<ActionResult> EditRoles(string useremail, [FromQuery] string roles)
+          {
+               var lst = roles.Split(",").ToArray();
+               var selectedRoles = new List<string>();
+               foreach(var item in lst)
+               {
+                    if (await _roleManager.RoleExistsAsync(item)) {
+                         selectedRoles.Add(item.Trim());
+                    } 
+               }
+
+               if (selectedRoles.Count() == 0 ) return BadRequest(new ApiResponse(404, "none of the roles exist in Identity Roles"));
+               
+               var user = await _userManager.FindByEmailAsync(useremail);
+
+               if (user == null) return NotFound("Could not find user");
+
+               var userRoles = await _userManager.GetRolesAsync(user);
+
+               IdentityResult result;
+               result = await _userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
+               
+               if (!result.Succeeded) return BadRequest("Failed to add to roles");
+
+               result = await _userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
+
+               if (!result.Succeeded) return BadRequest("Failed to remove from roles");
+
+               return Ok(await _userManager.GetRolesAsync(user));
+          }
+
+         
           [HttpPut("userrole/{userEmail}/{oldRoleName}/{newRoleName}")]
           public async Task<ActionResult<bool>> EditUserRole(string userEmail, string oldRoleName, string newRoleName)
           {
@@ -254,7 +350,9 @@ namespace api.Controllers
           {
                var user = await _userManager.FindByEmailAsync(useremail);
                if (user == null) return NotFound(new ApiResponse(404, "User not found"));
-               return Ok(user.UserRoles);
+               var roles = await _userManager.GetRolesAsync(user);
+
+               return Ok(roles);
           }
 
           [HttpGet("userhastherole/{useremail}/{rolename}")]
@@ -275,6 +373,14 @@ namespace api.Controllers
           }
           
 //Roles
+
+          [HttpGet("identityroles")]
+          public async Task<ActionResult<IReadOnlyList<String>>> GetIdentityRoles()
+          {
+               var iroles =  await _roleManager.Roles.OrderBy(x => x.Name).Select(x => x.Name).ToListAsync();
+               return iroles;
+          }
+
           [HttpPut("role/{existingRoleName}/{newRoleName}")]
           public async Task<ActionResult<bool>> EditRole(string existingRoleName, string newRoleName)
           {
@@ -301,6 +407,16 @@ namespace api.Controllers
                 }
           }
 
+          [HttpDelete("role/{rolename}")]
+          public async Task<ActionResult<bool>> DeleteIdentityRole(string rolename)
+          {
+               var role = await _roleManager.FindByNameAsync(rolename);
+               if (role==null) return NotFound(new ApiResponse(404, "Role not found"));
+
+               var result = await _roleManager.DeleteAsync(role);
+
+               return result.Succeeded;
+          }
 
      }
 }

@@ -1,106 +1,93 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
-using core.Entities.MasterEntities;
+using api.Errors;
+using api.Extensions;
+using core.Entities.EmailandSMS;
+using core.Entities.Identity;
 using core.Entities.Orders;
 using core.Interfaces;
 using core.ParamsAndDtos;
 using core.Specifications;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
-     public class ContractReviewController : BaseApiController
-     {
-          private readonly IContractReviewService _cReviewService;
-          private readonly IUnitOfWork _unitOfWork;
-          private readonly IMapper _mapper;
-          public ContractReviewController(IContractReviewService cReviewService, IUnitOfWork unitOfWork, IMapper mapper)
-          {
-               _mapper = mapper;
-               _unitOfWork = unitOfWork;
-               _cReviewService = cReviewService;
-          }
-
-          [HttpPost("newcontractreview")]
-          public async Task<ActionResult<bool>> CreateContractReview(ContractReview contractReview)
-          {
-               return await _cReviewService.CreateContractReview(contractReview);
-          }
-
-          [HttpGet("contractreviewitems")]
-          public async Task<IReadOnlyList<ContractReviewItemDto>> GetContractReviewItems(ContractReviewSpecParams contractReviewSpecParams)
-          {
-               return await _cReviewService.GetContractReviewItemsAsync(contractReviewSpecParams);
-          }
-
-          [HttpGet("contractreviewitemsoforderid")]
-          public async Task<IReadOnlyList<ContractReviewItemDto>> GetContractReviewItemsOfOrderId(int orderid)
-          {
-               return await _cReviewService.GetContractReviewItemsByOrderIdAsync(orderid);
-          }
-
-          [HttpGet("contractreview")]
-          public async Task<ContractReview> GetContractReview(int orderid)
-          {
-               return await _cReviewService.GetContractReview(orderid);
-          }
+    public class ContractReviewController : BaseApiController
+    {
+        private readonly IContractReviewService _reviewService;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IUnitOfWork _unitOfWork;
+        public ContractReviewController(IContractReviewService reviewService, UserManager<AppUser> userManager, IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+            _userManager = userManager;
+            _reviewService = reviewService;
+        }
 
 
-          [HttpPut("contractreview")]
-          public async Task<bool> EditContractReview(ContractReview contractReview)
-          {
-               _cReviewService.EditContractReview(contractReview);
-               if (await _unitOfWork.Complete() > 0) return true;
-               return false;
-          }
+        [Authorize] //(Roles = "ContractReviewRole")]
+        [HttpPost("createobject/{orderId}")]
+        public async Task<ContractReview> CreateContractReviewObject(int orderId)
+        {
+            var loggedInAppUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+            var cReview = await _reviewService.CreateContractReviewObject(orderId, loggedInAppUser.Id);
+            return cReview;
+        }
 
-          [HttpDelete("review")]
-          public async Task<bool> DeleteContractReview(int orderid)
-          {
-               return await _cReviewService.DeleteContractReview(orderid);
-          }
+        [Authorize] //(Roles = "ContractReviewRole")]
+        [HttpPut("update")]
+        public async Task<ActionResult<EmailMessage>> UpdateContractReview(ContractReview contractReview)
+        {
+            var msgDto = await _reviewService.EditContractReview(contractReview);
+            if (msgDto == null) {
+                return BadRequest(new ApiResponse(404, "Failed to update the Contract Review"));
+            } else {
+                return msgDto.EmailMessage;
+            }
+        }
 
-          [HttpDelete("reviewitem")]
-          public async Task<bool> DeleteContractReviewItem(int orderitemid)
-          {
-               return await _cReviewService.DeleteContractReviewItem(orderitemid);
-          }
-          
-          [HttpPost("reviewstatus/{reviewstatusname}")]
-          public async Task<bool> AddContractReviewStatusName(string reviewstatusname)
-          {
-               _cReviewService.AddReviewStatus(reviewstatusname);
 
-               return (await _unitOfWork.Complete() > 0);
-          }
+        [Authorize] //(Roles = "ContractReviewRole")]
+        [HttpGet("dto/{orderid}")]
+        public async Task<ContractReview> GetContractReviewDtoByOrderId(int orderid)
+        {
+            return await _reviewService.GetContractReviewDtoByOrderIdAsync(orderid);
+        }
 
-          [HttpPost("reviewitemstatus/{reviewstatusname}")]
-          public async Task<bool> AddContractReviewItemStatusName(string reviewstatusname)
-          {
-               _cReviewService.AddReviewItemStatus(reviewstatusname);
+        [Authorize] //(Roles = "ContractReviewRole")]
+        [HttpGet("orderitemdto/{orderitemid}")]
+        public async Task<ContractReviewItemDto> GetContractReviewItemDto(int orderitemid)
+        {
+            var rvwitem = await _reviewService.GetContractReviewItemWithOrderDetails(orderitemid);
+            return rvwitem;
+        }
 
-               return (await _unitOfWork.Complete() > 0);
-          }
+        [Authorize] //(Roles = "ContractReviewRole")]
+        [HttpDelete("{orderid}")]           //deletes contractreview and all children
+        public async Task<ActionResult<bool>> DeleteContractReview(int orderid)
+        {
+            if (!await _reviewService.DeleteContractReview(orderid))  return BadRequest(new ApiResponse(404, "Failed to delete the record"));
+            return Ok(true);
+        }
 
-          [HttpGet("reviewstatuslist")]
-          public async Task<ICollection<ReviewStatus>> GetReviewStatus()
-          {
-               return await _cReviewService.GetReviewStatus();
-          }
+        [Authorize] //(Roles = "ContractReviewRole")]
+        [HttpDelete("item/{orderitemid}")]      //deletes contractReviewItem and all reviewitems
+        public async Task<ActionResult<bool>> DeleteContractReviewItem(int orderitemid)
+        {
+            if (!await _reviewService.DeleteContractReviewItem(orderitemid))  return BadRequest(new ApiResponse(404, "Failed to delete the record"));
+            return Ok(true);
+        }
 
-          [HttpGet("reviewitemstatuslist")]
-          public async Task<IReadOnlyList<ReviewItemStatus>> GetReviewItemStatus()
-          {
-               return await _cReviewService.GetReviewItemStatus();
-          }
-          
-          [HttpGet("reviewitembyorderitemid/{orderitemid}")]
-          public async Task<ContractReviewItemDto> GetContractReviewItemByItemId(int orderitemid)
-          {
-               return await _cReviewService.GetContractReviewItemWithOrderDetails(orderitemid);
-          }
-          
+        [Authorize] //(Roles = "ContractReviewRole")]
+        [HttpDelete("reviewitem/{id}")]
+        public async Task<ActionResult<bool>> DeleteContractReviewReviewItem(int id)
+        {
+            if (!await _reviewService.DeleteReviewReviewItem(id)) return BadRequest(new ApiResponse(404, "Failed to delete the record"));
+            return Ok(true);
+        }
 
-     }
+        
+        
+    }
 }

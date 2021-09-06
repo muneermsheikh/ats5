@@ -46,6 +46,7 @@ namespace core.Entities
         public string Title { get; set; }
         public string OfficialName { get; set; }
         public string Designation { get; set; }
+        public string Divn {get; set;}  
         public string PhoneNo { get; set; }
         public string Mobile { get; set; }
         public string Email { get; set; }

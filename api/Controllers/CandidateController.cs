@@ -8,11 +8,13 @@ using core.Interfaces;
 using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
+     [Authorize(Policy = "Employee")]
      public class CandidateController : BaseApiController
      {
           private readonly IUnitOfWork _unitOfWork;

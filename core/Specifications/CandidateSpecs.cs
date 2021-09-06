@@ -85,7 +85,7 @@ namespace core.Specifications
           }
           
           public CandidateSpecs(string appUserId) 
-            : base(x => x.AppUserIdNotEnforced == appUserId)
+            : base(x => x.AppUserId == appUserId)
           {
               //AddInclude(x => x.Addresses);
               

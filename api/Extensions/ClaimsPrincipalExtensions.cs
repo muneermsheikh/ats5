@@ -29,7 +29,7 @@ namespace api.Extensions
 
         public static string GetIdentityUserEmailId(this ClaimsPrincipal user)
         {
-            return user.FindFirst(ClaimTypes.Email)?.Value;
+            return user?.FindFirst(ClaimTypes.Email)?.Value;
         }
         public static bool IsUserAuthenticated(this ClaimsPrincipal user)
         {

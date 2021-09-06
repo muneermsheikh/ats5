@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Entities;
 using core.Entities.Admin;
+using core.Entities.EmailandSMS;
 using core.Entities.Identity;
 using core.Entities.Users;
 using core.Interfaces;
@@ -20,9 +21,11 @@ namespace infra.Services
           private readonly IUnitOfWork _unitOfWork;
           private readonly ATSContext _context;
           private readonly UserManager<AppUser> _userManager;
+          private readonly ITaskService _taskService;
+          private readonly IComposeMessages _composeMessages;
           //private readonly TokenService _tokenService;
-          public UserService(IUnitOfWork unitOfWork, ATSContext context, 
-               UserManager<AppUser> usermanager
+          public UserService(IUnitOfWork unitOfWork, ATSContext context, ITaskService taskService,
+               UserManager<AppUser> usermanager, IComposeMessages composeMessages
                //, TokenService tokenService
                )
           {
@@ -30,22 +33,24 @@ namespace infra.Services
                _userManager = usermanager;
                _context = context;
                _unitOfWork = unitOfWork;
+               _taskService = taskService;
+               _composeMessages = composeMessages;
           }
 
           public async Task<Candidate> CreateCandidateAsync(RegisterDto registerDto)
           {
-               var cand = new Candidate(registerDto.Address.Gender, registerDto.AppUserId, 
+               var cand = new Candidate(registerDto.Address.Gender, registerDto.AppUserId, registerDto.AppUserIdNotEnforced,
                     await _context.Candidates.MaxAsync(x => x.ApplicationNo) + 1,
                     registerDto.Address.FirstName, registerDto.Address.SecondName,
                     registerDto.Address.FamilyName, registerDto.DisplayName, registerDto.Address.DOB,
                     registerDto.PlaceOfBirth, registerDto.AadharNo, registerDto.Email, registerDto.Introduction,
-                    registerDto.Interests, registerDto.UserQualifications, registerDto.UserProfessions,
+                    registerDto.Interests, registerDto.NotificationDesired, registerDto.UserQualifications, registerDto.UserProfessions,
                     registerDto.UserPassports, null);
                
                cand.Created = DateTime.UtcNow;
                cand.LastActive = DateTime.UtcNow;
                cand.CompanyId = registerDto.CompanyId;
-               cand.AppUserIdNotEnforced = registerDto.AppUserId;
+               cand.AppUserId = registerDto.AppUserId;
 
                //PP No is unique in the db - include only those passports that do not already exist in the database
                var lstPP = new List<UserPassport>();
@@ -92,7 +97,15 @@ namespace infra.Services
                     cand.UserQualifications = qry.Count() == 0 && qry != null ? registerDto.UserQualifications : null;
                }
 
+               
                _unitOfWork.Repository<Candidate>().Add(cand);
+
+               if (registerDto.NotificationDesired) {
+                    var paramsDto = new CandidateMessageParamDto{Candidate = cand, DirectlySendMessage = false};
+                    await _composeMessages.AckToCandidateByEmail(paramsDto);
+                    await _composeMessages.AckToCandidateBySMS(paramsDto);
+               }
+               
                var result = await _unitOfWork.Complete();
 
                if (result <= 0) return null;
@@ -257,5 +270,7 @@ namespace infra.Services
           {
                return await _userManager.FindByEmailAsync(email) != null;
           }
+
+
      }
 }

@@ -4,12 +4,14 @@ using api.Errors;
 using core.Entities;
 using core.Interfaces;
 using infra.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
-{
+{    
+     [Authorize(Policy = "Employee")]
      public class CategoriesController : BaseApiController
      {
           private readonly IUnitOfWork _unitOfWork;

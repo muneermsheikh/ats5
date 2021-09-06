@@ -8,6 +8,7 @@ namespace core.Entities.Identity
     //[NotMapped]
     public class AppRole: IdentityRole
     {
+        //[NotMapped]
         public ICollection<AppUserRole> UserRoles {get; set; }
     }
 }

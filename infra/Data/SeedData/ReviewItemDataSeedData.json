@@ -1,13 +1,13 @@
 [
-     {"SrNo": 1, "ReviewDescription": "Salary Offered Feasible"},
-     {"SrNo": 2, "ReviewDescription": "Technically Feasible"},
-     {"SrNo": 3, "ReviewDescription": "Comemercially Feasible"},
-     {"SrNo": 4, "ReviewDescription": "Logistically Feasible"},
-     {"SrNo": 5, "ReviewDescription": "Visa Available"},
-     {"SrNo": 6, "ReviewDescription": "Documentations will be available"},
-     {"SrNo": 7, "ReviewDescription": "Emigrate registered"},
-     {"SrNo": 8, "ReviewDescription": "Historical Data avaialble"},
-     {"SrNo": 9, "ReviewDescription": "Service Charges in INR"},
-     {"SrNo": 10, "ReviewDescription": "Fee from client"},
-     {"SrNo": 11, "ReviewDescription": "Fee from client Currency"}
+     {"SrNo": 1, "ReviewParameter": "Salary Offered Feasible", "IsMandatoryTrue": true},
+     {"SrNo": 2, "ReviewParameter": "Technically Feasible", "IsMandatoryTrue": true},
+     {"SrNo": 3, "ReviewParameter": "Commercially Feasible"},
+     {"SrNo": 4, "ReviewParameter": "Logistically Feasible", "IsMandatoryTrue": true},
+     {"SrNo": 5, "ReviewParameter": "Visa Available", "IsMandatoryTrue": true},
+     {"SrNo": 6, "ReviewParameter": "Documentations will be available", "IsMandatoryTrue": true},
+     {"SrNo": 7, "ReviewParameter": "Emigrate registered"},
+     {"SrNo": 8, "ReviewParameter": "Historical Data avaialble"},
+     {"SrNo": 9, "ReviewParameter": "Service Charges in INR", "IsMandatoryTrue": true},
+     {"SrNo": 10, "ReviewParameter": "Fee from client"},
+     {"SrNo": 11, "ReviewParameter": "Fee from client Currency"}
 ]

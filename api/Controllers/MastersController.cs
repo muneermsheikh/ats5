@@ -5,6 +5,7 @@ using core.Entities.MasterEntities;
 using core.Interfaces;
 using core.Params;
 using core.ParamsAndDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -17,6 +18,7 @@ namespace api.Controllers
                _mastersService = mastersService;
           }
 
+          [Authorize]    //(Policy = "MastersAddRole")]
           [HttpPost("addcategory/{categoryname}")]
           public async Task<ActionResult<Category>> AddCategory(string categoryname)
           {
@@ -24,6 +26,8 @@ namespace api.Controllers
                if (categoryAdded==null) return BadRequest(new ApiResponse(400, "failed to add the category"));
                return Ok(categoryAdded);
           }
+
+          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpPut("editcategory")]
           public async Task<ActionResult<bool>> EditCategory(Category category)
           {
@@ -32,6 +36,7 @@ namespace api.Controllers
                return true;
           }
 
+          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpDelete("deletecategory")]
           public async Task<ActionResult<bool>> DeleteCategory(Category category)
           {
@@ -40,6 +45,7 @@ namespace api.Controllers
                return true;
           }
 
+          [Authorize]         //(Policy = "ViewReportsRole")]
           [HttpGet("categorylist")]
           public async Task<ActionResult<Pagination<Category>>> GetCategoryListAsync(CategorySpecParams categoryParams)
           {
@@ -48,6 +54,7 @@ namespace api.Controllers
                return Ok(lst);
           }
      //industry
+          [Authorize]         //(Policy = "MastersAddRole")]
           [HttpPost("addindustry/{industryname}")]
           public async Task<ActionResult<Industry>> AddIndustry(string industryname)
           {
@@ -55,6 +62,8 @@ namespace api.Controllers
                if (industryAdded==null) return BadRequest(new ApiResponse(400, "failed to add the industry"));
                return Ok(industryAdded);
           }
+          
+          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpPut("editindustry")]
           public async Task<ActionResult<bool>> EditIndustry(Industry industry)
           {
@@ -63,6 +72,7 @@ namespace api.Controllers
                return true;
           }
 
+          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpDelete("deleteindustry")]
           public async Task<ActionResult<bool>> DeleteCategory(Industry industry)
           {
@@ -71,6 +81,7 @@ namespace api.Controllers
                return true;
           }
 
+          [Authorize]         //(Policy = "MastersAddRole")]
           //qualifications
           [HttpPost("addqualification/{qualificationname}")]
           public async Task<ActionResult<Qualification>> AddQualification(string qualificationname)
@@ -79,6 +90,8 @@ namespace api.Controllers
                if (qualificationAdded==null) return BadRequest(new ApiResponse(400, "failed to add the qualification"));
                return Ok(qualificationAdded);
           }
+
+          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpPut("editqualification")]
           public async Task<ActionResult<bool>> EditQualification(Qualification qualification)
           {
@@ -87,6 +100,7 @@ namespace api.Controllers
                return true;
           }
 
+          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpDelete("deletequalification")]
           public async Task<ActionResult<bool>> DeleteCategory(Qualification qualification)
           {
@@ -95,6 +109,7 @@ namespace api.Controllers
                return true;
           }
 
+          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpGet("qualificationlist")]
           public async Task<ActionResult<Qualification>> GetQualificationListAsync(QualificationSpecParams specParams)
           {
@@ -103,6 +118,7 @@ namespace api.Controllers
                return Ok(lst);
           }
 
+          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpGet("industrylist")]
           public async Task<ActionResult<Industry>> GetIndustryListAsync(IndustrySpecParams industryParams)
           {
@@ -111,14 +127,7 @@ namespace api.Controllers
                return Ok(lst);
           }
           /*
-        
-        
-    //Qualifications
-        Task<Category> AddQualification(string qualificationName);
-        Task<bool> EditQualificationAsync(Qualification qualification);
-        Task<bool> DeleteQualificationAsync(Qualification qualification);
-        Task<IReadOnlyList<Category>> GetQualificationListAsync();
-
+    
     //ReviewItemStatus.Description for Contract REVIEW RESULTS
         Task<ReviewItemData> AddReviewItemData(string reviewDescriptionName);
         Task<bool> EditReviewItemDataAsync(ReviewItemData reviewItemData);
@@ -137,12 +146,7 @@ namespace api.Controllers
         Task<bool> DeleteSkillDataAsync(SkillData skillData);
         Task<IReadOnlyList<SkillData>> GetSkillDataListAsync();
 
-    //checklistHRData - job card for HR Executives
-        Task<ChecklistHRData> AddChecklistHRParameter(string checklist);
-        Task<bool> EditChecklistHRDataAsync(ChecklistHRData checklistHRData);
-        Task<bool> DeleteChecklistHRDataAsync(ChecklistHRData checklistHRData);
-        Task<IReadOnlyList<ChecklistHRData>> GetChecklistHRDataListAsync();
-
+    
           */
      }
 }

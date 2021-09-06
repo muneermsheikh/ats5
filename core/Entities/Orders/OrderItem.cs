@@ -34,7 +34,7 @@ namespace core.Entities.Orders
 
           public OrderItem(int orderId, int srNo, int categoryId, string categoryName, int industryId, string industryName, 
             string sourceFrom, int quantity, int minCVs, int maxCVs, bool ecnr, bool requireAssess, DateTime completeBefore, 
-            int charges)
+            int charges, bool noReviewBySupervisor)
           {
                OrderId = orderId;
                SrNo = srNo;
@@ -50,9 +50,11 @@ namespace core.Entities.Orders
                RequireAssess = requireAssess;
                CompleteBefore = completeBefore;
                Charges = charges;
+               NoReviewBySupervisor = noReviewBySupervisor;
           }
 
         public int OrderId { get; set; }
+        public int OrderNo {get; set;}
         public int SrNo { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
@@ -63,10 +65,13 @@ namespace core.Entities.Orders
         public int MinCVs { get; set; }
         public int MaxCVs { get; set; }
         public bool Ecnr { get; set; }=false;
+        public bool IsProcessingOnly { get; set; }=false;
+        public bool RequireInternalReview {get; set;}=false;
         public bool RequireAssess { get; set; }=false;
         public DateTime CompleteBefore { get; set; }
         public int? HrExecId { get; set; }
         public string HRExecName { get; set; }
+        public bool NoReviewBySupervisor { get; set; }=false;
         public int? HrSupId { get; set; }
         public string HrSupName { get; set; }
         public int? HrmId { get; set; }

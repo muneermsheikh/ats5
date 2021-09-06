@@ -4,8 +4,9 @@ using core.Entities.HR;
 
 namespace core.ParamsAndDtos
 {
-    public class SelectionsPendingDto: BaseEntity
+    public class SelectionsPendingDto
     {
+        public int CVRefId { get; set; }
         public int OrderItemId { get; set; }
         //public int CategoryId {get; set;}
         //public int OrderId { get; set; }
@@ -18,6 +19,6 @@ namespace core.ParamsAndDtos
         public int ApplicationNo { get; set; }
         public string CandidateName {get; set;}
         public DateTime ReferredOn { get; set; }
-        public EnumCVRefStatus RefStatus { get; set; }
+        public int RefStatus { get; set; }
     }
 }

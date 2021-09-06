@@ -7,6 +7,9 @@ using core.Entities.Orders;
 using core.Entities.Users;
 using core.Entities.Identity;
 using core.ParamsAndDtos;
+using core.Entities.EmailandSMS;
+using core.Entities.Tasks;
+using core.Entities.Process;
 
 namespace api.Helpers
 {
@@ -14,6 +17,7 @@ namespace api.Helpers
      {
           public MappingProfiles()
           {
+               CreateMap<ApplicationTask, TaskDashboardDto>();
                CreateMap<Customer, CustomerTypeNameKnownAsOfficialsToReturnDto>();
                CreateMap<Customer, CustomerDto>();
                CreateMap<CVRef, CVRefDto>();
@@ -21,12 +25,14 @@ namespace api.Helpers
                     //.ForMember(d => d.PictureUrl, o => o.MapFrom<ProductUrlResolver>());
                CreateMap<CVRef, CVRefPostedDto>();
                CreateMap<CVRef, SelectionsPendingDto>();
+               CreateMap<EmailMessage, MessageDto>();
+               CreateMap<Employment, EmploymentToReturnDto>();
                CreateMap<OrderItem, OrderItemDto>();
                CreateMap<OrderItem, OrderItemToReturnDto>();
                CreateMap<Order, OrderToReturnDto>();
                CreateMap<Remuneration, RemunerationDto>();
                CreateMap<SelectionDecision, SelectionDecisionToReturnDto>();
-               CreateMap<Employment, EmploymentToReturnDto>();
+               
                CreateMap<RegisterDto, Candidate>()
                     .ForMember(d => d.FirstName, o => o.MapFrom(s => s.Address.FirstName))
                     .ForMember(d => d.SecondName, o => o.MapFrom(s => s.Address.SecondName))
@@ -36,6 +42,16 @@ namespace api.Helpers
                     ;
                CreateMap<Address, EntityAddress>();
                CreateMap<SelectionDecision, SelectionDecisionToRegisterDto>();
+
+               CreateMap<ContractReview, ContractReviewDto>();
+                    //.ForMember(d => d.ReviewStatus, o => o.MapFrom(s => s.ReviewStatus.Status));
+               CreateMap<ContractReviewItem, ContractReviewItemDto>();
+
+               CreateMap<SelDecisionToAddDto, RejDecisionToAddDto>();
+               CreateMap<CVRef, DeploymentPendingDto>()
+                    .ForMember(d => d.CVRefId, o => o.MapFrom(s => s.Id));
+                    //.ForMember(d => d.DeployStageId, o => o.MapFrom(s => EnumDeployStatus.GetAttribute<s.DeployStageId>()));
+               CreateMap<Deploy, DeployAddedDto>();
           }
      }
 }

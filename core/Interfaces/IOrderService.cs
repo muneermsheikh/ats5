@@ -12,6 +12,7 @@ namespace core.Interfaces
             Task<bool> EditOrder(Order order);
             Task<bool> DeleteOrder(Order order);
             Task<Pagination<OrderToReturnDto>> GetOrdersAllAsync(OrdersSpecParams orderSpecParams);
+            Task<bool> OrderForwardedToHRDept(int orderId);
 
         //order items
             Task<IReadOnlyList<OrderItem>> GetOrderItemsByOrderIdAsync(int OrderId);

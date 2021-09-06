@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using core.Entities.EmailandSMS;
 using core.Entities.MasterEntities;
 using core.Entities.Orders;
 using core.ParamsAndDtos;
@@ -18,8 +19,9 @@ namespace core.Interfaces
         //orderAssessment
         Task<OrderItemAssessment> GetOrderAssessmentItemQs (int OrderItemId);
         //Task<OrderAssessment> GetOrderAssessmentAsync (int orderId);
-        
         Task<bool> EditOrderAssessmentItem(OrderItemAssessment assessmentItem);
         Task<bool> DeleteAssessmentItemQ(int orderitemid);
+
+        
     }
 }

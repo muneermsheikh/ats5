@@ -35,7 +35,10 @@ namespace core.ParamsAndDtos
         public string Introduction { get; set; }
         public string Interests { get; set; }
         public string Position { get; set; }
+        public bool NotificationDesired {get; set;}
+        public string LoggedInAppUserId { get; set; }
         public string AppUserId {get; set;}
+        public bool AppUserIdNotEnforced {get; set;}
         public ICollection<UserQualification> UserQualifications {get; set;}
         public ICollection<UserExp> UserExperiences {get; set;}
         public ICollection<UserProfession> UserProfessions {get; set;}

@@ -13,8 +13,9 @@ namespace core.Entities.Users
                IsMain = isMain;
           }
 
-          public int EmployeeId { get; set; }
+        public int EmployeeId { get; set; }
         public string PhoneNo { get; set; }
+        public bool IsOfficial {get; set;}=true;
         public string MobileNo { get; set; }
         public bool IsMain {get; set;}=false;
         public bool IsValid { get; set; }=true;

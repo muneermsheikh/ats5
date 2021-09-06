@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using core.Entities;
 using core.Entities.HR;
+using core.Entities.Process;
 using core.Entities.Users;
 using core.Params;
 using core.ParamsAndDtos;
@@ -12,6 +13,7 @@ namespace core.Specifications
     {
         public CVRefSpecs(CVRefSpecParams specParams)
             : base(x => 
+                (!specParams.CVRefStatus.HasValue || x.RefStatus == specParams.CVRefStatus) &&
                 (!specParams.OrderId.HasValue || x.OrderId == specParams.OrderId) &&
                 (!specParams.OrderNo.HasValue || x.OrderNo == specParams.OrderNo) &&
                 (!specParams.OrderItemId.HasValue || x.OrderItemId == specParams.OrderItemId) &&
@@ -29,5 +31,12 @@ namespace core.Specifications
             AddOrderBy(x => x.ReferredOn);
         }
   
+        public CVRefSpecs(int pageIndex, int pageSize)
+            : base(x => x.DeployStageId < EnumDeployStatus.Concluded)
+        {
+            ApplyPaging(pageSize * (pageIndex - 1), pageSize);
+            AddOrderBy(x => x.CustomerName);
+            AddOrderBy(x => x.OrderId);
+        }
     }
 }

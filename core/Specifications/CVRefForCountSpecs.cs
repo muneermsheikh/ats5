@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using core.Entities;
 using core.Entities.HR;
+using core.Entities.Process;
 using core.Entities.Users;
 using core.Params;
 using core.ParamsAndDtos;
@@ -24,6 +25,9 @@ namespace core.Specifications
             )
         {
         }
-  
+        public CVRefForCountSpecs(int pageIndex, int pageSize)
+            : base(x => x.DeployStageId < EnumDeployStatus.Concluded)
+        {
+        }
     }
 }

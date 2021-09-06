@@ -7,11 +7,13 @@ using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
 using infra.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
+     [Authorize(Policy = "Admin")]
      public class EmployeesController : BaseApiController
      {
           private readonly IGenericRepository<Employee> _empRepo;

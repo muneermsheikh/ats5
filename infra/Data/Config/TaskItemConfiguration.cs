@@ -11,14 +11,14 @@ namespace infra.Data.Config
      {
           public void Configure(EntityTypeBuilder<TaskItem> builder)
           {
-               builder.HasIndex(p => p.TaskId);
+               builder.HasIndex(p => p.ApplicationTaskId);
                builder.Property(x => x.TransactionDate).IsRequired();
                builder.Property(x => x.TaskStatus).IsRequired();
                builder.Property(x => x.UserId).IsRequired();
                builder.HasIndex(x => x.UserId).HasFilter("[UserId]>0");
                builder.HasIndex(p => p.TransactionDate);
                builder.Property(x => x.TaskItemDescription).IsRequired().HasMaxLength(250);
-               builder.HasOne(p => p.Task).WithMany().HasForeignKey(p => p.TaskId);
+               builder.HasOne(p => p.ApplicationTask).WithMany().HasForeignKey(p => p.ApplicationTaskId);
 
           }
      }

@@ -11,5 +11,10 @@ namespace core.Interfaces
          Task<bool> DeleteEmployee(Employee employee);
          Task<Employee> AddNewEmployee(Employee employee);
          Task<Pagination<Employee>> GetEmployeePaginated(EmployeeSpecParams empParams);
+         Task<EmployeeDto> GetEmployeeFromIdAsync(int employeeId);
+         Task<int> GetEmployeeIdFromAppUserIdAsync(string appUserId);
+         Task<EmployeeDto> GetEmployeeBriefAsyncFromAppUserId(string appUserId);
+        Task<EmployeeDto> GetEmployeeBriefAsyncFromEmployeeId(int id);
+        Task<string> GetEmployeeNameFromEmployeeId(int id);
     }
 }

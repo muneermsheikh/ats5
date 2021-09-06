@@ -14,9 +14,11 @@ namespace core.Entities.Orders
             Question = question;
             MaxMarks = maxMarks;
         }
-        public OrderItemAssessmentQ(int orderItemId, int orderAssessmentItemId, int questionNo, string subject, string question, int maxMarks)
+        public OrderItemAssessmentQ(int orderItemId, int orderId, int orderAssessmentItemId, int questionNo, 
+            string subject, string question, int maxMarks)
         {
             OrderItemId = orderItemId;
+            OrderId = orderId;
             OrderAssessmentItemId = orderAssessmentItemId;
             QuestionNo = questionNo;
             Subject = subject;
@@ -26,6 +28,7 @@ namespace core.Entities.Orders
 
         public int OrderAssessmentItemId { get; set; }
         public int OrderItemId { get; set; }
+        public int OrderId {get; set;}
         public int QuestionNo { get; set; }
         public string Subject { get; set; }
         public string Question { get; set; }

@@ -7,14 +7,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace infra.Data.Config
 {
-     public class TaskConfiguration : IEntityTypeConfiguration<Task>
+     public class TaskConfiguration : IEntityTypeConfiguration<ApplicationTask>
      {
-          public void Configure(EntityTypeBuilder<Task> builder)
+          public void Configure(EntityTypeBuilder<ApplicationTask> builder)
           {
-               builder.HasIndex(p => p.TaskType);
+               builder.HasIndex(p => p.TaskTypeId);
                builder.HasIndex(p => p.TaskOwnerId);
                builder.HasIndex(p => p.AssignedToId);
                builder.Property(x => x.TaskDate).IsRequired().HasMaxLength(250);
+               builder.HasIndex(x => new{x.AssignedToId, x.OrderItemId, x.CandidateId, x.TaskTypeId}).IsUnique();
 
                builder.HasMany(o => o.TaskItems).WithOne().OnDelete(DeleteBehavior.Cascade);
           }

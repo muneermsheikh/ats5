@@ -2,6 +2,7 @@ using System.Reflection;
 using core.Entities;
 using core.Entities.Admin;
 using core.Entities.Attachments;
+using core.Entities.EmailandSMS;
 using core.Entities.HR;
 using core.Entities.MasterEntities;
 using core.Entities.Messages;
@@ -30,7 +31,7 @@ namespace infra.Data
           public DbSet<CustomerIndustry> CustomerIndustries {get; set;}
           public DbSet<CustomerOfficial> CustomerOfficials {get; set;}
           public DbSet<AgencySpecialty> AgencySpecialties {get; set;}
-          public DbSet<Message> Messages {get; set;}
+
      //HR
           public DbSet<ChecklistHR> ChecklistHRs {get; set;}
           public DbSet<CandidateAssessment> CandidateAssessments {get; set;}
@@ -40,6 +41,7 @@ namespace infra.Data
           public DbSet<CVRefRestriction> CVRefRestrictions {get; set;}
           public DbSet<SelectionDecision> SelectionDecisions {get; set;}
           public DbSet<Employment> Employments {get; set;}
+          public DbSet<CVRvw> CVReviews {get; set;}
      
        // masters
           //public DbSet<core.Entities.Users.Address> Addresses {get; set;}
@@ -64,22 +66,24 @@ namespace infra.Data
           
      ///orders
           
-          public DbSet<ContractReview> ContractReviews {get; set;}
-          public DbSet<ContractReviewItem> ContractReviewItems {get; set;}
           public DbSet<Order> Orders {get; set;}
           public DbSet<OrderItem> OrderItems {get; set;}
+          public DbSet<ContractReview> ContractReviews {get; set;}
+          public DbSet<ContractReviewItem> ContractReviewItems {get; set;}
+          public DbSet<ReviewItem> ReviewItems {get; set;}
+          public DbSet<ReviewItemData> ReviewItemDatas{get; set;}
           public DbSet<OrderItemAssessment> OrderItemAssessments {get; set;}
           public DbSet<OrderItemAssessmentQ> OrderItemAssessmentQs {get; set;}
-          public DbSet<ReviewItemData> ReviewItemDatas{get; set;}
+          
 
       //Process
           public DbSet<Deploy> Deploys {get; set;}
           public DbSet<DeployStatus> DeployStatus {get; set;}
           
      //Tasks
-          public DbSet<Task> Tasks {get; set;}
+          public DbSet<ApplicationTask> Tasks {get; set;}
           public DbSet<TaskItem> TaskItems {get; set;}
-         
+          public DbSet<TaskType> TaskTypes {get; set;}
 
      //users
 
@@ -98,6 +102,12 @@ namespace infra.Data
          public DbSet<Group> Groups { get; set; }
           public DbSet<Connection> Connections { get; set; }
     
+    //    Messages
+          public DbSet<MessageComposeSource> MessageComposeSources {get; set;}
+          public DbSet<MessageType> MessageTypes {get; set;}
+          public DbSet<EmailMessage> EmailMessages {get; set;}
+          public DbSet<PhoneMessage> PhoneMessages {get; set;}
+          public DbSet<SMSMessage> SMSMessages {get; set;}
 
           //required for migrations
           protected override void OnModelCreating(ModelBuilder modelBuilder)

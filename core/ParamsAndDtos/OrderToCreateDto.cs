@@ -7,6 +7,7 @@ namespace core.ParamsAndDtos
 {
      public class OrderToCreateDto
      {
+          public string LoggedInAppUserId { get; set; }
           [Required]
           public DateTime OrderDate { get; set; }
           public string OrderRef { get; set; }

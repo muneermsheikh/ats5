@@ -9,12 +9,14 @@ using core.Entities.Identity;
 using core.Interfaces;
 using core.ParamsAndDtos;
 using core.Specifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
+    [Authorize(Policy = "Employee, CustomerMaintenanceRole")]
      public class CustomersController : BaseApiController
      {
           private readonly IGenericRepository<Customer> _custRepo;

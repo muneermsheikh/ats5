@@ -36,8 +36,15 @@ namespace core.Entities.Orders
         public string CustomerName {get; set;}
         public string BuyerEmail {get; set;}
         public string OrderRef { get; set; }
-        public int? SalesmanId { get; set; }
+        public DateTime OrderRefDate {get; set;}
         public string SalesmanName { get; set; }
+        public int ProjectManagerId { get; set; }
+        public int? MedicalProcessInchargeEmpId { get; set; }
+        public int? VisaProcessInchargeEmpId { get; set; }
+        public int? EmigProcessInchargeId { get; set; }
+        public int? TravelProcessInchargeId { get; set; }
+        public int? SalesmanId { get; set; }
+        
         //public string AppUserId { get; set; }
         public DateTime CompleteBy { get; set; }
         public string Country { get; set; }
@@ -45,6 +52,8 @@ namespace core.Entities.Orders
         public int EstimatedRevenue {get; set;}
         public Customer Customer {get; set;}
         public EnumOrderStatus Status { get; set; } = EnumOrderStatus.AwaitingReview;
+        public DateTime? ForwardedToHRDeptOn { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; }
+        
     }
 }

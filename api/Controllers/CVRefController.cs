@@ -1,12 +1,18 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Errors;
+using api.Extensions;
 using AutoMapper;
+using core.Entities.EmailandSMS;
 using core.Entities.HR;
+using core.Entities.Identity;
 using core.Interfaces;
 using core.ParamsAndDtos;
 using core.Specifications;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace api.Controllers
 {
@@ -15,8 +21,17 @@ namespace api.Controllers
           private readonly ICVRefService _cvrefService;
           private readonly IUnitOfWork _unitOfWork;
           private readonly IMapper _mapper;
-          public CVRefController(ICVRefService cvrefService, IUnitOfWork unitOfWork, IMapper mapper)
+          private readonly ITaskService _taskService;
+          private readonly IConfiguration _config;
+          private readonly UserManager<AppUser> _userManager;
+          private readonly IEmployeeService _empService;
+          public CVRefController(ICVRefService cvrefService, IUnitOfWork unitOfWork, IEmployeeService empService,
+          IMapper mapper, ITaskService taskService, IConfiguration config, UserManager<AppUser> userManager)
           {
+               _empService = empService;
+               _userManager = userManager;
+               _config = config;
+               _taskService = taskService;
                _mapper = mapper;
                _unitOfWork = unitOfWork;
                _cvrefService = cvrefService;
@@ -60,11 +75,19 @@ namespace api.Controllers
                return Ok(cvref);
           }
 
+          [Authorize]
           [HttpPost]
-          public async Task<ActionResult<CVRefPostedDto>> MakeAReferral(CVRefToAddDto dto)
+          public async Task<ActionResult<ICollection<EmailMessage>>> MakeReferrals(ICollection<int> CVReviewIds)
           {
-               var cv = await _cvrefService.PostReferral(dto);
-               return _mapper.Map<CVRef, CVRefPostedDto>(cv);
+               var loggedInDto = await GetLoggedInUserDto();
+               if (loggedInDto == null) return Unauthorized(new ApiResponse(401, "this option requires logged in User"));
+               /*
+               if (!User.IsInRole("Admin")) {
+                    if (!User.IsInRole("DocControllerAdminRole")) return Unauthorized(new ApiResponse(401, "Only the Administrator or the Document Controller has the privilege to send CVs to clients"));
+               }
+               */
+               var msgs = await _cvrefService.MakeReferralsAndCreateTask(CVReviewIds, loggedInDto);
+               return Ok(msgs);
           }
 
           [HttpPut]
@@ -84,6 +107,42 @@ namespace api.Controllers
                return Ok(new Pagination<SelectionsPendingDto>(pendingParams.PageIndex,
                    pendingParams.PageSize, ct, mappedToDto));
 
+          }
+
+          [HttpGet("cvsreadytoforward")]
+          [Authorize]
+          public async Task<ActionResult<ICollection<CustomerReferralsPendingDto>>> CustomerReferralsPending()
+          {
+               var loggedInDto = await GetLoggedInUserDto();
+               if (loggedInDto == null) return Unauthorized(new ApiResponse(401, "this option requires logged in User"));
+               /*
+               if (!loggedInDto.HasAdminPrivilege) {
+                    if (!User.IsInRole("DocControllerAdminRole")) return Unauthorized(new ApiResponse(401, "Only the Administrator or the Document Controller has the privilege to send CVs to clients"));
+               }
+               */
+
+               var pendings = await _cvrefService.CustomerReferralsPending(0);
+
+               if (pendings==null && pendings.Count == 0) return NotFound(new ApiResponse(402, "No CVs pending for forwarding to customers"));
+
+               return Ok(pendings);
+
+          }
+          private async Task<LoggedInUserDto> GetLoggedInUserDto()
+          {
+               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               if (loggedInUser == null) return null;
+
+               var empId = await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
+               var loggedInUserDto = new LoggedInUserDto
+               {
+                    LoggedIAppUsername = loggedInUser.UserName,
+                    LoggedInAppUserEmail = loggedInUser.Email,
+                    LoggedInAppUserId = loggedInUser.Id,
+                    LoggedInEmployeeId = empId,
+                    HasAdminPrivilege = User.IsInRole("Admin")
+               };
+               return loggedInUserDto;
           }
      }
 }

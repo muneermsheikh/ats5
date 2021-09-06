@@ -5,24 +5,24 @@ namespace core.Entities.HR
     public enum EnumCVRefStatus
     {
         [EnumMember(Value="Referred")]
-        Referred,
+        Referred=100,
         [EnumMember(Value="Selected")]
-        Selected,
+        Selected=200,
         [EnumMember(Value="Rejected - Not Suitable")]
-        RejectedNotSuitable,
+        RejectedNotSuitable=300,
         [EnumMember(Value="Rejected - Medically Unfit")]
-        RejectedMedicallyUnfit,
+        RejectedMedicallyUnfit=400,
         [EnumMember(Value="Rejected - Salary Expectation High")]
-        RejectedHighSalaryExpectation,
+        RejectedHighSalaryExpectation=500,
         [EnumMember(Value="Rejected - No relevant exp")]
-        RejectedNoRelevantExp,
+        RejectedNoRelevantExp=600,
         [EnumMember(Value="Rejected - Not qualified")]
-        RejectedNotQualified,
+        RejectedNotQualified=700,
         [EnumMember(Value="Rejected - Overage")]
-        RejectedOverAge,
+        RejectedOverAge=800,
         [EnumMember(Value="Rejected - Not Available")]
-        NotAvailable,
+        NotAvailable=900,
         [EnumMember(Value="Not Interested")]
-        NotInterested
+        NotInterested=1000
     }
 }

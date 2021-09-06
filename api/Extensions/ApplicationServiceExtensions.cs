@@ -27,9 +27,18 @@ namespace api.Extensions
                 services.AddScoped<ICandidateAssessmentService, CandidateAssessmentService>();
                 services.AddScoped<ICVRefService, CVRefService>();
                 services.AddScoped<ISelectionDecisionService, SelectionDecisionService>();
+                services.AddScoped<IStatsService, StatsService>();
                 services.AddScoped<IContractReviewService, ContractReviewService>();
                 services.AddScoped<IDeployService, DeployService>();
+                services.AddScoped<ISMSService, SMSService>();
+                services.AddScoped<IEmailService, EmailService>();
                 services.AddScoped<ICommonServices, CommonServices>();
+                services.AddScoped<IComposeMessages, ComposeMessages>();
+                services.AddScoped<ITaskService, TaskServices>();
+                services.AddScoped<ICVReviewService, CVRvwService>();
+                services.AddScoped<IVerifyService, VerifyService>();
+                services.AddScoped<IOrderAssignmentService, OrderAssignmentService>();
+                services.AddScoped<IChecklistService, ChecklistService>();
                 
                 /*
                 services.AddScoped<IPaymentService, PaymentService>();

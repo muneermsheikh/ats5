@@ -43,6 +43,8 @@ namespace core.Entities.Admin
         [Required]         
         public string KnownAs { get; set; }
         [Required]
+        public string Position { get; set; }
+        [Required]
         public DateTime DOB { get; set; }
         public string PlaceOfBirth { get; set; }
         public string AadharNo { get; set; }

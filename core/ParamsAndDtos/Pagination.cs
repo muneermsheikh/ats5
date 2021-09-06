@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace core.ParamsAndDtos
 {
@@ -12,9 +15,18 @@ namespace core.ParamsAndDtos
             Data = data;
         }
 
-        public int PageIndex { get; set; }
+          public Pagination(int pageIndex, int pageSize, int count) 
+        {
+             this.PageIndex = pageIndex;
+                 this.PageSize = pageSize;
+                 this.Count = count;
+               
+        }
+                public int PageIndex { get; set; }
         public int PageSize { get; set; }
         public int Count { get; set; }
         public IReadOnlyList<T> Data { get; set; }
+
+        
     }
 }

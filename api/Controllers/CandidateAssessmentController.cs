@@ -25,6 +25,7 @@ namespace api.Controllers
 
 
           [HttpPost("assess")]
+          [Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           public async Task<ActionResult<CandidateAssessment>> AssessNewCandidate(CandidateAssessmentParams assessParams)
           {
                if (!User.IsUserAuthenticated()) return Unauthorized("user is not authenticated");
@@ -43,7 +44,8 @@ namespace api.Controllers
                return appuser.Id.ToString();
                //return appuser.IdentityUser();
           }
-
+          
+          [Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           [HttpPut("assess")]
           public async Task<ActionResult<bool>> EditCandidateAssessment(CandidateAssessment candidateAssessment)
           {
@@ -57,6 +59,7 @@ namespace api.Controllers
                }
           }
 
+          [Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           [HttpDelete("assess")]
           public async Task<ActionResult<bool>> DeleteCandidateAssessment(CandidateAssessment candidateAssessment)
           {
@@ -70,6 +73,7 @@ namespace api.Controllers
                }
           }
 
+          [Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           [HttpDelete("assessitem")]
           public async Task<ActionResult<bool>> DeleteCandidateAssessmentItem(CandidateAssessmentItem assessmentItem)
           {

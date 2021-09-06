@@ -16,6 +16,7 @@ namespace core.Entities.Orders
             CategoryName = categoryName;
             Quantity = quantity;
         }
+        public int ContractReviewId { get; set; }
         public int OrderId {get; set;}
         public int OrderItemId { get; set; }
         public string CategoryName { get; set; }
@@ -23,7 +24,8 @@ namespace core.Entities.Orders
         public bool Ecnr { get; set; }
         public bool RequireAssess { get; set; }
         public string SourceFrom {get; set;}
-        public EnumReviewItemStatus ReviewItemStatus {get; set;}=EnumReviewItemStatus.NotReviewed;
-        public OrderItem OrderItem {get; set;}
+        public int ReviewItemStatus {get; set;}=(int)EnumReviewItemStatus.NotReviewed;
+        public ICollection<ReviewItem> ReviewItems {get; set;}     //copies data from ReviewItemData
+        //public OrderItem OrderItem {get; set;}
     }
 }

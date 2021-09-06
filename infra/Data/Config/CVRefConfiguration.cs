@@ -10,12 +10,11 @@ namespace infra.Data.Config
      {
           public void Configure(EntityTypeBuilder<CVRef> builder)
           {
-               builder.Property(s => s.RefStatus).HasConversion(
+               /* builder.Property(s => s.RefStatus).HasConversion(
                 o => o.ToString(),
                 o => (EnumCVRefStatus) Enum.Parse(typeof(EnumCVRefStatus), o)
                );
-
-
+               */
                builder.HasIndex(p => p.OrderItemId);
                builder.HasIndex(p => new{p.CandidateId, p.OrderItemId}).IsUnique();
 

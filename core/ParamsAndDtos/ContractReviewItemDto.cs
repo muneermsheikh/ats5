@@ -1,17 +1,18 @@
 using System;
+using System.Collections.Generic;
 using core.Entities.Orders;
 
 namespace core.ParamsAndDtos
 {
     public class ContractReviewItemDto
     {
-        public ContractReviewItemDto(int id, int contractReviewId, int orderId, int orderItemId,  int srNo, string professionName,  
+          public ContractReviewItemDto()
+          {
+          }
+
+          public ContractReviewItemDto(int id, int contractReviewId, int orderId, int orderItemId,  int srNo, string professionName,  
             string sourceFrom, int quantity, bool ecnr, bool requireAssess, DateTime completeBefore, 
-            bool? technicallyFeasible, bool? commerciallyFeasible, bool? logisticallyFeasible, 
-            bool? visaAvailable, bool? documentationWillBeAvailable, 
-            bool? historicalStatusAvailable, bool? salaryOfferedFeasible, 
-            string serviceChargesInINR, string feeFromClientCurrency, 
-            int? feeFromClient, int reviewItemStatusId)
+            ICollection<ReviewItem> reviewIems, int reviewItemStatusId)
         {
             Id = id;
             ContractReviewId = contractReviewId;
@@ -23,6 +24,8 @@ namespace core.ParamsAndDtos
             Ecnr = ecnr;
             RequireAssess = requireAssess;
             CompleteBefore = completeBefore;
+            ReviewItems = reviewIems;
+            /* 
             TechnicallyFeasible = technicallyFeasible;
             CommerciallyFeasible = commerciallyFeasible;
             LogisticallyFeasible = logisticallyFeasible;
@@ -34,6 +37,7 @@ namespace core.ParamsAndDtos
             FeeFromClientCurrency = feeFromClientCurrency;
             FeeFromClient = feeFromClient;
             ReviewItemStatusId = reviewItemStatusId;
+            */
         }
  
         public int Id { get; set; }
@@ -48,6 +52,8 @@ namespace core.ParamsAndDtos
         public bool Ecnr {get; set;}
         public int Quantity {get; set; }
         public DateTime CompleteBefore { get; set; }
+        public ICollection<ReviewItem> ReviewItems {get; set;}
+        /*
         public bool? TechnicallyFeasible { get; set; }
         public bool? CommerciallyFeasible { get; set; }
         public bool? LogisticallyFeasible { get; set; }
@@ -60,5 +66,6 @@ namespace core.ParamsAndDtos
         public int? FeeFromClient { get; set; }
         public int ReviewItemStatusId { get; set; }
         public Remuneration Remuneration {get; set;}
+        */
     }
 }

@@ -8,6 +8,7 @@ using core.Entities.Process;
 using System.Collections.Generic;
 using System;
 using core.Entities.HR;
+using core.Entities.Orders;
 
 namespace infra.Services
 {
@@ -47,34 +48,57 @@ namespace infra.Services
                          CandidateName = cand.FullName,
                          CustomerName = c.CustomerName, 
                          CategoryName = cat.Name, 
-                         OrderNo = ordr.OrderNo
+                         OrderNo = ordr.OrderNo,
+                         HRExecId = i.HrExecId == null ? 0 : (int)i.HrExecId,
+                         HRSupId = i.HrSupId == null ? 0 : (int)i.HrSupId,
+                         HRMId = i.HrmId == null ? 0 : (int)i.HrmId,
+                         MedicalProcessInchargeEmpId = ordr.MedicalProcessInchargeEmpId == null ? 0 : (int) ordr.MedicalProcessInchargeEmpId,
+                         VisaProcessInchargeEmpId = ordr.VisaProcessInchargeEmpId == null ? 0 : (int)ordr.VisaProcessInchargeEmpId,
+                         TravelProcessInchargeId = ordr.TravelProcessInchargeId == null ? 0 : (int)ordr.TravelProcessInchargeId
                     })).FirstOrDefaultAsync();
 
                return qry; 
           }
 
-
-          public async Task<CommonDataDto> CommonDataFromOrderDetailIdAndCandidateId(int orderDetailId, int candidateId)
+          public async Task<CommonDataDto> CommonDataFromOrderDetailIdAndCandidateId(int CVReviewId)
           {
-               var qry = await (from i in _context.OrderItems where i.Id == orderDetailId
+               var qry = await (from r in _context.CVReviews where r.Id == CVReviewId
+                    join i in _context.OrderItems on r.OrderItemId equals i.Id 
                     join cat in _context.Categories on i.CategoryId equals cat.Id
                     join ordr in _context.Orders on i.OrderId equals ordr.Id 
                     join c in _context.Customers on ordr.CustomerId equals c.Id
-                    select (new {
+                    join cand in _context.Candidates on r.CandidateId equals cand.Id
+                    orderby r.SubmittedByHRExecOn
+                    select (new CommonDataDto{
                          CustomerName = c.CustomerName, 
                          CategoryName = cat.Name, 
                          CategoryId = i.CategoryId,
-                         OrderNo = ordr.OrderNo
+                         OrderId = ordr.Id,
+                         OrderItemId = i.Id,
+                         OrderItemSrNo = i.SrNo,
+                         OrderNo = ordr.OrderNo,
+                         NoReviewBySupervisor = i.NoReviewBySupervisor,
+                         HRSupId = (int)i.HrSupId,
+                         HRMId = (int)i.HrmId, 
+                         HRExecId = (int)i.HrExecId,
+                         ApplicationNo = cand.ApplicationNo,
+                         CandidateName = cand.FullName,
+                         CandidateId = cand.Id,
+                         Ecnr = cand.Ecnr
                     })).FirstOrDefaultAsync();
-               var qry2 = await _context.Candidates.Where(x => x.Id == candidateId)
-                    .Select(x => new {x.ApplicationNo, x.FullName}).FirstOrDefaultAsync();
                
-               return new CommonDataDto{
+               /* return new CommonDataDto{
                     CustomerName = qry.CustomerName, CategoryName = qry.CategoryName, OrderNo = qry.OrderNo,
-                    ApplicationNo = qry2.ApplicationNo, CandidateName = qry2.FullName, CategoryId = qry.CategoryId
+                    ApplicationNo = qry.ApplicationNo, CandidateName = qry.FullName, CategoryId = qry.CategoryId,
+                    NoReviewBySupervisor = qry.NoReviewBySupervisor, HRSupId = (int)qry.HRSupId, 
+                    HRMId = (int)qry.HRMId,
+                    HRExecId=(int)qry.HRExecId, OrderId = qry.OrderId, OrderItemId = qry.OrderItemId, 
+                    OrderItemSrNo = qry.SrNo, CandidateId = qry.CandidateId
                };
-               
+               */
+               return qry;
           }
+
 
           public async Task<ICollection<SelectionDecisionToRegisterDto>> PopulateSelectionDecisionsToRegisterDto(ICollection<SelectionDecisionToRegisterDto> dto)
           {
@@ -164,11 +188,164 @@ namespace infra.Services
                          CustomerName = c.CustomerName, 
                          CategoryName = cat.Name, 
                          OrderNo = ordr.OrderNo,
-                         DeployStageId = d.Status.StageId
+                         OrderItemSrNo = i.SrNo,
+                         DeployStageId = d.Status.StageId,
+                         RequireInternalReview = i.RequireInternalReview,
+                         HRSupId = (int)i.HrSupId,
+                         HRMId = (int)i.HrmId
                     })).FirstOrDefaultAsync();
 
                return qry;
                
           }
+
+          public async Task<string> DeploymentStageNameFromStageId(EnumDeployStatus stageId)
+          {
+               return await _context.DeployStatus.Where(x => x.StageId == stageId).Select(x => x.StatusName).FirstOrDefaultAsync();
+          }
+
+          public async Task<CustomerBriefDto> CustomerBriefDetailsFromCustomerId(int customerId)
+          {
+               var dto = await _context.Customers.Where(x => x.Id == customerId)
+                    .FirstOrDefaultAsync();
+               return new CustomerBriefDto{CustomerName = dto.CustomerName, City = dto.City, KnownAs = dto.KnownAs};
+          }
+
+          public async Task<OrderAssignmentDto> GetOrderAssignmentDto(int orderId)
+          {
+               var qry = await (from o in _context.Orders
+                where o.Id == orderId
+                join c in _context.Customers on o.CustomerId equals c.Id
+                join e in _context.Employees on o.ProjectManagerId equals e.Id
+                select new
+                {
+                    OrderId = o.Id, OrderNo = o.OrderNo, OrderDate = o.OrderDate.Date, CustomerName = c.CustomerName, 
+                    EmployeeName = e.FirstName + " " + e.FamilyName, Position = e.Position, email = e.Email, 
+                    ProjManagerAppUserId = e.AppUserId, ProjectManagerId = o.ProjectManagerId, EmployeeId = e.Id
+                }).FirstOrDefaultAsync();
+
+               if (qry == null) throw new Exception("failed to retrieve order particulars - check the project manager is assigned");
+
+               return new OrderAssignmentDto {
+                    OrderId = qry.OrderId, OrderNo = qry.OrderNo, OrderDate = qry.OrderDate, CustomerName = qry.CustomerName,
+                    ProjectManagerId = qry.EmployeeId, ProjectManagerPosition = qry.Position
+                    //, ProjectManagerEmail = qry.email, ProjectManagerAppUserId = qry.ProjManagerAppUserId
+               };
+          }
+
+          public async Task<CommonDataDto> CommonDataFromOrderDetailIdAndCandidateId(int OrderItemId, int candidateId)
+          {
+               var qry2 = await _context.Candidates.Where(x => x.Id == candidateId)
+                    .Select(x => new {x.ApplicationNo, x.FullName}).FirstOrDefaultAsync();
+               if (qry2==null) return null;
+               var qry = await (from i in _context.OrderItems where i.Id == OrderItemId 
+                    join cat in _context.Categories on i.CategoryId equals cat.Id
+                    join ordr in _context.Orders on i.OrderId equals ordr.Id 
+                    join c in _context.Customers on ordr.CustomerId equals c.Id
+                    select (new {
+                         CustomerName = c.CustomerName, 
+                         CategoryName = cat.Name, 
+                         CategoryId = i.CategoryId,
+                         OrderId = ordr.Id,
+                         OrderItemId= i.Id,
+                         OrderNo = ordr.OrderNo,
+                         SrNo = i.SrNo,
+                         NoReviewBySupervisor = i.NoReviewBySupervisor,
+                         HRSupId = i.HrSupId,
+                         HRMId = i.HrmId, HRExecId = i.HrExecId
+                    })).FirstOrDefaultAsync();
+               if (qry==null) return null;
+               return new CommonDataDto{
+                    CustomerName = qry.CustomerName, CategoryName = qry.CategoryName, OrderNo = qry.OrderNo,
+                    ApplicationNo = qry2.ApplicationNo, CandidateName = qry2.FullName, CategoryId = qry.CategoryId,
+                    NoReviewBySupervisor = qry.NoReviewBySupervisor, HRSupId = (int)qry.HRSupId, HRMId = (int)qry.HRMId,
+                    HRExecId=(int)qry.HRExecId, OrderId = qry.OrderId, OrderItemId = qry.OrderItemId, 
+                    OrderItemSrNo = qry.SrNo, CandidateId = candidateId
+               };
+               
+          }
+
+          public async Task<CommonDataForCVRefDto> CommonDataForCVRefFromOrderItemAndCandidateId(int OrderItemId, int candidateId)
+          {
+               var qry2 = await _context.Candidates.Where(x => x.Id == candidateId)
+                    .Select(x => new {x.ApplicationNo, x.PpNo, x.FullName}).FirstOrDefaultAsync();
+               if (qry2==null) return null;
+               var qry = await (from i in _context.OrderItems where i.Id == OrderItemId 
+                    join cat in _context.Categories on i.CategoryId equals cat.Id
+                    join ordr in _context.Orders on i.OrderId equals ordr.Id 
+                    join c in _context.Customers on ordr.CustomerId equals c.Id
+                    select (new {
+                         CustomerName = c.CustomerName, 
+                         CategoryId = cat.Id,
+                         CategoryName = cat.Name, 
+                         OrderNo = ordr.OrderNo,
+                         SrNo = i.SrNo,
+                         OrderId = ordr.Id
+                    })).FirstOrDefaultAsync();
+               if (qry==null) return null;
+               var cvrvwData = await _context.CVReviews.Where(
+                    x => x.CandidateId == candidateId && x.OrderItemId == OrderItemId)
+                    .Select(x => new{x.DocControllerAdminTaskId, x.Id}).FirstOrDefaultAsync();
+               return new CommonDataForCVRefDto{
+                    CustomerName = qry.CustomerName, CategoryName = qry.CategoryName, 
+                    CategoryRef = qry.OrderNo + "-" + qry.SrNo, OrderId = qry.OrderId, 
+                    OrderNo = qry.OrderNo, CandidateDesc = "Application " + qry2.ApplicationNo + " " +
+                         qry2.FullName + " PP No." + qry2.PpNo + " referred to " + 
+                         qry.CustomerName + " against requirement " + qry.OrderNo + "-" + qry.SrNo,
+                    ApplicationNo = qry2.ApplicationNo, CandidateName = qry2.FullName, PPNo = qry2.PpNo,
+                    CategoryId = qry.CategoryId, DocControllerAdminTaskId = (int)cvrvwData.DocControllerAdminTaskId,
+                    CVReviewId = cvrvwData.Id
+               };
+               
+          }
+
+          public async Task<CommonDataDto> CommonDataFromOrderItemCandidateIdWithChecklistId(int OrderItemId, int candidateId)
+          {
+               var catMatchesAndChklist = await (from c in _context.ChecklistHRs 
+                         where c.CandidateId==candidateId && c.OrderItemId == OrderItemId
+                    join i in _context.OrderItems on c.OrderItemId equals i.Id
+                    join p in _context.UserProfessions on c.CandidateId equals p.CandidateId where p.CategoryId==i.CategoryId
+                    select new {ChecklistId = c.Id, ProfessionId=p.CategoryId}
+               ).ToListAsync();
+
+               if (catMatchesAndChklist.Count == 0) return null;
+
+               int chklistId = catMatchesAndChklist.Select(x => x.ChecklistId).FirstOrDefault();
+               var qry = await (from i in _context.OrderItems where i.Id == OrderItemId 
+                    join cat in _context.Categories on i.CategoryId equals cat.Id
+                    join ordr in _context.Orders on i.OrderId equals ordr.Id 
+                    join c in _context.Customers on ordr.CustomerId equals c.Id
+                    select (new {
+                         CustomerName = c.CustomerName, 
+                         CategoryName = cat.Name, 
+                         CategoryId = i.CategoryId,
+                         OrderId = ordr.Id,
+                         OrderItemId= i.Id,
+                         OrderNo = ordr.OrderNo,
+                         SrNo = i.SrNo,
+                         NoReviewBySupervisor = i.NoReviewBySupervisor,
+                         HRSupId = i.HrSupId,
+                         HRMId = i.HrmId, HRExecId = i.HrExecId
+                    })).FirstOrDefaultAsync();
+                    
+               var hrexecTaskId = await _context.Tasks.Where(x => x.OrderItemId == OrderItemId &&
+                    x.AssignedToId == qry.HRExecId && x.TaskTypeId == (int)EnumTaskType.AssignTaskToHRExec)
+                    .Select(x => x.Id).FirstOrDefaultAsync();
+               if (hrexecTaskId == 0) return null;
+
+               var qry2 = await _context.Candidates.Where(x => x.Id == candidateId)
+                    .Select(x => new {x.ApplicationNo, x.FullName}).FirstOrDefaultAsync();
+               
+               return new CommonDataDto{
+                    CustomerName = qry.CustomerName, CategoryName = qry.CategoryName, OrderNo = qry.OrderNo,
+                    ApplicationNo = qry2.ApplicationNo, CandidateName = qry2.FullName, CategoryId = qry.CategoryId,
+                    NoReviewBySupervisor = qry.NoReviewBySupervisor, HRSupId = (int)qry.HRSupId, HRMId = (int)qry.HRMId,
+                    HRExecId=(int)qry.HRExecId, OrderId = qry.OrderId, OrderItemId = qry.OrderItemId, 
+                    OrderItemSrNo = qry.SrNo, CandidateId = candidateId, ChecklistHRId = chklistId, 
+                    HRExecTaskId = hrexecTaskId
+               };
+               
+          }
+
      }
 }

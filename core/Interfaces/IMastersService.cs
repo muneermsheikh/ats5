@@ -45,11 +45,5 @@ namespace core.Interfaces
         Task<bool> DeleteSkillDataAsync(SkillData skillData);
         Task<IReadOnlyList<SkillData>> GetSkillDataListAsync();
 
-    //checklistHRData - job card for HR Executives
-        Task<ChecklistHRData> AddChecklistHRParameter(string checklist);
-        Task<bool> EditChecklistHRDataAsync(ChecklistHRData checklistHRData);
-        Task<bool> DeleteChecklistHRDataAsync(ChecklistHRData checklistHRData);
-        Task<IReadOnlyList<ChecklistHRData>> GetChecklistHRDataListAsync();
-
     }
 }

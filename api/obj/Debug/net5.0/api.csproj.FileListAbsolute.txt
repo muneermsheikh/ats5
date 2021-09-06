@@ -10,7 +10,9 @@ D:\ats5\api\bin\Debug\net5.0\api.pdb
 D:\ats5\api\bin\Debug\net5.0\AutoMapper.dll
 D:\ats5\api\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 D:\ats5\api\bin\Debug\net5.0\Humanizer.dll
+D:\ats5\api\bin\Debug\net5.0\MailKit.dll
 D:\ats5\api\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\ats5\api\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.OpenIdConnect.dll
 D:\ats5\api\bin\Debug\net5.0\Microsoft.AspNetCore.Cryptography.Internal.dll
 D:\ats5\api\bin\Debug\net5.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
 D:\ats5\api\bin\Debug\net5.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
@@ -31,6 +33,9 @@ D:\ats5\api\bin\Debug\net5.0\Microsoft.IdentityModel.Protocols.dll
 D:\ats5\api\bin\Debug\net5.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 D:\ats5\api\bin\Debug\net5.0\Microsoft.IdentityModel.Tokens.dll
 D:\ats5\api\bin\Debug\net5.0\Microsoft.OpenApi.dll
+D:\ats5\api\bin\Debug\net5.0\MimeKit.dll
+D:\ats5\api\bin\Debug\net5.0\NETCore.MailKit.dll
+D:\ats5\api\bin\Debug\net5.0\BouncyCastle.Crypto.dll
 D:\ats5\api\bin\Debug\net5.0\SQLitePCLRaw.batteries_v2.dll
 D:\ats5\api\bin\Debug\net5.0\SQLitePCLRaw.nativelibrary.dll
 D:\ats5\api\bin\Debug\net5.0\SQLitePCLRaw.core.dll

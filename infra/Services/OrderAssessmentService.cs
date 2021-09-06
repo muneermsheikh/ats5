@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using core.Entities.EmailandSMS;
 using core.Entities.HR;
+using core.Entities.Identity;
 using core.Entities.MasterEntities;
 using core.Entities.Orders;
 using core.Interfaces;
 using core.ParamsAndDtos;
 using infra.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace infra.Services
@@ -15,8 +18,10 @@ namespace infra.Services
      {
           private readonly IUnitOfWork _unitOfWork;
           private readonly ATSContext _context;
-          public OrderAssessmentService(IUnitOfWork unitOfWork, ATSContext context)
+          private readonly ITaskService _taskService;
+          public OrderAssessmentService(IUnitOfWork unitOfWork, ATSContext context, ITaskService taskService)
           {
+               _taskService = taskService;
                _context = context;
                _unitOfWork = unitOfWork;
           }
@@ -24,7 +29,7 @@ namespace infra.Services
           public async Task<bool> AddStddQs(ICollection<AssessmentQBank> Qs)
           {
                var nextQuestionNo = await _context.AssessmentQsBank.MaxAsync(x => (int?)x.QNo) ?? 1;
-               foreach(var q in Qs)
+               foreach (var q in Qs)
                {
                     q.QNo = ++nextQuestionNo;
                     _unitOfWork.Repository<AssessmentQBank>().Add(q);
@@ -32,6 +37,12 @@ namespace infra.Services
                return await _unitOfWork.Complete() > 0;
           }
 
+          public Task<ICollection<EmailMessage>> AssignTasksToHRExecutives(ICollection<HRTaskAssignmentDto> assignmentsDto)
+          {
+               throw new System.NotImplementedException();
+          }
+
+        
           public async Task<OrderItemAssessment> CopyStddQToOrderAssessmentItem(int orderitemid)
           {
                var assessmentitem = await _context.OrderItemAssessments.Where(x => x.OrderItemId == orderitemid).FirstOrDefaultAsync();
@@ -39,21 +50,24 @@ namespace infra.Services
 
                var qs = await _context.AssessmentQsBank.Where(x => x.IsStandardQ).OrderBy(x => x.QNo).ToListAsync();
                var lst = new List<OrderItemAssessmentQ>();
-               foreach(var q in qs)
+               foreach (var q in qs)
                {
                     lst.Add(new OrderItemAssessmentQ(orderitemid, q.QNo, q.AssessmentParameter, q.Question, q.MaxPoints));
                }
                var orderitem = await _context.OrderItems.Where(x => x.Id == orderitemid)
-                    .Select(x => new {x.OrderId, x.CategoryName, x.CategoryId}).FirstOrDefaultAsync();
+                    .Select(x => new { x.OrderId, x.CategoryName, x.CategoryId }).FirstOrDefaultAsync();
                var orderNo = await _context.Orders.Where(x => x.Id == orderitem.OrderId).Select(x => x.OrderNo).FirstOrDefaultAsync();
-               assessmentitem = new OrderItemAssessment(orderitemid, orderitem.OrderId, orderNo, orderitem.CategoryId, 
-                    orderitem.CategoryName, lst );
-               
+               assessmentitem = new OrderItemAssessment(orderitemid, orderitem.OrderId, orderNo, orderitem.CategoryId,
+                    orderitem.CategoryName, lst);
+
                _unitOfWork.Repository<OrderItemAssessment>().Add(assessmentitem);
 
-               if (await _unitOfWork.Complete() > 0) {
+               if (await _unitOfWork.Complete() > 0)
+               {
                     return await _context.OrderItemAssessments.Where(x => x.OrderItemId == orderitemid).FirstOrDefaultAsync();
-               } else {
+               }
+               else
+               {
                     return null;
                }
           }
@@ -76,7 +90,7 @@ namespace infra.Services
           {
                _unitOfWork.Repository<OrderItemAssessment>().Update(assessmentItem);
 
-               foreach(var q in assessmentItem.OrderItemAssessmentQs)
+               foreach (var q in assessmentItem.OrderItemAssessmentQs)
                {
                     _unitOfWork.Repository<OrderItemAssessmentQ>().Update(q);
                }
@@ -86,7 +100,7 @@ namespace infra.Services
 
           public async Task<bool> EditStddQs(ICollection<AssessmentQBank> qs)
           {
-               foreach(var q in qs)
+               foreach (var q in qs)
                {
                     _unitOfWork.Repository<AssessmentQBank>().Update(q);
                }
@@ -107,5 +121,7 @@ namespace infra.Services
                     .Include(x => x.OrderItemAssessmentQs.OrderBy(x => x.QuestionNo))
                     .FirstOrDefaultAsync();
           }
+
+         
      }
 }

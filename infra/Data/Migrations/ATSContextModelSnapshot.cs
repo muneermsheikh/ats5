@@ -108,6 +108,10 @@ namespace infra.Data.Migrations
                     b.Property<string>("PlaceOfBirth")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("TEXT");
 
@@ -196,59 +200,6 @@ namespace infra.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("EmployeeQualifications");
-                });
-
-            modelBuilder.Entity("core.Entities.Admin.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DateRead")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("MessageSent")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("RecipientDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RecipientId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("RecipientId1")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RecipientUsername")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("SenderDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("SenderId1")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SenderUsername")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipientId1");
-
-                    b.HasIndex("SenderId1");
-
-                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("core.Entities.Attachments.FileOnFileSystem", b =>
@@ -404,6 +355,9 @@ namespace infra.Data.Migrations
                     b.Property<string>("Designation")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Divn")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .HasColumnType("TEXT");
 
@@ -441,6 +395,169 @@ namespace infra.Data.Migrations
                     b.ToTable("CustomerOfficials");
                 });
 
+            modelBuilder.Entity("core.Entities.EmailandSMS.EmailMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("BccEmailAddress")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CcEmailAddress")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DateReadOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MessageGroup")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("MessageSentOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageTypeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("RecipientDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RecipientEmailAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RecipientId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RecipientUserName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("SenderDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SenderEmailAddress")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderUserName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmailMessages");
+                });
+
+            modelBuilder.Entity("core.Entities.EmailandSMS.MessageComposeSource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LineText")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MessageType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Mode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SrNo")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MessageComposeSources");
+                });
+
+            modelBuilder.Entity("core.Entities.EmailandSMS.MessageType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MessageTypes");
+                });
+
+            modelBuilder.Entity("core.Entities.EmailandSMS.PhoneMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CompanyAdvised")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateOfAdvise")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OfficialAdvised")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNo")
+                        .IsRequired()
+                        .HasMaxLength(14)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TextAdvised")
+                        .HasMaxLength(160)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PhoneMessages");
+                });
+
+            modelBuilder.Entity("core.Entities.EmailandSMS.SMSMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DeliveryResult")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNo")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SMSDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SMSText")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SMSMessages");
+                });
+
             modelBuilder.Entity("core.Entities.HR.CVRef", b =>
                 {
                     b.Property<int>("Id")
@@ -448,6 +565,9 @@ namespace infra.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ApplicationNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CVReviewId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("CandidateId")
@@ -474,6 +594,15 @@ namespace infra.Data.Migrations
                     b.Property<int?>("DeployStageId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("DeployStageId1")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Ecnr")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("HRExecId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("INTEGER");
 
@@ -486,16 +615,15 @@ namespace infra.Data.Migrations
                     b.Property<string>("PaymentIntentId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RefStatus")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("RefStatus")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("ReferredOn")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DeployStageId");
+                    b.HasIndex("DeployStageId1");
 
                     b.HasIndex("OrderItemId");
 
@@ -538,6 +666,95 @@ namespace infra.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CVRefRestrictions");
+                });
+
+            modelBuilder.Entity("core.Entities.HR.CVRvw", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CVRefId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("CVReferredOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CandidateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Charges")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ChecklistHRId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DocControllerAdminEmployeeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("DocControllerAdminTaskId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Ecnr")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("HRExecRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("HRExecTaskId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("HRExecutiveId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("HRMId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("HRMRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("HRMReviewResultId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("HRMReviewedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("HRMTaskId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("HRSupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("NoReviewBySupervisor")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ReviewedBySupOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SubmittedByHRExecOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SupRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("SupReviewResultId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SupTaskId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId", "OrderItemId")
+                        .IsUnique();
+
+                    b.ToTable("CVReviews");
                 });
 
             modelBuilder.Entity("core.Entities.HR.CandidateAssessment", b =>
@@ -780,9 +997,6 @@ namespace infra.Data.Migrations
                     b.HasIndex("CVRefId")
                         .IsUnique();
 
-                    b.HasIndex("SelectionDecisionId")
-                        .IsUnique();
-
                     b.ToTable("Employments");
                 });
 
@@ -810,6 +1024,36 @@ namespace infra.Data.Migrations
                     b.Property<string>("CategoryName")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Charges")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ContractPeriodInMonths")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DecisionDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("FoodAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("FoodProvidedFree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("HousingAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("HousingProvidedFree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LeaveAirfareEntitlementAfterMonths")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LeavePerYearInDays")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("INTEGER");
 
@@ -819,10 +1063,28 @@ namespace infra.Data.Migrations
                     b.Property<int>("OrderNo")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("OtherAllowance")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Salary")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SalaryCurrency")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SelectedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("SelectionStatusId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TransportAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("TransportProvidedFree")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -911,6 +1173,25 @@ namespace infra.Data.Migrations
                     b.ToTable("Address");
                 });
 
+            modelBuilder.Entity("core.Entities.Identity.AppRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppRole");
+                });
+
             modelBuilder.Entity("core.Entities.Identity.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -974,11 +1255,19 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.Identity.AppUserRole", b =>
                 {
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("RoleId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");
+
+                    b.HasIndex("RoleId");
 
                     b.HasIndex("UserId");
 
@@ -1111,7 +1400,13 @@ namespace infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ReviewDescription")
+                    b.Property<bool>("IsMandatoryTrue")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Response")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReviewParameter")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("TEXT");
@@ -1234,14 +1529,17 @@ namespace infra.Data.Migrations
                     b.Property<int>("OrderNo")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ReviewStatusId")
+                    b.Property<bool>("ReleasedForProduction")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ReviewedBy")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("ReviewedOn")
+                    b.Property<DateTime>("ReviewedOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("RvwStatusId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -1250,8 +1548,6 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("OrderNo")
                         .IsUnique();
-
-                    b.HasIndex("ReviewStatusId");
 
                     b.ToTable("ContractReviews");
                 });
@@ -1265,7 +1561,7 @@ namespace infra.Data.Migrations
                     b.Property<string>("CategoryName")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ContractReviewId")
+                    b.Property<int>("ContractReviewId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("Ecnr")
@@ -1283,9 +1579,8 @@ namespace infra.Data.Migrations
                     b.Property<bool>("RequireAssess")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ReviewItemStatus")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("ReviewItemStatus")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("SourceFrom")
                         .HasColumnType("TEXT");
@@ -1370,7 +1665,16 @@ namespace infra.Data.Migrations
                     b.Property<string>("CustomerName")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("EmigProcessInchargeId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("EstimatedRevenue")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ForwardedToHRDeptOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("MedicalProcessInchargeEmpId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("OrderDate")
@@ -1382,6 +1686,12 @@ namespace infra.Data.Migrations
                     b.Property<string>("OrderRef")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("OrderRefDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProjectManagerId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("SalesmanId")
                         .HasColumnType("INTEGER");
 
@@ -1391,6 +1701,12 @@ namespace infra.Data.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("TravelProcessInchargeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("VisaProcessInchargeEmpId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -1453,6 +1769,9 @@ namespace infra.Data.Migrations
                     b.Property<string>("IndustryName")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsProcessingOnly")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("JobDescriptionId")
                         .HasColumnType("INTEGER");
 
@@ -1462,10 +1781,16 @@ namespace infra.Data.Migrations
                     b.Property<int>("MinCVs")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("NoReviewBySupervisor")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("OrderItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderNo")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Quantity")
@@ -1475,6 +1800,9 @@ namespace infra.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("RequireAssess")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("RequireInternalReview")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ReviewItemStatusId")
@@ -1553,6 +1881,9 @@ namespace infra.Data.Migrations
                     b.Property<int>("OrderAssessmentItemId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("OrderItemAssessmentId")
                         .HasColumnType("INTEGER");
 
@@ -1590,10 +1921,16 @@ namespace infra.Data.Migrations
                     b.Property<int>("FoodAllowance")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("FoodNotProvided")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("FoodProvidedFree")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("HousingAllowance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("HousingNotProvided")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("HousingProvidedFree")
@@ -1634,7 +1971,13 @@ namespace infra.Data.Migrations
                     b.Property<int>("TransportAllowance")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("TransportNotProvided")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("TransportProvidedFree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("WorkHours")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -1642,6 +1985,46 @@ namespace infra.Data.Migrations
                     b.HasIndex("OrderItemId1");
 
                     b.ToTable("Remunerations");
+                });
+
+            modelBuilder.Entity("core.Entities.Orders.ReviewItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ContractReviewItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsMandatoryTrue")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Response")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReviewParameter")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SrNo")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractReviewItemId", "ReviewParameter")
+                        .IsUnique();
+
+                    b.HasIndex("ContractReviewItemId", "SrNo")
+                        .IsUnique();
+
+                    b.ToTable("ReviewItems");
                 });
 
             modelBuilder.Entity("core.Entities.Process.Deploy", b =>
@@ -1686,6 +2069,10 @@ namespace infra.Data.Migrations
                     b.Property<int>("NextStageId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ProcessName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("StageId")
                         .HasColumnType("INTEGER");
 
@@ -1705,16 +2092,28 @@ namespace infra.Data.Migrations
                     b.ToTable("DeployStatus");
                 });
 
-            modelBuilder.Entity("core.Entities.Tasks.Task", b =>
+            modelBuilder.Entity("core.Entities.Tasks.ApplicationTask", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ApplicationNo")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("AssignedToId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("CVReviewId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CandidateId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("CompleteBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CompletedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("OrderId")
@@ -1723,21 +2122,29 @@ namespace infra.Data.Migrations
                     b.Property<int?>("OrderItemId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("OrderNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PostTaskAction")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("TaskDate")
                         .HasMaxLength(250)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TaskDescription")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TaskOwnerId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TaskStatus")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("TaskType")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("TaskTypeId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -1745,7 +2152,10 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("TaskOwnerId");
 
-                    b.HasIndex("TaskType");
+                    b.HasIndex("TaskTypeId");
+
+                    b.HasIndex("AssignedToId", "OrderItemId", "CandidateId", "TaskTypeId")
+                        .IsUnique();
 
                     b.ToTable("Tasks");
                 });
@@ -1756,16 +2166,34 @@ namespace infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ApplicationTaskId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ApplicationTaskId1")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CandidateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("NextFollowupById")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("NextFollowupOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("TaskId")
+                    b.Property<int>("OrderId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("TaskId1")
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TaskItemDescription")
@@ -1777,17 +2205,21 @@ namespace infra.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("TaskTypeId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TaskId");
+                    b.HasIndex("ApplicationTaskId");
 
-                    b.HasIndex("TaskId1");
+                    b.HasIndex("ApplicationTaskId1");
 
                     b.HasIndex("TransactionDate");
 
@@ -1795,6 +2227,20 @@ namespace infra.Data.Migrations
                         .HasFilter("[UserId]>0");
 
                     b.ToTable("TaskItems");
+                });
+
+            modelBuilder.Entity("core.Entities.Tasks.TaskType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaskTypes");
                 });
 
             modelBuilder.Entity("core.Entities.Users.Candidate", b =>
@@ -1806,8 +2252,11 @@ namespace infra.Data.Migrations
                     b.Property<string>("AadharNo")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("AppUserIdNotEnforced")
+                    b.Property<string>("AppUserId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("AppUserIdNotEnforced")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("ApplicationNo")
                         .HasColumnType("INTEGER");
@@ -1826,6 +2275,9 @@ namespace infra.Data.Migrations
 
                     b.Property<DateTime>("DOB")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Ecnr")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
                         .HasColumnType("TEXT");
@@ -1862,6 +2314,9 @@ namespace infra.Data.Migrations
                     b.Property<string>("Nationality")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("NotificationDesired")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("PlaceOfBirth")
                         .HasColumnType("TEXT");
 
@@ -1894,6 +2349,9 @@ namespace infra.Data.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsMain")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsOfficial")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsValid")
@@ -2212,23 +2670,6 @@ namespace infra.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("core.Entities.Admin.Message", b =>
-                {
-                    b.HasOne("core.Entities.Identity.AppUser", "Recipient")
-                        .WithMany("MessagesReceived")
-                        .HasForeignKey("RecipientId1")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("core.Entities.Identity.AppUser", "Sender")
-                        .WithMany("MessagesSent")
-                        .HasForeignKey("SenderId1")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Recipient");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("core.Entities.CustomerIndustry", b =>
                 {
                     b.HasOne("core.Entities.Customer", null)
@@ -2251,7 +2692,7 @@ namespace infra.Data.Migrations
                 {
                     b.HasOne("core.Entities.MasterEntities.DeployStage", "DeployStage")
                         .WithMany()
-                        .HasForeignKey("DeployStageId");
+                        .HasForeignKey("DeployStageId1");
 
                     b.HasOne("core.Entities.Orders.OrderItem", null)
                         .WithMany("CVRefs")
@@ -2310,15 +2751,6 @@ namespace infra.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("core.Entities.HR.Employment", b =>
-                {
-                    b.HasOne("core.Entities.HR.SelectionDecision", null)
-                        .WithOne("Employment")
-                        .HasForeignKey("core.Entities.HR.Employment", "SelectionDecisionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
                 {
                     b.HasOne("core.Entities.HR.CVRef", "CVRef")
@@ -2341,9 +2773,15 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.Identity.AppUserRole", b =>
                 {
+                    b.HasOne("core.Entities.Identity.AppRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId");
+
                     b.HasOne("core.Entities.Identity.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Role");
 
                     b.Navigation("User");
                 });
@@ -2355,31 +2793,19 @@ namespace infra.Data.Migrations
                         .HasForeignKey("GroupName");
                 });
 
-            modelBuilder.Entity("core.Entities.Orders.ContractReview", b =>
-                {
-                    b.HasOne("core.Entities.MasterEntities.ReviewStatus", "ReviewStatus")
-                        .WithMany()
-                        .HasForeignKey("ReviewStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ReviewStatus");
-                });
-
             modelBuilder.Entity("core.Entities.Orders.ContractReviewItem", b =>
                 {
                     b.HasOne("core.Entities.Orders.ContractReview", null)
                         .WithMany("ContractReviewItems")
                         .HasForeignKey("ContractReviewId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("core.Entities.Orders.OrderItem", "OrderItem")
+                    b.HasOne("core.Entities.Orders.OrderItem", null)
                         .WithOne("ContractReviewItem")
                         .HasForeignKey("core.Entities.Orders.ContractReviewItem", "OrderItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("OrderItem");
                 });
 
             modelBuilder.Entity("core.Entities.Orders.JobDescription", b =>
@@ -2515,6 +2941,15 @@ namespace infra.Data.Migrations
                     b.Navigation("OrderItem");
                 });
 
+            modelBuilder.Entity("core.Entities.Orders.ReviewItem", b =>
+                {
+                    b.HasOne("core.Entities.Orders.ContractReviewItem", null)
+                        .WithMany("ReviewItems")
+                        .HasForeignKey("ContractReviewItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("core.Entities.Process.Deploy", b =>
                 {
                     b.HasOne("core.Entities.HR.CVRef", "CVRef")
@@ -2532,17 +2967,17 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.Tasks.TaskItem", b =>
                 {
-                    b.HasOne("core.Entities.Tasks.Task", "Task")
+                    b.HasOne("core.Entities.Tasks.ApplicationTask", "ApplicationTask")
                         .WithMany()
-                        .HasForeignKey("TaskId")
+                        .HasForeignKey("ApplicationTaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("core.Entities.Tasks.Task", null)
+                    b.HasOne("core.Entities.Tasks.ApplicationTask", null)
                         .WithMany("TaskItems")
-                        .HasForeignKey("TaskId1");
+                        .HasForeignKey("ApplicationTaskId1");
 
-                    b.Navigation("Task");
+                    b.Navigation("ApplicationTask");
                 });
 
             modelBuilder.Entity("core.Entities.Users.Candidate", b =>
@@ -2664,18 +3099,9 @@ namespace infra.Data.Migrations
                     b.Navigation("ChecklistItemHRs");
                 });
 
-            modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
-                {
-                    b.Navigation("Employment");
-                });
-
             modelBuilder.Entity("core.Entities.Identity.AppUser", b =>
                 {
                     b.Navigation("Address");
-
-                    b.Navigation("MessagesReceived");
-
-                    b.Navigation("MessagesSent");
                 });
 
             modelBuilder.Entity("core.Entities.Messages.Group", b =>
@@ -2686,6 +3112,11 @@ namespace infra.Data.Migrations
             modelBuilder.Entity("core.Entities.Orders.ContractReview", b =>
                 {
                     b.Navigation("ContractReviewItems");
+                });
+
+            modelBuilder.Entity("core.Entities.Orders.ContractReviewItem", b =>
+                {
+                    b.Navigation("ReviewItems");
                 });
 
             modelBuilder.Entity("core.Entities.Orders.Order", b =>
@@ -2705,7 +3136,7 @@ namespace infra.Data.Migrations
                     b.Navigation("OrderItemAssessmentQs");
                 });
 
-            modelBuilder.Entity("core.Entities.Tasks.Task", b =>
+            modelBuilder.Entity("core.Entities.Tasks.ApplicationTask", b =>
                 {
                     b.Navigation("TaskItems");
                 });

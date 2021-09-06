@@ -23,7 +23,7 @@ namespace core.Specifications
                 (specParams.CVRefIds.Length==0 || specParams.CVRefIds.Contains(x.CVRefId))
                 )
         {
-            if(specParams.IncludeEmploymentData) AddInclude(x => x.Employment);
+            //if(specParams.IncludeEmploymentData) AddInclude(x => x.Employment);
             ApplyPaging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
             AddOrderBy(x => x.OrderId);
             AddOrderBy(x => x.OrderItemId);

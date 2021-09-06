@@ -30,14 +30,6 @@ namespace infra.Services
                return null;
           }
 
-          public async Task<ChecklistHRData> AddChecklistHRParameter(string checklistParameter)
-          {
-               var srno = await _context.ChecklistHRDatas.MaxAsync(x => x.SrNo) + 1;
-               var checklist = new ChecklistHRData(srno, checklistParameter);
-               _unitOfWork.Repository<ChecklistHRData>().Add(checklist);
-               if (await _unitOfWork.Complete() > 0) return checklist;
-               return null;
-          }
 
           public async Task<Industry> AddIndustry(string industryName)
           {
@@ -88,12 +80,6 @@ namespace infra.Services
                return (await _unitOfWork.Complete() > 0);
           }
 
-          public async Task<bool> DeleteChecklistHRDataAsync(ChecklistHRData checklistHRData)
-          {
-               _unitOfWork.Repository<ChecklistHRData>().Delete(checklistHRData);
-               return (await _unitOfWork.Complete() > 0);
-          }
-
           public async Task<bool> DeleteIndustryyAsync(Industry industry)
           {
                _unitOfWork.Repository<Industry>().Delete(industry);
@@ -127,12 +113,6 @@ namespace infra.Services
           public async Task<bool> EditCategoryAsync(Category category)
           {
                _unitOfWork.Repository<Category>().Update(category);
-               return (await _unitOfWork.Complete() > 0);
-          }
-
-          public async Task<bool> EditChecklistHRDataAsync(ChecklistHRData checklistHRData)
-          {
-               _unitOfWork.Repository<ChecklistHRData>().Update(checklistHRData);
                return (await _unitOfWork.Complete() > 0);
           }
 
@@ -175,11 +155,6 @@ namespace infra.Services
                //var data = _mapper.Map<IReadOnlyList<CategoryToReturnDto>>(lst);
 
                return new Pagination<Category>(specParams.PageIndex, specParams.PageSize, totalCount, lst);
-          }
-
-          public Task<IReadOnlyList<ChecklistHRData>> GetChecklistHRDataListAsync()
-          {
-               throw new System.NotImplementedException();
           }
 
           public async Task<Pagination<Industry>> GetIndustryListAsync(IndustrySpecParams specParams)
