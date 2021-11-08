@@ -27,6 +27,8 @@ namespace api.Helpers
                CreateMap<CVRef, SelectionsPendingDto>();
                CreateMap<EmailMessage, MessageDto>();
                CreateMap<Employment, EmploymentToReturnDto>();
+               CreateMap<EmployeeToAddDto, EmployeeDto>();
+                    
                CreateMap<OrderItem, OrderItemDto>();
                CreateMap<OrderItem, OrderItemToReturnDto>();
                CreateMap<Order, OrderToReturnDto>();
@@ -40,6 +42,9 @@ namespace api.Helpers
                     .ForMember(d => d.KnownAs, o => o.MapFrom(s => s.DisplayName))
                     .ForMember(d => d.DOB, o => o.MapFrom(s => s.Address.DOB))
                     ;
+               
+               CreateMap<Candidate, CandidateInBriefDto>();
+               
                CreateMap<Address, EntityAddress>();
                CreateMap<SelectionDecision, SelectionDecisionToRegisterDto>();
 
@@ -52,6 +57,11 @@ namespace api.Helpers
                     .ForMember(d => d.CVRefId, o => o.MapFrom(s => s.Id));
                     //.ForMember(d => d.DeployStageId, o => o.MapFrom(s => EnumDeployStatus.GetAttribute<s.DeployStageId>()));
                CreateMap<Deploy, DeployAddedDto>();
+
+               CreateMap<UserProfession, Prof>();
+
+               //itnerviews
+
           }
      }
 }

@@ -451,7 +451,7 @@ namespace infra.Services
                return await _context.Tasks.FindAsync(hrsuptask.Id);
           }
      }
-     public async Task<bool> SetApplicationTaskStatus(int ApplicationTaskId, DateTime dateOfStatus, string taskStatus, string UserName, string AppUserId)
+     public async Task<bool> SetApplicationTaskStatus(int ApplicationTaskId, DateTime dateOfStatus, string taskStatus, string UserName, int AppUserId)
      {
           var t = await _unitOfWork.Repository<ApplicationTask>().GetByIdAsync(ApplicationTaskId);
           t.TaskStatus = taskStatus;
@@ -461,7 +461,7 @@ namespace infra.Services
 
           var tItem = new TaskItem((int)t.TaskTypeId, t.Id, dateOfStatus, taskStatus,
                "set as " + taskStatus + " on " + dateOfStatus + " by " + UserName, employeeId, (int)t.OrderId,
-               (int)t.OrderItemId, (int)t.OrderNo, AppUserId, DateTime.Now.AddDays(2), (int)t.CandidateId, 0,0, t);
+               (int)t.OrderItemId, (int)t.OrderNo, employeeId, DateTime.Now.AddDays(2), (int)t.CandidateId, 0,0, t);
           //_context.Entry(tItem).State = EntityState.Added;
           t.TaskItems.Add(tItem);
 

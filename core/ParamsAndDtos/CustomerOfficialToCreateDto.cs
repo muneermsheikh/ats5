@@ -30,7 +30,7 @@ namespace core.ParamsAndDtos
         public string State { get; set; }
         public string Pin { get; set; }
         public string Country { get; set; }
-        public string AppUserId { get; set; }
+        public int AppUserId { get; set; }
         public string DisplayName { get; set; }
         public string UserName {get; set;}
         [RegularExpression("(?=^.{6,10}$)(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&amp;*()_+}{&quot;:;'?/&gt;.&lt;,])(?!.*\\s).*$", 

@@ -14,8 +14,8 @@ namespace core.Entities.Orders
           {
           }
 
-          public Order(int orderNo, int customerId, string customerName, string cityOfWorking, string orderRef, int salesmanId, 
-            int estimatedRevenue, DateTime completeBy, OrderAddress orderAddress,ICollection<OrderItem> orderItems)
+          public Order(int orderNo, int customerId, string customerName, string cityOfWorking, string orderRef, DateTime orderRefDate,
+            int salesmanId, int estimatedRevenue, DateTime completeBy, OrderAddress orderAddress,ICollection<OrderItem> orderItems)
           {
                OrderNo = orderNo;
                CustomerId = customerId;
@@ -23,6 +23,7 @@ namespace core.Entities.Orders
                CityOfWorking = cityOfWorking;
                OrderAddress = orderAddress;
                OrderRef = orderRef;
+               OrderRefDate = orderRefDate;
                SalesmanId = salesmanId;
                CompleteBy = completeBy;
                EstimatedRevenue = estimatedRevenue;

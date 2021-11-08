@@ -15,6 +15,13 @@ namespace core.Entities.Users
             Nationality = nationality;
             Validity = validity;
         }
+        public UserPassport(int candidateId, string passportNo, string nationality, DateTime validity)
+        {
+            CandidateId = candidateId;
+            PassportNo = passportNo;
+            Nationality = nationality;
+            Validity = validity;
+        }
 
         public int CandidateId { get; set; }
         public string PassportNo { get; set; }

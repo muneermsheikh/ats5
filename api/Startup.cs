@@ -1,22 +1,28 @@
 using api.Extensions;
 using api.Helpers;
+using core.Entities.Identity;
 using infra.Data;
 using infra.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
+
 namespace api
 {
      public class Startup
      {
           private readonly IConfiguration _config;
-          public Startup(IConfiguration config)
+          private readonly IWebHostEnvironment _env;
+          public Startup(IConfiguration config, IWebHostEnvironment env)
           {
+               _env = env;
                _config = config;
           }
 
@@ -30,21 +36,33 @@ namespace api
                services.AddControllers();
                services.AddApplicationServices();
                services.AddIdentityServices(_config);
-               
-               services.AddDbContext<ATSContext>(x => x.UseSqlite(
-                   _config.GetConnectionString("DefaultConnection")
-               ));
-               
-               services.AddDbContext<AppIdentityDbContext>( x => 
-               {
-                    x.UseSqlite(_config.GetConnectionString("IdentityConnection"));
-               });
+
+               /*
+               if (_env.IsDevelopment()) {
+                    services.AddDbContext<ATSContext>(x => x.UseSqlite(
+                         _config.GetConnectionString("DefaultConnection")));
+                    services.AddDbContext<AppIdentityDbContext>(x =>
+                         { x.UseSqlite(_config.GetConnectionString("IdentityConnection")); });
+               } else {
+                    services.AddDbContext<SQLDbContext>(x => x.UseSqlServer(
+                         _config.GetConnectionString("SQLServerConnection")));
+                    
+                    services.AddDbContext<AppIdentityDbContext>(x =>
+                         { x.UseSqlServer(_config.GetConnectionString("IdentityConnection")); });
+                }
+               */
+               services.AddDbContext<ATSContext>(x => x.UseSqlServer(
+                    _config.GetConnectionString("SQLServerConnection")));
+               //services.AddDbContext<AppIdentityDbContext>(x =>
+                         //{ x.UseSqlite(_config.GetConnectionString("IdentityConnection")); });
+               services.AddDbContext<AppIdentityDbContext>(x =>
+                         { x.UseSqlServer(_config.GetConnectionString("IdentityConnection")); });
 
                services.AddSwaggerGen(c =>
                {
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "api", Version = "v1" });
                });
-               
+
                //services.AddSwaggerDocumentation();
 
                services.AddCors(opt =>
@@ -61,7 +79,11 @@ namespace api
 
           // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
           //order in this procedure is imp
-          public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+          //comment out line 85 gives error in roles
+          public void Configure(IApplicationBuilder app, IWebHostEnvironment env
+               , DbContextOptions<AppIdentityDbContext> identityDbContextOptions, UserManager<AppUser> userManager
+               //, RoleManager<IdentityRole<int>> roleManager
+               )
           {
                if (env.IsDevelopment())
                {

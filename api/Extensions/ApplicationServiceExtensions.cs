@@ -39,6 +39,9 @@ namespace api.Extensions
                 services.AddScoped<IVerifyService, VerifyService>();
                 services.AddScoped<IOrderAssignmentService, OrderAssignmentService>();
                 services.AddScoped<IChecklistService, ChecklistService>();
+                services.AddScoped<IInterviewService, InterviewService>();
+                services.AddScoped<IInterviewFollowupService, InterviewFollowupService>();
+                services.AddScoped<IUserContactService, UserContactService>();
                 
                 /*
                 services.AddScoped<IPaymentService, PaymentService>();

@@ -26,6 +26,7 @@ namespace core.Entities.HR
         public int AssessedById { get; set; }
         [Required]
         public int CandidateId {get; set;}
+        //public int UserProfessionId { get; set; }
         public DateTime AssessedOn { get; set; }
         [Required]
         public EnumCandidateAssessmentResult AssessResult { get; set; }

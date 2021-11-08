@@ -13,6 +13,7 @@ namespace core.Interfaces
         Task<bool> EditCategoryAsync(Category category);
         Task<bool> DeleteCategoryAsync(Category category);
         Task<Pagination<Category>> GetCategoryListAsync(CategorySpecParams categoryParams);
+        Task<int> CategoryFromOrderItemId (int orderItemId);
 
     //industry
         Task<Industry> AddIndustry(string industryName);

@@ -108,7 +108,7 @@ namespace infra.Services
                          task.CompletedOn = dateTimeNow;
                          var taskitem = new TaskItem((int)EnumTaskType.SubmitCVToDocControllerAdmin, task.Id, dateTimeNow,
                               "Completed", taskItemDescription, loggedInUserDto.LoggedInEmployeeId, cvref.OrderId, cvref.OrderItemId,
-                              cvref.OrderNo, loggedInUserDto.LoggedInAppUserId, dateTimeNow.AddYears(-1000), rvw.CandidateId,
+                              cvref.OrderNo, loggedInUserDto.LoggedInEmployeeId, dateTimeNow.AddYears(-1000), rvw.CandidateId,
                               0, _docControllerAdminId, task);
                          _unitOfWork.Repository<TaskItem>().Add(taskitem);
                          _unitOfWork.Repository<ApplicationTask>().Update(task);

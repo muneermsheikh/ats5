@@ -148,7 +148,16 @@ namespace infra.Data
                     }
                     await context.SaveChangesAsync();
                 }
-                                
+
+                if(!context.InterviewAttendancesStatus.Any()) {
+                    var jsonData = File.ReadAllText("../infra/data/SeedData/InterviewAttendanceStatusSeedData.json");
+                    var fileData = JsonSerializer.Deserialize<List<InterviewAttendanceStatus>>(jsonData);
+                    foreach(var item in fileData) {
+                        context.InterviewAttendancesStatus.Add(item);
+                    }
+                    await context.SaveChangesAsync();
+                }
+
                 if(!context.Employees.Any()) {
                     var jsonData = File.ReadAllText("../infra/data/SeedData/EmployeeSeedData.json");
                     var fileData = JsonSerializer.Deserialize<List<Employee>>(jsonData);
@@ -168,15 +177,16 @@ namespace infra.Data
                 }
 
                 if(!context.Candidates.Any()) {
-                    var jsonData = File.ReadAllText("../infra/data/SeedData/UserSeedData.json");
-                    var fileData = JsonSerializer.Deserialize<List<Candidate>>(jsonData);
-                    foreach(var item in fileData) {
+                    var jsonData1 = File.ReadAllText("../infra/data/SeedData/UserSeedData.json");
+                    var fileData1 = JsonSerializer.Deserialize<List<Candidate>>(jsonData1);
+                    foreach(var item in fileData1) {
                         context.Candidates.Add(item);
                     }
                     await context.SaveChangesAsync();
                 }
 
-                if(true) { //!context.Orders.Any()) {
+                if(!context.Orders.Any()) 
+                {
                     var jsnData = File.ReadAllText("../infra/data/SeedData/OrderSeedData.json");
                     var filData = JsonSerializer.Deserialize<List<Order>>(jsnData);
                     foreach(var item in filData) {

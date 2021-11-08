@@ -10,10 +10,6 @@ namespace infra.Data.Config
      {
         public void Configure(EntityTypeBuilder<Candidate> builder)
         {
-            builder.Property(s => s.CandidateStatus).HasConversion(
-                o => o.ToString(),
-                o => (EnumCandidateStatus) Enum.Parse(typeof(EnumCandidateStatus), o)
-            );
 
             builder.HasIndex(x => x.ApplicationNo).IsUnique().HasFilter("[ApplicationNo] > 0");
             
@@ -30,6 +26,7 @@ namespace infra.Data.Config
             builder.Property("SecondName").HasColumnType("VARCHAR").HasMaxLength(75).IsUnicode(false);
             builder.Property("FamilyName").HasColumnType("VARCHAR").HasMaxLength(75).IsUnicode(false);
 
+            
         }
      }
 }

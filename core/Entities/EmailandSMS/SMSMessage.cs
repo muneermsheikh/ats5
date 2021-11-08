@@ -4,7 +4,7 @@ namespace core.Entities.EmailandSMS
 {
     public class SMSMessage: BaseEntity
     {
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         public DateTime SMSDateTime { get; set; }
         public string PhoneNo { get; set; }
         public string SMSText { get; set; }

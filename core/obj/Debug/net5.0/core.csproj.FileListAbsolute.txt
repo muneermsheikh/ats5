@@ -10,3 +10,27 @@ D:\ats5\core\obj\Debug\net5.0\core.csproj.CoreCompileInputs.cache
 D:\ats5\core\obj\Debug\net5.0\core.dll
 D:\ats5\core\obj\Debug\net5.0\ref\core.dll
 D:\ats5\core\obj\Debug\net5.0\core.pdb
+D:\User Profile\My Documents\ats5\core\bin\Debug\net5.0\core.deps.json
+D:\User Profile\My Documents\ats5\core\bin\Debug\net5.0\core.dll
+D:\User Profile\My Documents\ats5\core\bin\Debug\net5.0\ref\core.dll
+D:\User Profile\My Documents\ats5\core\bin\Debug\net5.0\core.pdb
+D:\User Profile\My Documents\ats5\core\obj\Debug\net5.0\core.csprojAssemblyReference.cache
+D:\User Profile\My Documents\ats5\core\obj\Debug\net5.0\core.GeneratedMSBuildEditorConfig.editorconfig
+D:\User Profile\My Documents\ats5\core\obj\Debug\net5.0\core.AssemblyInfoInputs.cache
+D:\User Profile\My Documents\ats5\core\obj\Debug\net5.0\core.AssemblyInfo.cs
+D:\User Profile\My Documents\ats5\core\obj\Debug\net5.0\core.csproj.CoreCompileInputs.cache
+D:\User Profile\My Documents\ats5\core\obj\Debug\net5.0\core.dll
+D:\User Profile\My Documents\ats5\core\obj\Debug\net5.0\ref\core.dll
+D:\User Profile\My Documents\ats5\core\obj\Debug\net5.0\core.pdb
+D:\ats6\core\bin\Debug\net5.0\core.deps.json
+D:\ats6\core\bin\Debug\net5.0\core.dll
+D:\ats6\core\bin\Debug\net5.0\ref\core.dll
+D:\ats6\core\bin\Debug\net5.0\core.pdb
+D:\ats6\core\obj\Debug\net5.0\core.csprojAssemblyReference.cache
+D:\ats6\core\obj\Debug\net5.0\core.GeneratedMSBuildEditorConfig.editorconfig
+D:\ats6\core\obj\Debug\net5.0\core.AssemblyInfoInputs.cache
+D:\ats6\core\obj\Debug\net5.0\core.AssemblyInfo.cs
+D:\ats6\core\obj\Debug\net5.0\core.csproj.CoreCompileInputs.cache
+D:\ats6\core\obj\Debug\net5.0\core.dll
+D:\ats6\core\obj\Debug\net5.0\ref\core.dll
+D:\ats6\core\obj\Debug\net5.0\core.pdb

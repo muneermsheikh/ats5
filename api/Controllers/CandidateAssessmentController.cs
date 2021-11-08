@@ -25,7 +25,7 @@ namespace api.Controllers
 
 
           [HttpPost("assess")]
-          [Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
+          //[Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           public async Task<ActionResult<CandidateAssessment>> AssessNewCandidate(CandidateAssessmentParams assessParams)
           {
                if (!User.IsUserAuthenticated()) return Unauthorized("user is not authenticated");
@@ -37,15 +37,15 @@ namespace api.Controllers
                return await _candidateAssessService.AssessNewCandidate(assessParams);
           }
 
-          private string Identityuserid()
+          private int Identityuserid()
           {
                var email = User.GetIdentityUserEmailId();
                var appuser = _userManager.FindByEmailAsync(email);
-               return appuser.Id.ToString();
+               return appuser.Id;
                //return appuser.IdentityUser();
           }
           
-          [Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
+          //[Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           [HttpPut("assess")]
           public async Task<ActionResult<bool>> EditCandidateAssessment(CandidateAssessment candidateAssessment)
           {
@@ -59,7 +59,7 @@ namespace api.Controllers
                }
           }
 
-          [Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
+          //[Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           [HttpDelete("assess")]
           public async Task<ActionResult<bool>> DeleteCandidateAssessment(CandidateAssessment candidateAssessment)
           {
@@ -73,7 +73,7 @@ namespace api.Controllers
                }
           }
 
-          [Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
+          //[Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           [HttpDelete("assessitem")]
           public async Task<ActionResult<bool>> DeleteCandidateAssessmentItem(CandidateAssessmentItem assessmentItem)
           {

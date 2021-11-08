@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using core.Entities.Admin;
-using core.Entities.Identity;
-using core.Entities.MasterEntities;
+
 
 namespace core.Entities.Users
 {
@@ -13,7 +11,7 @@ namespace core.Entities.Users
           {
           }
 
-          public Candidate(string gender, string appUserId,  bool appUserIdNotEnforced, int applicationNo, 
+          public Candidate(string gender, int appUserId,  bool appUserIdNotEnforced, int applicationNo, 
                 string firstName, string secondName, string familyName, string knownAs, DateTime dOB, 
                 string placeOfBirth, string aadharNo, string email, string introduction, 
                 string interests, bool notificationDesired, ICollection<UserQualification> userQualifications, 
@@ -52,6 +50,8 @@ namespace core.Entities.Users
         public string AadharNo { get; set; }
         public string PpNo { get; set; } 
         public bool Ecnr { get; set; }
+        public string City {get; set;}
+        public string Pin {get; set;}
         public string Nationality {get; set;}
         [EmailAddress]
         public string Email { get; set; }
@@ -63,10 +63,10 @@ namespace core.Entities.Users
         public string Interests { get; set; }
     //navigations
         public bool AppUserIdNotEnforced { get; set; }
-        public string AppUserId {get; set;}
+        public int AppUserId {get; set;}
         public bool NotificationDesired {get; set;}
 
-        public EnumCandidateStatus? CandidateStatus {get; set;} = EnumCandidateStatus.NotReferred;
+        public int? CandidateStatus {get; set;} = (int)EnumCandidateStatus.NotReferred;
         public ICollection<UserPhone> UserPhones {get; set;}
         public ICollection<UserQualification> UserQualifications { get; set; }
         public ICollection<UserProfession> UserProfessions {get; set;}

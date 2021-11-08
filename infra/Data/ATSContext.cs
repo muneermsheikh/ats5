@@ -4,19 +4,22 @@ using core.Entities.Admin;
 using core.Entities.Attachments;
 using core.Entities.EmailandSMS;
 using core.Entities.HR;
+using core.Entities.Identity;
 using core.Entities.MasterEntities;
 using core.Entities.Messages;
 using core.Entities.Orders;
 using core.Entities.Process;
 using core.Entities.Tasks;
 using core.Entities.Users;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace infra.Data
 {
     public class ATSContext: DbContext
     {
-        public ATSContext(DbContextOptions<ATSContext> options) : base(options)
+          public ATSContext(DbContextOptions<ATSContext> options) : base(options)
           {
           }
 
@@ -42,7 +45,17 @@ namespace infra.Data
           public DbSet<SelectionDecision> SelectionDecisions {get; set;}
           public DbSet<Employment> Employments {get; set;}
           public DbSet<CVRvw> CVReviews {get; set;}
-     
+          public DbSet<FileUpload> FileUploads {get; set;}
+          public DbSet<Interview> Interviews {get; set;}
+          public DbSet<InterviewItem> InterviewItems {get; set;}
+          public DbSet<InterviewItemCandidate> InterviewItemCandidates {get; set;}
+          public DbSet<InterviewItemCandidateFollowup> InterviewItemCandidatesFollowup {get; set;}
+
+     //Admin
+          public DbSet<UserContact> UserContacts {get; set;}
+          //public DbSet<UserContactedItem> UserContactedItems {get; set;}
+
+
        // masters
           //public DbSet<core.Entities.Users.Address> Addresses {get; set;}
           public DbSet<AssessmentQBank> AssessmentQsBank { get; set; }
@@ -62,7 +75,7 @@ namespace infra.Data
           public DbSet<ReviewStatus> ReviewStatuses {get; set;}
           public DbSet<SkillData> SkillDatas {get; set;}
           public DbSet<SelectionStatus> SelectionStatuses {get; set;}
-          
+          public DbSet<InterviewAttendanceStatus> InterviewAttendancesStatus {get; set;}
           
      ///orders
           
@@ -88,6 +101,7 @@ namespace infra.Data
      //users
 
           public DbSet<Candidate> Candidates {get; set;}
+          public DbSet<EntityAddress> EntityAddresses {get; set;}
           public DbSet<Photo> Photos {get; set;}
           //public DbSet<core.Entities.Users.Address> UserAddresses {get; set;}
           public DbSet<UserExp> UserExps {get; set;}

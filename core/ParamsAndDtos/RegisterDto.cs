@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using core.Entities.Admin;
+using core.Entities.HR;
 using core.Entities.Identity;
 using core.Entities.Users;
+using Microsoft.AspNetCore.Http;
 
 namespace core.ParamsAndDtos
 {
@@ -36,9 +38,10 @@ namespace core.ParamsAndDtos
         public string Interests { get; set; }
         public string Position { get; set; }
         public bool NotificationDesired {get; set;}
-        public string LoggedInAppUserId { get; set; }
-        public string AppUserId {get; set;}
+        public int LoggedInAppUserId { get; set; }
+        public int AppUserId {get; set;}
         public bool AppUserIdNotEnforced {get; set;}
+        public ICollection<EntityAddress> EntityAddresses {get; set;}
         public ICollection<UserQualification> UserQualifications {get; set;}
         public ICollection<UserExp> UserExperiences {get; set;}
         public ICollection<UserProfession> UserProfessions {get; set;}
@@ -46,6 +49,7 @@ namespace core.ParamsAndDtos
         public ICollection<UserPassport> UserPassports {get; set;}
         public ICollection<EmployeeHRSkill> HrSkills {get; set;}        //for employees
         public ICollection<EmployeeOtherSkill> OtherSkills{get; set;}   //for employees
+        //public ICollection<IFormFile> UserAttachments { get; set; }
 
 
 

@@ -12,7 +12,7 @@ namespace infra.Data.Config
           {
                builder.Property(p => p.CustomerType).IsRequired().HasMaxLength(10);
                builder.Property(p => p.CustomerName).IsRequired().HasMaxLength(50);
-               builder.Property(p => p.KnownAs).IsRequired().HasMaxLength(10);
+               builder.Property(p => p.KnownAs).IsRequired().HasMaxLength(25);
                builder.Property(p => p.City).IsRequired().HasMaxLength(25);
 
                builder.HasIndex(p => new {p.CustomerName, p.City})

@@ -23,7 +23,7 @@ namespace core.Specifications
           {
           }
           
-          public AppUserForCountSpecs(string appUserId) 
+          public AppUserForCountSpecs(int appUserId) 
             : base(x => x.Id == appUserId)
           {
           }

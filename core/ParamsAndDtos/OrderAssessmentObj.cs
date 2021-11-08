@@ -6,7 +6,7 @@ namespace core.ParamsAndDtos
     public class OrderAssessmentQObj
     {
         public int EmployeeId { get; set; }
-        public string AppUserId {get; set;}
+        public int AppUserId {get; set;}
         public string AppUserEmail { get; set; }
         public string EmployeeFullName {get; set;}
         public string AppUserName {get; set;}

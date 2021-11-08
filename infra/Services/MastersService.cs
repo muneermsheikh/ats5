@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using core.Entities;
 using core.Entities.MasterEntities;
@@ -30,6 +31,10 @@ namespace infra.Services
                return null;
           }
 
+          public async Task<int> CategoryFromOrderItemId(int orderItemId)
+          {
+               return await _context.OrderItems.Where(x => x.Id == orderItemId).Select(x => x.CategoryId).FirstOrDefaultAsync();
+          }
 
           public async Task<Industry> AddIndustry(string industryName)
           {
@@ -74,6 +79,7 @@ namespace infra.Services
 
           }
 
+        
           public async Task<bool> DeleteCategoryAsync(Category category)
           {
                _unitOfWork.Repository<Category>().Delete(category);

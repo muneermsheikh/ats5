@@ -19,11 +19,12 @@ namespace api.Extensions
             return int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
         }
     */
-        public static string GetIdentityUserId(this ClaimsPrincipal user)
+        public static int GetIdentityUserId(this ClaimsPrincipal user)
         {
             //var id = user.FindFirst("Id").Value;
-            var x = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var x = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
         }
 

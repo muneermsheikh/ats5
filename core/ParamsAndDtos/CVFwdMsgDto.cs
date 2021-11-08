@@ -15,7 +15,7 @@ namespace core.ParamsAndDtos
         public int OfficialId { get; set; }
         public string OfficialTitle { get; set; }
         public string OfficialName { get; set; }
-        public string OfficialUserId { get; set; }
+        public int OfficialUserId { get; set; }
         public string Designation { get; set; }
         public string OfficialEmail { get; set; }
         public int OrderNo { get; set; }

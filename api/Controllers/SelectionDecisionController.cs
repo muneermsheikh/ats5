@@ -66,9 +66,9 @@ namespace api.Controllers
           [Authorize(Policy = "CandidateSelectionRegisterRole")]
           [HttpDelete]
           public async Task<ActionResult<bool>> DeleteSelectionDecision(SelectionDecision selectionDecision)
-     {
-          return await _service.DeleteSelection(selectionDecision);
-     }
+          {
+               return await _service.DeleteSelection(selectionDecision);
+          }
 
           
           [HttpGet("pendingseldecisions")]

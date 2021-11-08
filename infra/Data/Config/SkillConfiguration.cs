@@ -9,7 +9,7 @@ namespace infra.Data.Config
      {
           public void Configure(EntityTypeBuilder<SkillData> builder)
           {
-               builder.Property(p => p.SkillName).IsRequired().HasMaxLength(50);
+               builder.Property(p => p.SkillName).IsRequired().HasMaxLength(100);
                builder.HasIndex(p => p.SkillName).IsUnique();
           }
      }

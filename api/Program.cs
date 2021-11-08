@@ -27,12 +27,12 @@ namespace api
                 await ATSContextSeed.SeedAsync(context, loggerFactory);
                 
                 var userManager = services.GetRequiredService<UserManager<AppUser>>();
-
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 
                 var identityContext = services.GetRequiredService<AppIdentityDbContext>();
                 await identityContext.Database.MigrateAsync();
                 await AppIdentityDbContextSeed.SeedUsersAsync(userManager, roleManager);
+                //await AppIdentityDbContextSeed.SeedUsersAsync(userManager);
             }
             catch (Exception ex)
             {

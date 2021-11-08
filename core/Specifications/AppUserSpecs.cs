@@ -54,7 +54,7 @@ namespace core.Specifications
               }
           }
           
-          public AppUserSpecs(string appUserId) 
+          public AppUserSpecs(int appUserId) 
             : base(x => x.Id == appUserId)
           {
               AddInclude(x => x.Address);

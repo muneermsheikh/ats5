@@ -11,11 +11,12 @@ namespace core.Entities.Orders
           public OrderItem()
           {
           }
-          public OrderItem(int srNo, int categoryId, string categoryName, int industryId, string industryName, 
+          public OrderItem(int srNo, int orderNo, int categoryId, string categoryName, int industryId, string industryName, 
             string sourceFrom, int quantity, int minCVs, int maxCVs, bool ecnr, bool requireAssess, DateTime completeBefore, 
             int charges, JobDescription jd, Remuneration remun)
           {
                SrNo = srNo;
+               OrderNo = orderNo;
                CategoryId = categoryId;
                CategoryName = categoryName;
                IndustryId = industryId;

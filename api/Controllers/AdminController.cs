@@ -17,7 +17,7 @@ namespace api.Controllers
             _userManager = userManager;
         }
 
-        [Authorize(Policy = "ModeratePhotoRole")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("photos-to-moderate")]
         public ActionResult GetPhotosForModeration()
         {

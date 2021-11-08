@@ -14,7 +14,13 @@ namespace infra.Data.Config
                 .HasForeignKey(ur => ur.RoleId)
                 .IsRequired();
                */
-               builder.Ignore(x => x.UserRoles);
+               //builder.Ignore(x => x.UserRoles);
+               /* builder
+                .HasMany(ur => ur.UserRoles)
+                .WithOne(u => u.Role)
+                .HasForeignKey(ur => ur.RoleId)
+                .IsRequired();
+               */
           }
      }
 }

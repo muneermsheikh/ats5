@@ -12,7 +12,7 @@ namespace infra.Services
     public class EmailAsyncService
     {
 
-        static bool mailSent = false;
+        //static bool mailSent = false;
         private static void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
         {
             // Get the unique identifier for this asynchronous operation.
@@ -29,7 +29,7 @@ namespace infra.Services
             {
                 //Console.WriteLine("Message sent.");
             }
-            mailSent = true;
+            //mailSent = true;
         }
 
         public async Task SendEmailAsync(EmailMessage msg)

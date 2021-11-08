@@ -13,7 +13,12 @@ namespace core.Entities.Users
                QualificationId = qualificationId;
                IsMain = isMain;
           }
-
+        public UserQualification(int candidateId, int qualificationId, bool isMain)
+          {
+               CandidateId = candidateId;
+               QualificationId = qualificationId;
+               IsMain = isMain;
+          }
         public int CandidateId { get; set; }
         public int QualificationId { get; set; }
         public bool IsMain { get; set; }

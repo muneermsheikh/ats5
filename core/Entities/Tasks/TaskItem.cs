@@ -13,7 +13,7 @@ namespace core.Entities.Tasks
 
           public TaskItem(int taskTypeId, int taskId, DateTime transactionDate, string taskStatus, 
                 string taskItemDescription, int employeeId, int orderId, int orderItemId, int orderNo, 
-                string userId, DateTime? nextFollowupOn, int candidateid, int NextFollowupById, 
+                int userId, DateTime? nextFollowupOn, int candidateid, int NextFollowupById, 
                 int quantity, ApplicationTask applicationTask)
           {
                TaskTypeId = taskTypeId;
@@ -51,7 +51,7 @@ namespace core.Entities.Tasks
         public int OrderNo { get; set; }
         public int CandidateId { get; set; }
         [Required]
-        public string UserId {get; set;}
+        public int UserId {get; set;}
         public int Quantity { get; set; }=1;
         public DateTime? NextFollowupOn {get; set;}
         public int? NextFollowupById {get; set;}

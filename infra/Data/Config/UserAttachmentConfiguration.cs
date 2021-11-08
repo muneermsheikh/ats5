@@ -9,10 +9,11 @@ namespace infra.Data.Config
           public void Configure(EntityTypeBuilder<UserAttachment> builder)
           {
                builder.Property(p => p.CandidateId).IsRequired();
-               builder.Property(p => p.AttachmentType).IsRequired().HasMaxLength(10);
-               builder.Property(p => p.AttachmentUrl).IsRequired();
-               builder.HasIndex(p => p.AttachmentUrl).IsUnique();
+               //builder.Property(p => p.AttachmentType).IsRequired().HasMaxLength(10);
+               //builder.Property(p => p.AttachmentUrl).IsRequired();
+               //builder.HasIndex(p => p.AttachmentUrl).IsUnique();
                //builder.HasOne(p => p.Candidate).WithMany().HasForeignKey(p => p.CandidateId);
+               builder.Property(p => p.FileName).IsRequired();
           }
      }
 }

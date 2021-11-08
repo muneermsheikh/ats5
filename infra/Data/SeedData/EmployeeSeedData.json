@@ -1,6 +1,6 @@
 [
-     {"Person_FirstName": "Abdul Mateen", "Person_SecondName":"Abdul Waheed", 
-          "Person_FamilyName": "Khan","KnownAs": "Mateen", "PlaceOfBirth": "Lucknow", "AadharNo": "293824334560",
+     {"FirstName": "Abdul Mateen", "SecondName":"Abdul Waheed", "FamilyName": "Khan","KnownAs": "Mateen", 
+          "PlaceOfBirth": "Lucknow", "AadharNo": "293824334560",
           "PpNo": "A3094534", "Nationality": "Indian", "Email": "mateen@gmail.com", "DOB": "1986-11-12T02:22:22", 
           "Qualifications": [{"QualificationId": 1, "isMain": 0}, {"QualificationId": 2, "isMain": 1}],
           "DOJ": "2015-11-11T22:11:11", "Department": "Production", "Status":1, 
@@ -8,16 +8,13 @@
                {"CategoryId": 1, "IndustryId": 1, "skillLevel": 0}, 
                {"CategoryId": 2, "IndustryId": 1, "skillLevel": 2}
           ],
-          "Address_Add":"25, 32 raman raghav road", 
-          "Address_StreetAdd":"opposite national bank",
-          "Address_Location":"opposite Kotak Bank", 
-          "Address_City": "Bangalore",
-          "Address_Pin": "560022", "Address_State": "Karnataka", 
-          
-          "AppUserId": "scrambledPassword"
+          "Add":"25, 32 raman raghav road", 
+          "Address2":"opposite national bank",
+          "City": "Bangalore",
+          "Country": "India"
      },
-     {"Person_FirstName": "Sanjay", "Person_SecondName":"Rajaram", 
-          "Person_FamilyName": "Patil","KnownAs": "Sanjay", "PlaceOfBirth": "Kolhapur", "AadharNo": "233852334560",
+     {"FirstName": "Sanjay", "SecondName":"Rajaram", "FamilyName": "Patil","KnownAs": "Sanjay", 
+          "PlaceOfBirth": "Kolhapur", "AadharNo": "233852334560",
           "PpNo": "A3114534", "Nationality": "Indian", "Email": "sanjayoatil@gmail.com", "DOB": "1976-11-12T02:22:22", 
           "Qualifications": [{"QualificationId": 1, "isMain": 0}, {"QualificationId": 2, "isMain": 1}],
           "DOJ": "2016-12-11T22:11:11", "Department": "Production", "Status": 1,
@@ -25,16 +22,13 @@
                {"CategoryId": 3, "IndustryId": 2, "skillLevel": 1}, 
                {"CategoryId": 2, "IndustryId": 1, "skillLevel": 2}
           ],
-          "Address_Add":"12/56 BD Chawls", 
-          "Address_StreetAdd":"worli",
-          "Address_Location":"opposite Kotak Bank", 
-          "Address_City": "Mumbai",
-          "Address_Pin": "400018", "Address_State": "Maharashtra", 
-          
-          "AppUserId": "scrambledPassword"
+          "Add":"12/56 BD Chawls", 
+          "Address2":"worli",
+          "City": "Mumbai",
+          "Country": "India"
      },
-     {"Person_FirstName": "Shahid", "Person_SecondName":"Mohammed Yusuf", 
-          "Person_FamilyName": "Khan","KnownAs": "Mateen", "PlaceOfBirth": "Patna", "AadharNo": "293824032560",
+     {"FirstName": "Shahid", "SecondName":"Mohammed Yusuf", "FamilyName": "Khan","KnownAs": "Mateen", 
+          "PlaceOfBirth": "Patna", "AadharNo": "293824032560",
           "PpNo": "A3004534", "Nationality": "Indian", "Email": "shahid@gmail.com", "DOB": "1989-11-12T02:22:22", 
           "Qualifications": [{"QualificationId": 1, "isMain": 0}, {"QualificationId": 2, "isMain": 1}],
           "DOJ": "2015-12-21T22:11:11", "Department": "Production", "Status": 1,
@@ -46,13 +40,10 @@
                {"skillDataId": 1, "skillLevel": 1, "isMain": 0}, 
                {"skillDataId": 2, "skillLevel": 1, "isMain": 2}
           ],
-          "Address_Add":"POlot No.39485, jhumritalaiyya", 
-          "Address_StreetAdd":"opposite national bank",
-          "Address_Location":"opposite Kotak Bank", 
-          "Address_City": "Chennai",
-          "Address_Pin": "760022", "Address_State": "Tamil Nadu", 
-          
-          "AppUserId": "scrambledPassword"
+          "Add":"POlot No.39485, jhumritalaiyya", 
+          "Address2":"opposite national bank",
+          "City": "Chennai",
+          "Country": "India"
      }
 ]
 

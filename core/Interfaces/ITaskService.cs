@@ -27,7 +27,7 @@ namespace core.Interfaces
         Task<TaskItem> EditTaskItem(TaskItem taskItem);
         Task<bool> DeleteTaskItem(TaskItem taskItem);
         Task<bool> SetApplicationTaskStatus(int ApplicationTaskId, DateTime dateOfStatus, 
-               string TaskStatus, string UserName, string AppUserId);
+               string TaskStatus, string UserName, int AppUserId);
         Task<ICollection<EmailMessage>> CreateTaskForHRExecAssignment(ICollection<int> OrderItemIds, LoggedInUserDto loggedInDto);
 
         Task<ApplicationTask> GetHRExecTaskForCVCompiling(int orderitemId, int candidateId);   

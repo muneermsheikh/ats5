@@ -32,7 +32,7 @@ namespace infra.Services
             //check if the candidate has aleady been checklisted for the order item
             var checkedOn = await _context.ChecklistHRs.Where(x => x.CandidateId == candidateId && x.OrderItemId == orderItemId)
                 .Select(x => x.CheckedOn.Date).FirstOrDefaultAsync();
-            if (checkedOn != null && checkedOn.Year > 2000) throw new Exception("Checklist on the candidate for the same requirement has been done on " + checkedOn);
+            if (checkedOn.Year > 2000) throw new Exception("Checklist on the candidate for the same requirement has been done on " + checkedOn);
                 
             //update loggerInUserDto.LoggedInEmployeeId
             if(loggedInUserDto.LoggedInEmployeeId == 0) loggedInUserDto.LoggedInEmployeeId = await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUserDto.LoggedInAppUserId);
@@ -138,7 +138,7 @@ namespace infra.Services
                 .Select(x => x.SubmittedByHRExecOn)
                 .FirstOrDefaultAsync();
 
-            if (submitted != null && submitted.Year > 2000)
+            if (submitted.Year > 2000)
             {
                 dto.ErrorDesc = "This Checklist is referred by the HR Executive on " + submitted.Date + " and cannot be edited now";
                 return dto;

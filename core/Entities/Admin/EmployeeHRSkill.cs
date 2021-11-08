@@ -13,7 +13,7 @@ namespace core.Entities.Admin
                SkillLevel = skillLevel;
           }
 
-          public int EmployeeId { get; set; }
+        public int EmployeeId { get; set; }
         public int CategoryId { get; set; }        
         public int IndustryId {get; set;}
         public int SkillLevel {get; set;}

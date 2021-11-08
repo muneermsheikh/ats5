@@ -11,6 +11,6 @@ namespace core.ParamsAndDtos
         public EnumCandidateAssessmentResult AssessmentResult {get; set;}
         public int AssessedById {get; set;}
         public DateTime DateAssessed {get; set;}
-        public string LoggedInIdentityUserId {get; set;}
+        public int LoggedInIdentityUserId {get; set;}
     }
 }

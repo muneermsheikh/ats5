@@ -24,7 +24,7 @@ namespace core.Entities
                LogInCredential = login;
           }
 
-        public CustomerOfficial(string appuserid, string gender, string title, string officialName, string designation, 
+        public CustomerOfficial(int appuserid, string gender, string title, string officialName, string designation, 
             string phoneNo, string mobile, string email, string imageUrl, bool login)
           {
                AppUserId = appuserid;
@@ -40,7 +40,7 @@ namespace core.Entities
           }
 
         public bool LogInCredential {get; set;}=false;
-        public string AppUserId { get; set; }
+        public int AppUserId { get; set; }
         public int CustomerId { get; set; }
         public string Gender { get; set; }="M";
         public string Title { get; set; }

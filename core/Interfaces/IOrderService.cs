@@ -9,10 +9,12 @@ namespace core.Interfaces
     public interface IOrderService
         {
             Task<Order> CreateOrderAsync(OrderToCreateDto dto);
+            Task<ICollection<Order>> CreateOrdersAsync(int loggedInUserId, ICollection<OrderToCreateDto> dtos);
             Task<bool> EditOrder(Order order);
             Task<bool> DeleteOrder(Order order);
             Task<Pagination<OrderToReturnDto>> GetOrdersAllAsync(OrdersSpecParams orderSpecParams);
             Task<bool> OrderForwardedToHRDept(int orderId);
+
 
         //order items
             Task<IReadOnlyList<OrderItem>> GetOrderItemsByOrderIdAsync(int OrderId);

@@ -5286,11 +5286,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\ats5\\core\\core.csproj",
+      "projectUniqueName": "D:\\ats6\\core\\core.csproj",
       "projectName": "core",
-      "projectPath": "D:\\ats5\\core\\core.csproj",
+      "projectPath": "D:\\ats6\\core\\core.csproj",
       "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-      "outputPath": "D:\\ats5\\core\\obj\\",
+      "outputPath": "D:\\ats6\\core\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"

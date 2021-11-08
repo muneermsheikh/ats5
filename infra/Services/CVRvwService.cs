@@ -224,7 +224,7 @@ namespace infra.Services
 
                               var hrExecTaskItem = new TaskItem((int)EnumTaskType.SubmitCVToHRSupForReview,hrexecTask.Id, dateTimeNow, "Completed",
                                    "CV reviewed by Sup",loggedInDto.LoggedInEmployeeId, item.CommonDataDto.OrderId, item.CommonDataDto.OrderItemId,
-                                   item.CommonDataDto.OrderNo, loggedInDto.LoggedInAppUserId, dateTimeNow, item.CommonDataDto.CandidateId, item.CommonDataDto.HRSupId,
+                                   item.CommonDataDto.OrderNo, loggedInDto.LoggedInEmployeeId, dateTimeNow, item.CommonDataDto.CandidateId, item.CommonDataDto.HRSupId,
                                    1,hrexecTask);
                               _unitOfWork.Repository<TaskItem>().Add(hrExecTaskItem);
                          }
@@ -343,7 +343,7 @@ namespace infra.Services
                                    (int)cvrvw.SupTaskId,  dateTimeNow, "Open", 
                                    "CV Forwarded to Doc Controller: " + item.CommonDataDto.CandidateDesc, 
                                    loggedInDto.LoggedInEmployeeId,  item.CommonDataDto.OrderId, item.OrderItemId, 
-                                   item.CommonDataDto.OrderNo, loggedInDto.LoggedInAppUserId,
+                                   item.CommonDataDto.OrderNo, loggedInDto.LoggedInEmployeeId,
                                    dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0, item.ParentTask);
                               //TODO - remove fields such as nextassigned to, and checkbydate
                               _unitOfWork.Repository<TaskItem>().Add(hrExecTaskItem);
@@ -373,7 +373,7 @@ namespace infra.Services
                                    hrmTask.Id,  dateTimeNow, "Completed", 
                                    "Candidate approved", 
                                    loggedInDto.LoggedInEmployeeId,  item.CommonDataDto.OrderId, item.OrderItemId, 
-                                   item.CommonDataDto.OrderNo, loggedInDto.LoggedInAppUserId,
+                                   item.CommonDataDto.OrderNo, loggedInDto.LoggedInEmployeeId,
                                    dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0, item.ParentTask);
                               _unitOfWork.Repository<TaskItem>().Add(hrmtaskitem);
                          } else {
@@ -381,7 +381,7 @@ namespace infra.Services
                                    hrmTask.Id,  dateTimeNow, "Completed", 
                                    "Candidate rejected", 
                                    loggedInDto.LoggedInEmployeeId,  0, item.OrderItemId, 
-                                   0, loggedInDto.LoggedInAppUserId,
+                                   0, loggedInDto.LoggedInEmployeeId,
                                    dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0, item.ParentTask);
                               _unitOfWork.Repository<TaskItem>().Add(hrmtaskitem);
                          }

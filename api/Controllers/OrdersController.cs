@@ -43,7 +43,7 @@ namespace api.Controllers
                return Ok(orders);
           }
 
-          [Authorize(Policy = "OrdersCreateRole")]
+          //[Authorize(Policy = "OrdersCreateRole")]
           [HttpPost]
           public async Task<ActionResult<Order>> CreateOrder(OrderToCreateDto dto)
           {
@@ -55,7 +55,19 @@ namespace api.Controllers
                return Ok(order);
           }
 
-          [Authorize(Policy = "OrdersCreateRole")]
+          [HttpPost("orders")]
+          public async Task<ActionResult<ICollection<Order>>> CreateOrders(ICollection<OrderToCreateDto> dtos)
+          {
+               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+
+               var order = await _orderService.CreateOrdersAsync(loggedInUser.Id, dtos);
+
+               if (order == null) return BadRequest(new ApiResponse(400, "Problem creating order"));
+
+               return Ok(order);
+          }
+
+          //[Authorize(Policy = "OrdersCreateRole")]
           [HttpPut]
           public async Task<ActionResult<bool>> EditOrder(Order order)
           {

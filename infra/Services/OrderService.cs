@@ -15,6 +15,7 @@ using core.Specifications;
 using infra.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace infra.Services
 {
@@ -28,9 +29,11 @@ namespace infra.Services
           private readonly IMapper _mapper;
           private readonly IComposeMessages _composeMessages;
           private readonly ITaskService _taskService;
+          private readonly IConfiguration _config;
           public OrderService(IUnitOfWork unitOfWork, IComposeMessages composeMessages
                , ATSContext context, UserManager<AppUser> userManager
-               , IGenericRepository<OrderItem> orderItemRepo, IMapper mapper, ITaskService taskService)
+               , IGenericRepository<OrderItem> orderItemRepo, IMapper mapper, ITaskService taskService
+               , IConfiguration config)
           {
                _taskService = taskService;
                _context = context;
@@ -40,13 +43,104 @@ namespace infra.Services
                _orderItemRepo = orderItemRepo;
                _mapper = mapper;
                _composeMessages = composeMessages;
+               _config = config;
           }
+
+
+     public async Task<ICollection<Order>> CreateOrdersAsync(int loggedInUserId, ICollection<OrderToCreateDto> dtos)
+     {
+          string salesmanName = "";
+          var orders = new List<Order>();
+          var orderNo = await _context.Orders.MaxAsync(x => (int?)x.OrderNo) ?? 1000;
+          var defaultProjectManagerId = _config.GetConnectionString("DefaultProjectManagerId");
+          var defaultVisaExecutiveId = _config.GetConnectionString("DefaultVisaProcessInchargeId_KSA");
+          var defaultMedicalInchargeId_KSA = _config.GetConnectionString("DefaultMedicalInchargeId_KSA");
+          var defaultTravellingInchargeId = _config.GetConnectionString("DefaultTravellingInchargeId");
+
+          foreach(var dto in dtos)
+          {
+               ++orderNo;
+               if (dto.SalesmanId != 0) salesmanName = await EmployeeNameEmployeeId((int)dto.SalesmanId);
+
+               //isnert customer name
+               var cus = await _context.Customers.Where(x => x.Id == dto.CustomerId)
+                    .Select(x => new { x.CustomerName, x.Add, x.Add2, x.City, x.Pin, x.District, x.State, x.Country, x.Email })
+                    .FirstOrDefaultAsync();
+               if (cus == null) continue;
+               
+               dto.CustomerName = cus.CustomerName;
+               dto.OrderAddress = new OrderAddress(cus.CustomerName, cus.Add, cus.Add2, "", cus.City,
+                    cus.District, cus.State, cus.Pin, cus.Country);
+
+               var subtotal = 0;
+               var items = new List<OrderItem>();
+               foreach (var item in dto.OrderItems)
+               {
+                    item.JobDescription.OrderNo = orderNo;
+                    item.Remuneration.OrderNo = orderNo;
+                    var categoryName = await CategoryNameFromId(item.CategoryId);
+                    var industryName = await IndustryNameFromId(item.IndustryId);
+                    items.Add(new OrderItem(item.SrNo, orderNo, item.CategoryId, categoryName, item.IndustryId,
+                         industryName, item.SourceFrom, item.Quantity, item.MinCVs, item.MaxCVs,
+                         item.Ecnr, item.RequireAssess, item.CompleteBefore, item.Charges, item.JobDescription, item.Remuneration));
+                         subtotal = items.Sum(item => item.Charges * item.Quantity) + (items.Sum(item => item.FeeFromClientINR * item.Quantity));
+               }
+
+               // create order
+
+               var order = new Order(orderNo, dto.CustomerId, dto.CustomerName, dto.CityOfEmployment, dto.OrderRef,
+                    dto.OrderRefDate, (int)dto.SalesmanId, subtotal, dto.CompleteBy, dto.OrderAddress, items);
+               order.SalesmanName = salesmanName;
+               order.CityOfWorking = cus.City;
+               order.Country = cus.Country;
+               order.OrderAddress = dto.OrderAddress;
+               order.BuyerEmail = cus.Email ?? "not available";
+               order.ProjectManagerId = dto.ProjectManagerId.HasValue && dto.ProjectManagerId != 0 ? Convert.ToInt32(dto.ProjectManagerId) : Convert.ToInt32(defaultProjectManagerId);
+               order.VisaProcessInchargeEmpId = dto.VisaInchargeId.HasValue && dto.VisaInchargeId != 0 ? Convert.ToInt32(dto.VisaInchargeId) : Convert.ToInt32(defaultVisaExecutiveId);
+               order.TravelProcessInchargeId = dto.TravelInchargeId.HasValue && dto.TravelInchargeId != 0 ? Convert.ToInt32(dto.TravelInchargeId) : Convert.ToInt32(defaultTravellingInchargeId);
+
+               _unitOfWork.Repository<Order>().Add(order);
+               orders.Add(order);
+          }
+
+          var result = await _unitOfWork.Complete();
+          if (result <= 0) return null;
+
+          //update orderId and roderItemId in remunerations and JobDescription
+          foreach(var order in orders)
+          {
+               var orderid = order.Id;
+               foreach(var orderitem in order.OrderItems)
+               {
+                    var orderItemId = orderitem.Id;
+                    orderitem.JobDescription.OrderItemId=orderitem.Id;
+                    orderitem.JobDescription.OrderId = orderid;
+                    _unitOfWork.Repository<JobDescription>().Update(orderitem.JobDescription);
+
+                    orderitem.Remuneration.OrderId = orderid;
+                    orderitem.Remuneration.OrderItemId = orderitem.Id;
+                    _unitOfWork.Repository<Remuneration>().Update(orderitem.Remuneration);                    
+               }
+          }
+          await _unitOfWork.Complete();
+
+          foreach(var order in orders)
+          {
+               await _composeMessages.AckEnquiryToCustomer(new OrderMessageParamDto { Order = order, DirectlySendMessage = false });
+          }
+          
+          //create task for Admn Manager for contract review
+          // return order
+          return orders;
+     }
 
      public async Task<Order> CreateOrderAsync(OrderToCreateDto dto)
      {
-
           string salesmanName = "";
           if (dto.SalesmanId != 0) salesmanName = await EmployeeNameEmployeeId((int)dto.SalesmanId);
+
+          var orderNo = await _context.Orders.MaxAsync(x => (int?)x.OrderNo) ?? 1000;
+          ++orderNo;
 
           //isnert customer name
           var cus = await _context.Customers.Where(x => x.Id == dto.CustomerId)
@@ -62,18 +156,16 @@ namespace infra.Services
           {
                var categoryName = await CategoryNameFromId(item.CategoryId);
                var industryName = await IndustryNameFromId(item.IndustryId);
-               items.Add(new OrderItem(item.SrNo, item.CategoryId, categoryName, item.IndustryId,
+               items.Add(new OrderItem(item.SrNo, orderNo, item.CategoryId, categoryName, item.IndustryId,
                     industryName, item.SourceFrom, item.Quantity, item.MinCVs, item.MaxCVs,
                     item.Ecnr, item.RequireAssess, item.CompleteBefore, item.Charges, item.JobDescription, item.Remuneration));
                subtotal = items.Sum(item => item.Charges * item.Quantity) + (items.Sum(item => item.FeeFromClientINR * item.Quantity));
           }
 
           // create order
-          var orderNo = await _context.Orders.MaxAsync(x => (int?)x.OrderNo) ?? 1000;
-          orderNo++;
 
           var order = new Order(orderNo, dto.CustomerId, dto.CustomerName, dto.CityOfEmployment, dto.OrderRef,
-                (int)dto.SalesmanId, subtotal, dto.CompleteBy, dto.OrderAddress, items);
+                dto.OrderRefDate, (int)dto.SalesmanId, subtotal, dto.CompleteBy, dto.OrderAddress, items);
           order.SalesmanName = salesmanName;
           order.CityOfWorking = cus.City;
           order.Country = cus.Country;
@@ -230,13 +322,9 @@ namespace infra.Services
      {
           var nm = await _context.Employees.Where(x => x.Id == id)
                .Select(x => new { x.FirstName, x.FamilyName }).FirstOrDefaultAsync();
-          string employeename = "";
-          if (!string.IsNullOrEmpty(nm.FirstName))
-          {
-               employeename = nm.FirstName + " " + nm.FamilyName ?? "";
-          }
+          if (nm==null) return "";
 
-          return employeename;
+          return nm.FirstName ?? "" + " " + nm.FamilyName ?? "";
      }
 
      public async Task<IReadOnlyList<OrderItem>> GetOrderItemsByOrderIdAsync(int orderId)

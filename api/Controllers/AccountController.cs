@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using api.DTOs;
 using api.Errors;
 using api.Extensions;
-using AutoMapper;
 using core.Entities.Identity;
 using core.Entities.Users;
 using core.Interfaces;
@@ -14,9 +13,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using core.Params;
-using core.Specifications;
 using infra.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Microsoft.Extensions.Configuration;
+using AutoMapper;
+using System.Net.Http;
+using core.Entities.Attachments;
 
 namespace api.Controllers
 {
@@ -31,21 +35,25 @@ namespace api.Controllers
           private readonly AppIdentityDbContext _identityContext;
           private readonly ITaskService _taskService;
           private readonly IEmployeeService _empService;
+          private readonly IConfiguration _config;
+
           public AccountController(
                UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
-               RoleManager<IdentityRole> roleManager, ITokenService tokenService,
+               RoleManager<IdentityRole<int>> roleManager, 
+               ITokenService tokenService,
               IMapper mapper, IUserService userService, AppIdentityDbContext identityContext,
-              ITaskService taskService, IEmployeeService empService)
+              ITaskService taskService, IEmployeeService empService, IConfiguration config)
           {
-               _roleManager = roleManager;
-               _userService = userService;
-               _mapper = mapper;
-               _tokenService = tokenService;
-               _signInManager = signInManager;
-               _userManager = userManager;
-               _identityContext = identityContext;
-               _taskService = taskService;
-               _empService = empService;
+               //_roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
+               _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+               _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+               _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
+               _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
+               _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+               _identityContext = identityContext ?? throw new ArgumentNullException(nameof(identityContext));
+               _taskService = taskService ?? throw new ArgumentNullException(nameof(taskService));
+               _empService = empService ?? throw new ArgumentNullException(nameof(empService));
+               _config = config ?? throw new ArgumentNullException(nameof(config));
           }
 
           [Authorize]
@@ -97,13 +105,24 @@ namespace api.Controllers
           public async Task<ActionResult<core.ParamsAndDtos.UserDto>> Login(LoginDto loginDto)
           {
                var user = await _userManager.FindByEmailAsync(loginDto.Email);
-
                if (user == null) return Unauthorized(new ApiResponse(401));
-
                var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
                if (!result.Succeeded) return Unauthorized(new ApiResponse(401));
+          /*
+               //authorization
+               var claims = new List<Claim>();
+               claims.Add(new Claim("username",loginUser.Username));
+               claims.Add(new Claim("displayname",loginUser.Name));
+               
+               // Add roles as multiple claims
+               foreach(var role in user.Roles) 
+               {
+                    claims.Add(new Claim(ClaimTypes.Role, role.Name));
+               }
+               // Optionally add other app specific claims as needed
+               claims.Add(new Claim("UserState", UserState.ToString()));
 
+          */
                int loggedInEmployeeId = await _empService.GetEmployeeIdFromAppUserIdAsync(user.Id);
                //var taskParams = new TaskParams{TaskOwnerId = loggedInEmployeeId, AssignedToId = loggedInEmployeeId, TaskStatus = "Open"};
 
@@ -127,109 +146,164 @@ namespace api.Controllers
 
           
           //registers individuals. For customers and vendors, it will register the users for customers that exist
+          //the IFormFile collection has following prefixes to filenames:
+          //pp: passport; ph: photo, ec: educational certificates, qc: qualification certificates
           [HttpPost("register")]
-          public async Task<ActionResult<core.ParamsAndDtos.UserDto>> Register(RegisterDto registerDto)
+          public async Task<ActionResult<core.ParamsAndDtos.UserDto>> Register(RegisterDto registerDto
+               //, ICollection<FileAttachment> files
+               )
           {
-               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
-               registerDto.LoggedInAppUserId = loggedInUser.Id;
                
-               if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
-               {
-                    return new BadRequestObjectResult(new ApiValidationErrorResponse { Errors = new[] { "Email address is in use" } });
-               }
+               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               int loggedInEmployeeId = loggedInUser == null ? 0 : await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
+               
+               //populate loggedInUser
+               if (registerDto.UserType.ToLower() != "candidate") {
+                    if (loggedInUser == null) return BadRequest(new ApiResponse(401, "Unauthorized"));
+                    registerDto.LoggedInAppUserId = loggedInUser.Id;
+               } 
+               
+               //check if user email already on record
+                    if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
+                    {
+                         return new BadRequestObjectResult(new ApiValidationErrorResponse { Errors = new[] { "Email address is in use" } });
+                    }
 
                //for customer and vendor official, customer Id is mandatory
-               if (registerDto.UserType.ToLower() == "employee" && string.IsNullOrEmpty(registerDto.AadharNo))
-               {
-                    return BadRequest(new ApiResponse(400, "for employees, Aadhar number is mandatory"));
-               }
-
-               if (registerDto.UserType.ToLower() == "official" && (int)registerDto.CompanyId == 0)
-               {
-                    return BadRequest(new ApiResponse(400, "For officials, customer Id is essential"));
-               }
-
-               if (registerDto.UserPhones != null && registerDto.UserPhones.Count() > 0)
-               {
-                    foreach (var ph in registerDto.UserPhones)
+                    if (registerDto.UserType.ToLower() == "employee" && string.IsNullOrEmpty(registerDto.AadharNo))
                     {
-                         if (ph.PhoneNo == "" && ph.MobileNo == "") return BadRequest(new ApiResponse(400, "either phone no or mobile no must be mentioned"));
+                         return BadRequest(new ApiResponse(400, "for employees, Aadhar number is mandatory"));
                     }
-               }
 
-               var objPP = new UserPassport();
+                    if (registerDto.UserType.ToLower() == "official" && (int)registerDto.CompanyId == 0)
+                    {
+                         return BadRequest(new ApiResponse(400, "For officials, customer Id is essential"));
+                    }
 
-               if (string.IsNullOrEmpty(registerDto.PpNo))
-               {
-                    objPP = null;
-               }
-               else
-               {
-                    objPP = new UserPassport(registerDto.PpNo, registerDto.Nationality, registerDto.PPValidity);
-               }
+                    if (registerDto.UserPhones != null && registerDto.UserPhones.Count() > 0)
+                    {
+                         foreach (var ph in registerDto.UserPhones)
+                         {
+                              if (string.IsNullOrEmpty(ph.MobileNo)) return BadRequest(new ApiResponse(400, "either phone no or mobile no must be mentioned"));
+                         }
+                    }
 
-               var user = new AppUser
-               {
-                    UserType = registerDto.UserType,
-                    DisplayName = registerDto.DisplayName,
-                    Address = registerDto.Address,
-                    //UserPassport = objPP,
+               //validate passport obj
+                    var objPP = new UserPassport();
+                    if (string.IsNullOrEmpty(registerDto.PpNo))
+                    {
+                         objPP = null;
+                    }
+                    else
+                    {
+                         objPP = new UserPassport(registerDto.PpNo, registerDto.Nationality, registerDto.PPValidity);
+                    }
 
-                    Email = registerDto.Email,
-                    UserName = registerDto.Email
-               };
+               //create and save AppUser IdentityObject
+                    var user = new AppUser
+                    {
+                         UserType = registerDto.UserType,
+                         DisplayName = registerDto.DisplayName,
+                         Address = registerDto.Address,
+                         //UserPassport = objPP,
 
-               var result = await _userManager.CreateAsync(user, registerDto.Password);
+                         Email = registerDto.Email,
+                         UserName = registerDto.Email
+                    };
+                    var result = await _userManager.CreateAsync(user, registerDto.Password);
 
-               if (!result.Succeeded) return BadRequest(new ApiResponse(400));
+               //return if failed to create identity object
+                    if (!result.Succeeded) return BadRequest(new ApiResponse(400));
 
-               var userDtoToReturn = new core.ParamsAndDtos.UserDto
-               {
-                    DisplayName = user.DisplayName,
-                    Token = _tokenService.CreateToken(user),
-                    Email = user.Email
-               };
+               //the plain dto object to return, irrespective of type of user, i.e. whether candidate, employee or customer
+                    var userDtoToReturn = new core.ParamsAndDtos.UserDto
+                    {
+                         DisplayName = user.DisplayName,
+                         Token = _tokenService.CreateToken(user),
+                         Email = user.Email
+                    };
 
-               var userAdded = await _userManager.FindByEmailAsync(registerDto.Email);
+                    //var userAdded = await _userManager.FindByEmailAsync(registerDto.Email);
+                    //no need to retreive obj from DB - the object user can be used for the same
+                    var userAdded = user;
                //user registered. 
 
+               //now save the objects in DataContext database
+                    if(objPP != null) {
+                         var lstPP = new List<UserPassport>();
+                         lstPP.Add(objPP);
+                         registerDto.UserPassports = lstPP;
+                    }
 
-               var lstPP = new List<UserPassport>();
-               lstPP.Add(objPP);
-               registerDto.UserPassports = lstPP;
+                    registerDto.AppUserId = userAdded.Id;
 
-               registerDto.AppUserId = userAdded.Id;
-
-               if (registerDto.UserPhones != null)
-               {    //ensure no duplicate user phones in the collection
-                    var qry = (from p in registerDto.UserPhones
-                               group p by p.PhoneNo into g
-                               where g.Count() > 1
-                               select g.Key);
-                    if (qry != null) registerDto.UserPhones = null;     //disallow if any duplicate numbers
-               }
+                    if (registerDto.UserPhones != null)
+                    {    //ensure no duplicate user phones in the collection
+                         var qry = (from p in registerDto.UserPhones
+                                   group p by p.MobileNo into g
+                                   where g.Count() > 1
+                                   select g.Key);
+                         if (qry != null) registerDto.UserPhones = null;     //disallow if any duplicate numbers
+                    }
 
                //depending upon usertype, create other entities
-               switch (registerDto.UserType.ToLower())
+                    switch (registerDto.UserType.ToLower())
+                    {
+                         case "candidate":
+                              var userCreated = await _userService.CreateCandidateAsync(registerDto);
+                              break;
+                         case "employee":
+                              await _userService.CreateEmployeeAsync(registerDto);
+                              break;
+                         case "customerofficial":
+                              await _userService.CreateCustomerOfficialAsync(registerDto);
+                              break;
+                         case "vendorofficial":
+                              await _userService.CreateCustomerOfficialAsync(registerDto);
+                              break;
+                         default:
+                              break;
+                    }
+               //return
+                    return userDtoToReturn;
+               /*
+               */
+          }
+
+         private async Task<string> WriteFile(IFormFile file)
+          {
+               //bool isSaveSuccess = false;
+               string fileName;
+               try
                {
-                    case "candidate":
-                         await _userService.CreateCandidateAsync(registerDto);
-                         break;
-                    case "employee":
-                         await _userService.CreateEmployeeAsync(registerDto);
-                         break;
-                    case "customerofficial":
-                         await _userService.CreateCustomerOfficialAsync(registerDto);
-                         break;
-                    case "vendorofficial":
-                         await _userService.CreateCustomerOfficialAsync(registerDto);
-                         break;
-                    default:
-                         break;
+                    var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
+                    fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
+
+                    var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                    if (!Directory.Exists(pathBuilt))
+                    {
+                         Directory.CreateDirectory(pathBuilt);
+                    }
+
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files", fileName);
+
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                         await file.CopyToAsync(stream);
+                    }
+
+                    //isSaveSuccess = true;
+               }
+               catch (Exception e)
+               {
+                    return e.Message;
                }
 
-               return userDtoToReturn;
+               return "";
           }
+
+
 
           [HttpDelete("user/{useremail}")]
           public async Task<ActionResult<bool>> DeleteIdentityUser (string useremail)

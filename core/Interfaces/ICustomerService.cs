@@ -10,6 +10,8 @@ namespace core.Interfaces
         void UpdateCustomer(Customer customer);
         void DeleteCustomer(Customer customer);
         Task<CustomerDto> AddCustomer (RegisterCustomerDto dto);
+        Task<ICollection<CustomerDto>> AddCustomers (ICollection<RegisterCustomerDto> dtos);
+        
         void EditCustomer(Customer customer);
         Task<ICollection<CustomerDto>> GetCustomersAsync(string userType);
         Task<ICollection<CustomerDto>> GetCustomersPaginatedAsync(CustomerParams custParam);

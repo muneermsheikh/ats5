@@ -18,6 +18,21 @@ namespace infra.Data.Config
                //builder.HasOne(u => u.Recipient).WithMany(m => m.MessagesReceived).OnDelete(DeleteBehavior.Restrict);
                //builder.HasOne(U => U.Sender).WithMany(m => m.MessagesSent).OnDelete(DeleteBehavior.Restrict);
                
+              /* builder
+                .HasOne(u => u.Recipient)
+                .WithMany(m => m.MessagesReceived)
+                .OnDelete(DeleteBehavior.Restrict);
+
+               builder
+                .HasOne(u => u.Sender)
+                .WithMany(m => m.MessagesSent)
+                .OnDelete(DeleteBehavior.Restrict)
+               */
+
+               builder.HasOne(x => x.Sender).WithMany().OnDelete(DeleteBehavior.NoAction);
+               builder.HasOne(x => x.Recipient).WithMany().OnDelete(DeleteBehavior.NoAction);
+               
+
           }
      }
 }

@@ -37,8 +37,8 @@ namespace core.Entities.Identity
         public string Pin { get; set; }
         public string Country { get; set; }="India";
         //[Required]
-        public string AppUserId { get; set; }
-        public AppUser AppUser { get; set; }
+        //public string AppUserId { get; set; }
+        //public AppUser AppUser { get; set; }
           
     }
 }

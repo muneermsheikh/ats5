@@ -373,14 +373,16 @@ namespace infra.Services
                var order = orderMessageDto.Order;
                var customer = await _context.Customers.Where(x => x.Id == orderMessageDto.Order.CustomerId)
                     .Include(x => x.CustomerOfficials).FirstOrDefaultAsync();
+               if (customer==null) throw new Exception("failed to retrieve customer data for customer no. " + orderMessageDto.Order.CustomerId);
                var OrderItems = orderMessageDto.Order.OrderItems.OrderBy(x => x.SrNo).ToList();
-               EmployeeDto projManager = await _empService.GetEmployeeFromIdAsync(order.ProjectManagerId);
+               var projectManagerId = order.ProjectManagerId == 0 ? 1021 : order.ProjectManagerId;
+               EmployeeDto projManager = await _empService.GetEmployeeFromIdAsync(projectManagerId);
 
                string[] officialDepts = { "main contact", "hr", "accounts", "logistics" };
                CustomerOfficial official = null;
                foreach (var off in officialDepts)
                {
-                    official = customer.CustomerOfficials.Where(x => x.Divn.ToLower() == off).FirstOrDefault();
+                    official = customer.CustomerOfficials.Where(x => x.Divn?.ToLower() == off).FirstOrDefault();
                     if (official != null) break;
                }
                bool HasException = false;
@@ -403,17 +405,26 @@ namespace infra.Services
                msg += string.IsNullOrEmpty(projManager.OfficialMobileNo) == true ? "" : "<br>Mobile: " + projManager.OfficialMobileNo;
                msg += string.IsNullOrEmpty(projManager.OfficialEmailAddress) == true ? "" : "<br>Email: " + projManager.OfficialEmailAddress;
 
+               var senderEmailAddress = _confg["EmailSenderEmailId"] ?? "";
+               var senderUserName = _confg["EmailSenderDisplayName"] ?? "";
+               var recipientUserName = customer.CustomerName ?? "";
+               var recipientEmailAddress = official?.Email ?? "";
+               var ccEmailAddress = _confg["EmailCCandAck"] ?? "";
+               var bccEmailAddress = _confg["EmailBCCandAck"] ?? "";
+               var subject = "Your enquiry dated " + order.OrderDate.Date + " is registered by us under Serial No. " + order.OrderNo;
+               var messageTypeId = (int)EnumMessageType.OrderAcknowledgement;
+               
                var emailMessage = new EmailMessage
                {
-                    SenderEmailAddress = _confg["EmailSenderEmailId"],
-                    SenderUserName = _confg["EmailSenderDisplayName"],
-                    RecipientUserName = customer.CustomerName,
-                    RecipientEmailAddress = official.Email,
-                    CcEmailAddress = _confg["EmailCCandAck"],
-                    BccEmailAddress = _confg["EmailBCCandAck"],
-                    Subject = "Your enquiry dated " + order.OrderRefDate.Date + " is registered by us under Serial No. " + order.OrderNo,
+                    SenderEmailAddress = senderEmailAddress,
+                    SenderUserName = senderUserName,
+                    RecipientUserName = recipientUserName,
+                    RecipientEmailAddress = recipientEmailAddress,
+                    CcEmailAddress = ccEmailAddress,
+                    BccEmailAddress = bccEmailAddress,
+                    Subject = subject,
                     Content = msg,
-                    MessageTypeId = (int)EnumMessageType.OrderAcknowledgement
+                    MessageTypeId = messageTypeId
                };
 
                return emailMessage;
@@ -491,7 +502,7 @@ namespace infra.Services
                msg += "<br><br>Task for this requirement is also assigned to you.<br><br>" + projMgr.KnownAs +
                     "<br>Project Manager-Order" + order.OrderNo;
 
-               var emailMsg = new EmailMessage("forwardToHR", projMgr.AppUserId, hrObj.AppUserId, projMgr.OfficialEmailAddress,
+               var emailMsg = new EmailMessage("forwardToHR", projMgr.EmployeeId, hrObj.EmployeeId, projMgr.OfficialEmailAddress,
                     projMgr.UserName, hrObj.UserName, hrObj.OfficialEmailAddress, "", "", "New Requirement No. " + order.OrderNo,
                     msg, (int)EnumMessageType.RequirementForwardToHRDept);
                return emailMsg;
@@ -533,7 +544,7 @@ namespace infra.Services
                     var hruser = await _empService.GetEmployeeBriefAsyncFromEmployeeId((int)recipientId);
                     if (hruser==null) throw new Exception("HR Supervisor Id value for the category not defined");
 
-                    var hrUserObj = await _userManager.FindByIdAsync(hruser.AppUserId);
+                    var hrUserObj = await _userManager.FindByIdAsync(hruser.AppUserId.ToString());
 
                     categoriesToDesignQ.Add(new OrderAssessmentQObj{
                          EmployeeId = (int)recipientId, AppUserId = hrUserObj.Id, AppUserEmail = hrUserObj.Email, AppUserName = hrUserObj.UserName,
@@ -951,7 +962,7 @@ namespace infra.Services
                     if (item.Remuneration != null)
                     {
                          strToReturn += "</td><td>" + item.Remuneration.WorkHours;
-                         if (item.CompleteBefore == null)
+                         if (item.CompleteBefore.Year < 2000)
                          {
                               strToReturn += "</td><td>Not Known";
                          }

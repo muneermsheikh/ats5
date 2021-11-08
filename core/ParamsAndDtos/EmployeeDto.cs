@@ -11,7 +11,7 @@ namespace core.ParamsAndDtos
         public string OfficialPhoneNo { get; set; }
         public string OfficialMobileNo { get; set; }
         public string OfficialEmailAddress {get; set;}
-        public string AppUserId { get; set; }
+        public int AppUserId { get; set; }
         public string UserName { get; set; }
 
     }

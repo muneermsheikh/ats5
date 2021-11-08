@@ -9,7 +9,8 @@ namespace infra.Data.Config
      {
           public void Configure(EntityTypeBuilder<AppUserRole> builder)
           {
-               builder.HasNoKey();
+               //builder.HasNoKey();
+               
           }
      }
 }

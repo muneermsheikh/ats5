@@ -5,15 +5,15 @@ namespace core.Entities.Users
     public enum EnumCandidateStatus
     {
         [EnumMember(Value="Not Referred")]
-        NotReferred, 
+        NotReferred = 100, 
         [EnumMember(Value="Referred, awaiting selection")]
-        Referred,
+        Referred = 200,
         [EnumMember(Value="Selected, deployment in process")]
-        Selected,
+        Selected = 300,
         [EnumMember(Value="Traveled, currently overseas")]
-        Traveled,
+        Traveled = 400,
         [EnumMember(Value="Not Available")]
-        NotAvailable
+        NotAvailable = 500
         
     }
 }

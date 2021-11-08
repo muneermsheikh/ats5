@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
-    [Authorize(Policy = "Employee, CustomerMaintenanceRole")]
+    //[Authorize(Policy = "Employee, CustomerMaintenanceRole")]
      public class CustomersController : BaseApiController
      {
           private readonly IGenericRepository<Customer> _custRepo;
@@ -34,24 +34,18 @@ namespace api.Controllers
                _custRepo = custRepo;
           }
 
+        [HttpPost("registercustomers")]
+        public async Task<ActionResult<ICollection<CustomerDto>>> RegisterCustomers(ICollection<RegisterCustomerDto> dtos)
+        {
+            var customers = await _customerService.AddCustomers(dtos);
+            if(customers == null) return BadRequest(new ApiResponse(400, "failed to save the customers"));
+            return Ok(customers);
+
+        }
+
         [HttpPost("registercustomer")]
         public async Task<ActionResult<CustomerDto>> RegisterCustomer(RegisterCustomerDto dto)
         {
-            foreach (var em in dto.CustomerOfficials)
-            {
-                var email = em.Email;
-                if (string.IsNullOrEmpty(email)) return BadRequest(new 
-                        ApiResponse(400, "email Id for official " + em.FirstName + " " + em.SecondName + " " + em.FamilyName + 
-                        " not provided"));
-                if (CheckEmailExistsAsync(email).Result.Value)
-                {
-                        return BadRequest(new ApiValidationErrorResponse { Errors = new[] { "Email address " + email + " is in use" } });
-                }
-
-                if(em.LogInCredential && string.IsNullOrEmpty(em.Password)) {
-                    return BadRequest(new ApiResponse(400, "Password for logInCredential users essential"));
-                }
-            }
 
             return await _customerService.AddCustomer(dto);
         }

@@ -20,7 +20,7 @@ namespace infra.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITaskService _taskService;
         private readonly ICommonServices _commonServices;
-        private readonly int _targetDaysForHRExecutivesToSourceCVs = 5;
+        //private readonly int _targetDaysForHRExecutivesToSourceCVs = 5;
         private readonly UserManager<AppUser> _userManager;
         private readonly IEmployeeService _empService;
         public OrderAssignmentService(ATSContext context, IUnitOfWork unitOfWork, IEmployeeService empService,

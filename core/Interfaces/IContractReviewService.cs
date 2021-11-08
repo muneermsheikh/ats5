@@ -10,7 +10,7 @@ namespace core.Interfaces
 {
     public interface IContractReviewService
     {
-        Task<ContractReview> CreateContractReviewObject(int orderId, string AppUserId);
+        Task<ContractReview> CreateContractReviewObject(int orderId, int AppUserId);
         //Task<bool> UpdateContractReview(ContractReview cReview);
         Task<ContractReview> GetContractReviewDtoByOrderIdAsync(int orderId);
         //Task<IReadOnlyList<ContractReviewItemDto>> GetContractReviewItemsByOrderIdAsync(int orderid);
