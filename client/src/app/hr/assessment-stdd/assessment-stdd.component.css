@@ -1,0 +1,18 @@
+.stddmx2 {
+     display: inline-block;
+     margin: 2px;
+     padding: 2px;
+     font-size: small;
+ }
+
+ .alignR {text-align: right;}
+ .b {font-weight: bold;}
+
+ .w50 {width: 50px;}
+ .w75 {width: 75px;;}
+ .w100 {width: 100px;}
+ .w150 {width: 150px;}
+ .w400 {width: 400px;}
+
+ .blue {color: blue;}
+ .red {color: red;}

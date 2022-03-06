@@ -6,15 +6,15 @@ namespace core.Entities.Orders
     public enum EnumReviewItemStatus
     {
         [EnumMember(Value="Not Reviewed")]
-        NotReviewed, 
+        NotReviewed = 0, 
         [EnumMember(Value="Accepted")]
-        Accepted,
+        Accepted=100,
         [EnumMember(Value="Declined - Salary Not Feasible")]
-        SalaryNotFeasible,
+        SalaryNotFeasible=200,
         [EnumMember(Value="Declined - Visa availability uncertain")]
-        VisaAvailabilityUncertain,
+        VisaAvailabilityUncertain=300,
         [EnumMember(Value="Negative Background report on customer")]
-        NegativeBackgroundReport
+        NegativeBackgroundReport=400
 
     }
 }

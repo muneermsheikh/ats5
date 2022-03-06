@@ -26,14 +26,15 @@ namespace infra.Services
           private readonly int _docControllerAdminId;
           private readonly int _TargetDays_FollowUpWithClientForSelection;
           private readonly bool _ByepassCVReviewLevels;
-          private readonly IComposeMessages _composeMsg;
+          private readonly IComposeMessagesForAdmin _composeMsgAdmin;
+          
           private readonly IEmailService _emailService;
           public CVRefService(IUnitOfWork unitOfWork, ATSContext context, ICommonServices commonService, IEmailService emailService,
-                    IConfiguration config, IComposeMessages composeMsg, IEmployeeService empService)
+                    IConfiguration config, IComposeMessagesForAdmin composeMsgAdmin, IEmployeeService empService)
           {
+               _composeMsgAdmin = composeMsgAdmin;
                _emailService = emailService;
                _empService = empService;
-               _composeMsg = composeMsg;
                _config = config;
                _commonService = commonService;
                _context = context;
@@ -109,7 +110,9 @@ namespace infra.Services
                          var taskitem = new TaskItem((int)EnumTaskType.SubmitCVToDocControllerAdmin, task.Id, dateTimeNow,
                               "Completed", taskItemDescription, loggedInUserDto.LoggedInEmployeeId, cvref.OrderId, cvref.OrderItemId,
                               cvref.OrderNo, loggedInUserDto.LoggedInEmployeeId, dateTimeNow.AddYears(-1000), rvw.CandidateId,
-                              0, _docControllerAdminId, task);
+                              0, _docControllerAdminId
+                              //, task)
+                         );
                          _unitOfWork.Repository<TaskItem>().Add(taskitem);
                          _unitOfWork.Repository<ApplicationTask>().Update(task);
                     }
@@ -133,7 +136,7 @@ namespace infra.Services
                          if (cvref != null) rvw.CVRefId = cvref.Id;
                     }
 
-                    var emailmsgs = _composeMsg.ComposeCVFwdMessagesToClient(cvrefs, loggedInUserDto);
+                    var emailmsgs = _composeMsgAdmin.ComposeCVFwdMessagesToClient(cvrefs, loggedInUserDto);
                     await _unitOfWork.Complete();
                     var filePaths = new List<string>();
                     foreach (var msg in emailmsgs)

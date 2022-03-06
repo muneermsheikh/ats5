@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace infra.Identity
 {
-     public class AppIdentityDbContext : IdentityDbContext<AppUser, AppRole    
-          , int,    
-          IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>, 
-          IdentityRoleClaim<int>, IdentityUserToken<int>>
+     public class AppIdentityDbContext : IdentityDbContext<AppUser, AppRole, int,
+        IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>,
+        IdentityRoleClaim<int>, IdentityUserToken<int>
+          >
      {
           public AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options) : base(options)
           {
@@ -17,14 +17,14 @@ namespace infra.Identity
           protected override void OnModelCreating(ModelBuilder builder)
           {
               base.OnModelCreating(builder);
-
+               
               builder.Entity<AppUser>()
                 .HasMany(ur => ur.UserRoles)
                 .WithOne(u => u.User)
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
 
-               builder.Entity<AppRole>()
+            builder.Entity<AppRole>()
                 .HasMany(ur => ur.UserRoles)
                 .WithOne(u => u.Role)
                 .HasForeignKey(ur => ur.RoleId)

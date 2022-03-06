@@ -1,0 +1,58 @@
+
+<div class="mx-2">
+     <div class="mx-2">
+          <div>
+               <strong>Customer: </strong> {{customerName}}
+          </div>
+          <div>
+               <strong>Order No.:</strong> {{orderNo}} dt {{orderDate | date}}
+          </div>
+          <div>
+               <strong>Category: </strong>{{categoryName}}
+          </div>
+     
+     </div>
+     <div class="modal-body">
+          <form #jdForm="ngForm" id="jdForm">
+               <div>
+                    <input type="text" id="orderitemid" name="orderitemid" class="form-text-input stdd w50" style="visibility: hidden;" [(ngModel)]="orderItemId" >
+                    <input type="text" id="id" name="id" class="form-text-input stdd w50" style="visibility: hidden;" [(ngModel)]="id" >
+               </div>
+     
+               <label>Job Description</label>
+               <textarea type="text" 
+                    id="jobDescInBrief"
+                    name="jobDescInBrief"
+                    class="form-text-input"
+                    [(ngModel)]="jobDescInBrief"     
+                    cols="45" rows="5"
+               > </textarea>
+             
+               
+               <br>
+               <strong>Qualification</strong>
+               <input class="form-text-input" 
+                    id="qualificationDesired" name = "qualificationDesired" 
+                    [(ngModel)]="qualificationDesired" type="text" > 
+               
+               <br><label style="font-weight: bold; margin-right: 2px;">Exp (in yrs):</label>
+               <label style="font-weight: bold; margin-right: 2px;" for="expDesiredMin">From: </label>
+                    <input class="form-text-input stdd w50" type="text" id="expDesiredMin" name="expDesiredMin" [(ngModel)]="expDesiredMin">
+               <label style="font-weight: bold; margin-left: 2px;" for="expDesiredMax">to: </label> 
+                    <input class="form-text-input stdd w50" type="text" id="expDesiredMax" name="expDesiredMax" [(ngModel)]="expDesiredMax">
+               
+               <br>
+               <label style="font-weight: bold; margin-right: 5px;">Age (in yrs):</label>
+               <label style="font-weight: bold; margin-right: 2px;" for="expDesiredMin">From: </label>
+                    <input class="form-text-input" type="text" style="display: inline-block; margin-left: 3px; width: 50px" id="minAge" name="minAge" [(ngModel)]="minAge">
+               <label style="font-weight: bold; margin-left: 3px;" for="expDesiredMax">to: </label> 
+                    <input class="form-text-input" style="display: inline-block; width: 50px; margin-left: 3px;" type="text" id="maxAge" name="maxAge" [(ngModel)]="maxAge">
+          </form>
+     
+     </div>
+     <div class="modal-footer">
+          <button type="button" class="btn btn-success fa fa-save" (click)="confirm()"></button>
+          <button type="button" class="btn btn-danger fa fa-cancel red" (click)="decline()"></button>
+     </div>
+     
+</div>

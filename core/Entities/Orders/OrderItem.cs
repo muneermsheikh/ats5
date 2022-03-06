@@ -81,7 +81,7 @@ namespace core.Entities.Orders
         public string AssignedToName { get; set; }
         public int Charges { get; set; }
         public int FeeFromClientINR {get; set;}
-        public EnumOrderItemStatus Status { get; set; }=EnumOrderItemStatus.AwaitingReview;
+        public int Status { get; set; }=(int)EnumOrderItemStatus.NotStarted;
         public EnumReviewItemStatus ReviewItemStatusId { get; set; }=EnumReviewItemStatus.NotReviewed;
         public virtual Employee Assigned { get; set; }
         public Category Category { get; set; }

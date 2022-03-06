@@ -21,6 +21,7 @@ using Microsoft.Extensions.Configuration;
 using AutoMapper;
 using System.Net.Http;
 using core.Entities.Attachments;
+using System.Security.Claims;
 
 namespace api.Controllers
 {
@@ -31,20 +32,17 @@ namespace api.Controllers
           private readonly ITokenService _tokenService;
           private readonly IMapper _mapper;
           private readonly IUserService _userService;
-          private readonly RoleManager<IdentityRole> _roleManager;
           private readonly AppIdentityDbContext _identityContext;
           private readonly ITaskService _taskService;
           private readonly IEmployeeService _empService;
           private readonly IConfiguration _config;
-
+          private readonly RoleManager<AppRole> _roleManager;
           public AccountController(
                UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
-               RoleManager<IdentityRole<int>> roleManager, 
-               ITokenService tokenService,
-              IMapper mapper, IUserService userService, AppIdentityDbContext identityContext,
-              ITaskService taskService, IEmployeeService empService, IConfiguration config)
+               ITokenService tokenService, RoleManager<AppRole> roleManager,
+               IMapper mapper, IUserService userService, AppIdentityDbContext identityContext,
+               ITaskService taskService, IEmployeeService empService, IConfiguration config)
           {
-               //_roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
                _userService = userService ?? throw new ArgumentNullException(nameof(userService));
                _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
                _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
@@ -54,17 +52,20 @@ namespace api.Controllers
                _taskService = taskService ?? throw new ArgumentNullException(nameof(taskService));
                _empService = empService ?? throw new ArgumentNullException(nameof(empService));
                _config = config ?? throw new ArgumentNullException(nameof(config));
+               _roleManager = roleManager;
           }
 
-          [Authorize]
+
+          //[Authorize]
           [HttpGet]
           public async Task<ActionResult<core.ParamsAndDtos.UserDto>> GetCurrentUser()
           {
                var user = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               if (user==null) return BadRequest("User Claim not found");
                return new core.ParamsAndDtos.UserDto
                {
                     Email = user.Email,
-                    Token = _tokenService.CreateToken(user),
+                    Token = await _tokenService.CreateToken(user),
                     DisplayName = user.DisplayName
                };
           }
@@ -75,7 +76,21 @@ namespace api.Controllers
           {
                return await _userManager.FindByEmailAsync(email) != null;
           }
+          
+          [HttpGet("ppexists")]
+          public async Task<ActionResult<string>> CheckPPNumberExistsAsync([FromQuery] string ppnumber)
+          {
+               var pp = await _userService.CheckPPNumberExists(ppnumber);
+               return pp;
+          }
+          
+          [HttpGet("aadahrexists/{aadharno}")]
+          public async Task<ActionResult<bool>> CheckAadharNoExistsAsync([FromQuery] string aadharno)
+          {
+               return await _userService.CheckAadharNoExists(aadharno);
+          }
 
+          /*
           [Authorize]
           [HttpGet("address")]
           public async Task<ActionResult<AddressDto>> GetUserAddress()
@@ -84,7 +99,7 @@ namespace api.Controllers
 
                return _mapper.Map<AddressDto>(user.Address);
           }
-
+     
           [Authorize]
           [HttpPut("address")]
           public async Task<ActionResult<AddressDto>> UpdateUserAddress(AddressDto address)
@@ -99,42 +114,49 @@ namespace api.Controllers
 
                return BadRequest("Problem updating the user");
           }
-
+          */
 
           [HttpPost("login")]
           public async Task<ActionResult<core.ParamsAndDtos.UserDto>> Login(LoginDto loginDto)
           {
-               var user = await _userManager.FindByEmailAsync(loginDto.Email);
+               //var user = await _userManager.FindByEmailAsync(loginDto.Email);
+               var user = await _userManager.Users.Where(x => x.Email == loginDto.Email)
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .FirstOrDefaultAsync();
                if (user == null) return Unauthorized(new ApiResponse(401));
                var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
                if (!result.Succeeded) return Unauthorized(new ApiResponse(401));
-          /*
+          
                //authorization
                var claims = new List<Claim>();
-               claims.Add(new Claim("username",loginUser.Username));
-               claims.Add(new Claim("displayname",loginUser.Name));
+               claims.Add(new Claim("username", user.UserName));
+               claims.Add(new Claim("displayname", user.KnownAs));
                
                // Add roles as multiple claims
-               foreach(var role in user.Roles) 
-               {
-                    claims.Add(new Claim(ClaimTypes.Role, role.Name));
+               if (user.UserRoles != null) {
+                    foreach(var role in user.UserRoles) 
+                    {
+                         claims.Add(new Claim(ClaimTypes.Role, role.Role.Name));
+                    }
                }
                // Optionally add other app specific claims as needed
-               claims.Add(new Claim("UserState", UserState.ToString()));
-
-          */
+               //claims.Add(new Claim("UserState", UserState.ToString()));
+          
+          
                int loggedInEmployeeId = await _empService.GetEmployeeIdFromAppUserIdAsync(user.Id);
                //var taskParams = new TaskParams{TaskOwnerId = loggedInEmployeeId, AssignedToId = loggedInEmployeeId, TaskStatus = "Open"};
 
                var tasksOfLoggedInUser = await _taskService.GetDashboardTasks(loggedInEmployeeId);
 
-               return new core.ParamsAndDtos.UserDto
+               var userdto = new core.ParamsAndDtos.UserDto
                {
                     dashboardTasks = tasksOfLoggedInUser,
                     Email = user.Email,
-                    Token = _tokenService.CreateToken(user),
+                    Token = await _tokenService.CreateToken(user),
                     DisplayName = user.DisplayName
                };
+
+               return userdto;
           }
 
           [HttpGet("users")]
@@ -149,13 +171,16 @@ namespace api.Controllers
           //the IFormFile collection has following prefixes to filenames:
           //pp: passport; ph: photo, ec: educational certificates, qc: qualification certificates
           [HttpPost("register")]
-          public async Task<ActionResult<core.ParamsAndDtos.UserDto>> Register(RegisterDto registerDto
-               //, ICollection<FileAttachment> files
-               )
+          public async Task<ActionResult<core.ParamsAndDtos.UserDto>> Register(RegisterDto registerDto)  //, ICollection<IFormFile> UserFormFiles )
           {
+               var loggedInUser = new AppUser();
+               int loggedInEmployeeId =0;
                
-               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
-               int loggedInEmployeeId = loggedInUser == null ? 0 : await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
+               if(User==null && registerDto.UserType != "Candidate") return Unauthorized("Log-in required!");
+               if (User!=null) {
+                    loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+                    loggedInEmployeeId = loggedInUser == null ? 0 : await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
+               }
                
                //populate loggedInUser
                if (registerDto.UserType.ToLower() != "candidate") {
@@ -163,6 +188,7 @@ namespace api.Controllers
                     registerDto.LoggedInAppUserId = loggedInUser.Id;
                } 
                
+               if (registerDto.UserType.ToLower() == "candidate") registerDto.UserRole = "Candidate";
                //check if user email already on record
                     if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
                     {
@@ -184,42 +210,45 @@ namespace api.Controllers
                     {
                          foreach (var ph in registerDto.UserPhones)
                          {
-                              if (string.IsNullOrEmpty(ph.MobileNo)) return BadRequest(new ApiResponse(400, "either phone no or mobile no must be mentioned"));
+                              if (string.IsNullOrEmpty(ph.MobileNo)) return BadRequest(new ApiResponse(400, "mobile no cannot be blank"));
                          }
                     }
 
                //validate passport obj
                     var objPP = new UserPassport();
-                    if (string.IsNullOrEmpty(registerDto.PpNo))
-                    {
-                         objPP = null;
-                    }
-                    else
-                    {
-                         objPP = new UserPassport(registerDto.PpNo, registerDto.Nationality, registerDto.PPValidity);
-                    }
-
+                    objPP = string.IsNullOrEmpty(registerDto.PpNo) 
+                         ? null 
+                         : new UserPassport(registerDto.PpNo, registerDto.Nationality, registerDto.PPValidity);
+                    var objAddress = registerDto.EntityAddresses;
                //create and save AppUser IdentityObject
                     var user = new AppUser
                     {
                          UserType = registerDto.UserType,
-                         DisplayName = registerDto.DisplayName,
-                         Address = registerDto.Address,
+                         DisplayName = registerDto.KnownAs, // registerDto.DisplayName,
+                         //Address = registerDto.Address,
                          //UserPassport = objPP,
-
+                         KnownAs = registerDto.KnownAs,
+                         Gender = registerDto.Gender,
+                         PhoneNumber = registerDto.UserPhones.Where(x => x.IsMain).Select(x => x.MobileNo).FirstOrDefault(),
                          Email = registerDto.Email,
                          UserName = registerDto.Email
                     };
+                    registerDto.DisplayName = registerDto.DisplayName ?? user.DisplayName;
+                    registerDto.PlaceOfBirth = registerDto.PlaceOfBirth ?? "";
                     var result = await _userManager.CreateAsync(user, registerDto.Password);
+                    if (!result.Succeeded) return BadRequest(result.Errors);
 
-               //return if failed to create identity object
-                    if (!result.Succeeded) return BadRequest(new ApiResponse(400));
-
+                    if (registerDto.UserRole != "") {
+                         var succeeded = await _roleManager.CreateAsync(new AppRole{Name="Candidate"});
+                         var roleResult = await _userManager.AddToRoleAsync(user, registerDto.UserRole);
+                         if (!result.Succeeded) return BadRequest(result.Errors);
+                    }
+                    
                //the plain dto object to return, irrespective of type of user, i.e. whether candidate, employee or customer
                     var userDtoToReturn = new core.ParamsAndDtos.UserDto
                     {
                          DisplayName = user.DisplayName,
-                         Token = _tokenService.CreateToken(user),
+                         Token = await _tokenService.CreateToken(user),
                          Email = user.Email
                     };
 
@@ -236,7 +265,8 @@ namespace api.Controllers
                     }
 
                     registerDto.AppUserId = userAdded.Id;
-
+                    //*** flg not working..
+                    /*
                     if (registerDto.UserPhones != null)
                     {    //ensure no duplicate user phones in the collection
                          var qry = (from p in registerDto.UserPhones
@@ -245,15 +275,14 @@ namespace api.Controllers
                                    select g.Key);
                          if (qry != null) registerDto.UserPhones = null;     //disallow if any duplicate numbers
                     }
+                    */
 
                //depending upon usertype, create other entities
                     switch (registerDto.UserType.ToLower())
                     {
                          case "candidate":
-                              var userCreated = await _userService.CreateCandidateAsync(registerDto);
-                              break;
-                         case "employee":
-                              await _userService.CreateEmployeeAsync(registerDto);
+                              //var userCreated = await _userService.CreateCandidateAsync(registerDto, UserFormFiles, loggedInEmployeeId);
+                              var userCreated = await _userService.CreateCandidateAsync(registerDto, loggedInEmployeeId);
                               break;
                          case "customerofficial":
                               await _userService.CreateCustomerOfficialAsync(registerDto);
@@ -264,6 +293,96 @@ namespace api.Controllers
                          default:
                               break;
                     }
+               //return
+                    return userDtoToReturn;
+               /*
+               */
+          }
+
+          [HttpPost("registeremployee")]
+          public async Task<ActionResult<core.ParamsAndDtos.UserDto>> RegisterEmployee(RegisterEmployeeDto registerDto )
+          {
+               
+               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               int loggedInEmployeeId = loggedInUser == null ? 0 : await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
+               
+               /* if (loggedInUser==null) {
+                    loggedInUser = await _userManager.FindByEmailAsync("sanjaypatil@agenterprises.com");
+               }
+               */
+               //populate loggedInUser
+               if (loggedInUser == null) return BadRequest(new ApiResponse(401, "Unauthorized"));
+               registerDto.LoggedInAppUserId = loggedInUser.Id;
+               
+               //check if user email already on record
+                    if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
+                    {
+                         return new BadRequestObjectResult(new ApiValidationErrorResponse { Errors = new[] { "Email address is in use" } });
+                    }
+
+               //for customer and vendor official, customer Id is mandatory
+                    if (string.IsNullOrEmpty(registerDto.AadharNo))
+                    {
+                         return BadRequest(new ApiResponse(400, "for employees, Aadhar number is mandatory"));
+                    }
+
+                    if (registerDto.EmployeePhones != null && registerDto.EmployeePhones.Count() > 0)
+                    {
+                         foreach (var ph in registerDto.EmployeePhones)
+                         {
+                              if (string.IsNullOrEmpty(ph.MobileNo)) return BadRequest(new ApiResponse(400, "mobile no cannot be blank"));
+                         }
+                    }
+
+               //update address 
+               //registerDto.Address.
+               //create and save AppUser IdentityObject
+                    var user = new AppUser
+                    {
+                         UserType = "Employee",
+                         DisplayName = registerDto.KnownAs, // registerDto.DisplayName,
+                         //Address = registerDto.Address,
+                         
+                         Email = registerDto.Email,
+                         UserName = registerDto.Email
+                    };
+                    registerDto.DisplayName = registerDto.DisplayName ?? user.DisplayName;
+                    registerDto.PlaceOfBirth = registerDto.PlaceOfBirth ?? "";
+                    var result = await _userManager.CreateAsync(user, registerDto.Password);
+                    if (!result.Succeeded) return BadRequest(result.Errors);
+
+                    
+                    var roleResult = await _userManager.AddToRoleAsync(user, registerDto.UserRole);
+                    if (!result.Succeeded) return BadRequest(result.Errors);
+                    
+               //the plain dto object to return, irrespective of type of user, i.e. whether candidate, employee or customer
+                    var userDtoToReturn = new core.ParamsAndDtos.UserDto
+                    {
+                         DisplayName = user.DisplayName,
+                         Token = await _tokenService.CreateToken(user),
+                         Email = user.Email
+                    };
+
+                    //var userAdded = await _userManager.FindByEmailAsync(registerDto.Email);
+                    //no need to retreive obj from DB - the object user can be used for the same
+                    var userAdded = user;
+               //user registered. 
+
+               //now save the objects in DataContext database
+                    registerDto.AppUserId = userAdded.Id;
+                    //*** flg not working..
+                    /*
+                    if (registerDto.UserPhones != null)
+                    {    //ensure no duplicate user phones in the collection
+                         var qry = (from p in registerDto.UserPhones
+                                   group p by p.MobileNo into g
+                                   where g.Count() > 1
+                                   select g.Key);
+                         if (qry != null) registerDto.UserPhones = null;     //disallow if any duplicate numbers
+                    }
+                    */
+
+                    await _userService.CreateEmployeeAsync(registerDto);
                //return
                     return userDtoToReturn;
                /*
@@ -318,6 +437,7 @@ namespace api.Controllers
           }
 //userRoles
 
+          /*
           [Authorize]
           [HttpGet("users-with-roles")]
           public async Task<ActionResult<ICollection<AppUser>>> GetUsersWithRoles()
@@ -337,7 +457,6 @@ namespace api.Controllers
                     }).ToListAsync();
                
                
-               /*
                var users = await _userManager.Users
                     //.Include(r =>r.UserRoles)
                     //.ThenInclude(r => r.Role)
@@ -357,140 +476,15 @@ namespace api.Controllers
                     })
                     
                     .ToListAsync();
-               */
+               
                return Ok(users);
           }
 
-          //[Authorize(Policy = "AdminRole")]
-          [HttpPost("edit-roles/{useremail}")]
-          public async Task<ActionResult> EditRoles(string useremail, [FromQuery] string roles)
+         */
+     
+          private async Task<bool> UserExists(string username)
           {
-               var lst = roles.Split(",").ToArray();
-               var selectedRoles = new List<string>();
-               foreach(var item in lst)
-               {
-                    if (await _roleManager.RoleExistsAsync(item)) {
-                         selectedRoles.Add(item.Trim());
-                    } 
-               }
-
-               if (selectedRoles.Count() == 0 ) return BadRequest(new ApiResponse(404, "none of the roles exist in Identity Roles"));
-               
-               var user = await _userManager.FindByEmailAsync(useremail);
-
-               if (user == null) return NotFound("Could not find user");
-
-               var userRoles = await _userManager.GetRolesAsync(user);
-
-               IdentityResult result;
-               result = await _userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
-               
-               if (!result.Succeeded) return BadRequest("Failed to add to roles");
-
-               result = await _userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
-
-               if (!result.Succeeded) return BadRequest("Failed to remove from roles");
-
-               return Ok(await _userManager.GetRolesAsync(user));
+               return await _userManager.Users.AnyAsync(x => x.UserName == username.ToLower());
           }
-
-         
-          [HttpPut("userrole/{userEmail}/{oldRoleName}/{newRoleName}")]
-          public async Task<ActionResult<bool>> EditUserRole(string userEmail, string oldRoleName, string newRoleName)
-          {
-               var user = await _userManager.FindByEmailAsync(userEmail);
-               if (user==null) {
-                    return BadRequest(new ApiResponse(400, "no user with the selected email exists"));
-               }
-               var roleExists = await _roleManager.RoleExistsAsync(newRoleName);
-               if (!roleExists) return BadRequest(new ApiResponse(400, "the role " + newRoleName + " does not exist"));
-
-               var roleAdded = await _userManager.RemoveFromRoleAsync(user,oldRoleName);
-               if (roleAdded.Succeeded) await _userManager.AddToRoleAsync(user, newRoleName);
-
-               return roleAdded.Succeeded;
-          }
-
-          [HttpGet("userswithgivenrole/{rolename}")]
-          public async Task<ActionResult<IReadOnlyList<AppUser>>> GetIdentityUsersWithARole(string roleName)
-          {
-               var users = await _userManager.GetUsersInRoleAsync(roleName);
-               if (users == null) return NotFound(new ApiResponse(404, "No users found with role '" + roleName + "'"));
-               return Ok(users);
-          }
-
-          [HttpGet("userwithroles/{useremail}")]
-          public async Task<ActionResult<IReadOnlyList<AppUserRole>>> GetIdentityUserWithRoles(string useremail)
-          {
-               var user = await _userManager.FindByEmailAsync(useremail);
-               if (user == null) return NotFound(new ApiResponse(404, "User not found"));
-               var roles = await _userManager.GetRolesAsync(user);
-
-               return Ok(roles);
-          }
-
-          [HttpGet("userhastherole/{useremail}/{rolename}")]
-          public async Task<ActionResult<bool>> UserHasTheRole(string useremail, string roleName)
-          {
-               var user = await _userManager.FindByEmailAsync(useremail);
-               if (user == null) return NotFound(new ApiResponse(404, "user not found"));
-               return await _userManager.IsInRoleAsync(user, roleName);
-          }
-          
-          [HttpGet("deleteuserrole/{useremail}/{rolename}")]
-          public async Task<ActionResult<bool>> DeleteUserRole(string useremail, string roleName)
-          {
-               var user = await _userManager.FindByEmailAsync(useremail);
-               if (user == null) return NotFound(new ApiResponse(404, "user not found"));
-               var result = await _userManager.RemoveFromRoleAsync(user, roleName);
-               return result.Succeeded;
-          }
-          
-//Roles
-
-          [HttpGet("identityroles")]
-          public async Task<ActionResult<IReadOnlyList<String>>> GetIdentityRoles()
-          {
-               var iroles =  await _roleManager.Roles.OrderBy(x => x.Name).Select(x => x.Name).ToListAsync();
-               return iroles;
-          }
-
-          [HttpPut("role/{existingRoleName}/{newRoleName}")]
-          public async Task<ActionResult<bool>> EditRole(string existingRoleName, string newRoleName)
-          {
-               var role = await _roleManager.FindByNameAsync(existingRoleName);
-               if (role==null) return BadRequest(new ApiResponse(400, "The requested role does not exist"));
-               role.Name=newRoleName;
-               if (await _roleManager.UpdateAsync(role) == null) {
-                    return BadRequest(new ApiResponse(404, "failed to update the role " + existingRoleName));
-               } else {
-                    return Ok();
-               }
-          }
-
-          [HttpPost("role/{newRole}")]
-          public async Task<ActionResult<bool>> AddNewRole(string newRole)
-          {
-                var roleExists = await _roleManager.RoleExistsAsync(newRole);
-                if (!roleExists)
-                {
-                    IdentityResult result = await _roleManager.CreateAsync(new IdentityRole(newRole));
-                    return Ok(true);
-                } else {
-                     return BadRequest(new ApiResponse(404, "the role '" + newRole + "' already exists"));
-                }
-          }
-
-          [HttpDelete("role/{rolename}")]
-          public async Task<ActionResult<bool>> DeleteIdentityRole(string rolename)
-          {
-               var role = await _roleManager.FindByNameAsync(rolename);
-               if (role==null) return NotFound(new ApiResponse(404, "Role not found"));
-
-               var result = await _roleManager.DeleteAsync(role);
-
-               return result.Succeeded;
-          }
-
      }
 }

@@ -20,17 +20,22 @@ namespace api.Controllers
      {
           private readonly IUnitOfWork _unitOfWork;
           private readonly IMapper _mapper;
-          private readonly IComposeMessages _composeMessages;
+          private readonly IComposeMessagesForAdmin _composeMsgAdmin;
           private readonly IEmailService _emailService;
           private readonly ISMSService _smsService;
           private readonly UserManager<AppUser> _userManager;
-          public MessagesController(IMapper mapper, IUnitOfWork unitOfWork, IComposeMessages composeMessages,
+          private readonly IComposeMessagesForHR _composeMsgHR;
+          private readonly IComposeMessagesForProcessing _composeMsgProcess;
+          public MessagesController(IMapper mapper, IUnitOfWork unitOfWork, IComposeMessagesForAdmin composeMsgAdmin, 
+               IComposeMessagesForHR composeMsgHR, IComposeMessagesForProcessing composeMsgProcess,
                IEmailService emailService, ISMSService smsService, UserManager<AppUser> userManager)
           {
+               _composeMsgProcess = composeMsgProcess;
+               _composeMsgHR = composeMsgHR;
                _userManager = userManager;
                _smsService = smsService;
                _emailService = emailService;
-               _composeMessages = composeMessages;
+               _composeMsgAdmin = composeMsgAdmin;
                _mapper = mapper;
                _unitOfWork = unitOfWork;
           }
@@ -155,7 +160,7 @@ namespace api.Controllers
           [HttpGet("ComposeCVAcknToCandidateByEmail")]
           public async Task<EmailMessage> ComposeCVAcknEmailMessage(CandidateMessageParamDto paramDto)
           {
-               var msg = await _composeMessages.AckToCandidateByEmail(paramDto);
+               var msg = await _composeMsgHR.ComposeHTMLToAckToCandidateByEmail(paramDto);
                var msgToReturn = new EmailMessage();
                var AttachmentFilePaths = new List<string>();
                if (paramDto.DirectlySendMessage)
@@ -170,7 +175,7 @@ namespace api.Controllers
           [HttpGet("ComposeSelAdvToCandidateByEmail")]
           public async Task<ICollection<EmailMessage>> ComposeSelAdviseToCandidateByemail(ICollection<SelectionDecisionMessageParamDto> paramDto)
           {
-               var msgs = await _composeMessages.AdviseSelectionStatusToCandidateByEmail(paramDto);
+               var msgs = await _composeMsgAdmin.AdviseSelectionStatusToCandidateByEmail(paramDto);
                var AttachmentFilePaths = new List<string>();
                foreach(var msg in msgs)
                {
@@ -183,7 +188,7 @@ namespace api.Controllers
           [HttpGet("ComposeRejAdvToCandidateByEmail")]
           public ICollection<EmailMessage> ComposeRejAdviseToCandidateByemail(ICollection<RejDecisionToAddDto> paramDto)
           {
-               var msgs = _composeMessages.AdviseRejectionStatusToCandidateByEmail(paramDto);
+               var msgs = _composeMsgAdmin.AdviseRejectionStatusToCandidateByEmail(paramDto);
                var AttachmentFilePaths = new List<string>();
                foreach(var msg in msgs)
                {
@@ -196,7 +201,7 @@ namespace api.Controllers
           [HttpGet("ComposeProcessAdvToCandidateByEmail")]
           public async Task<EmailMessage> ComposeProcessAdviseToCandidateByemail(DeployMessageParamDto paramDto)
           {
-               var msg = await _composeMessages.AdviseProcessTransactionUpdatesToCandidateByEmail(paramDto);
+               var msg = await _composeMsgProcess.AdviseProcessTransactionUpdatesToCandidateByEmail(paramDto);
                var msgToReturn = new EmailMessage();
                var AttachmentFilePaths = new List<string>();
                if (paramDto.DirectlySendMessage)
@@ -210,7 +215,7 @@ namespace api.Controllers
           [HttpGet("ComposeCVAcknToCandidateBySMS")]
           public async Task<SMSMessage> ComposeCVAcknBySMS(CandidateMessageParamDto paramDto)
           {
-               var msg = await _composeMessages.AckToCandidateBySMS(paramDto);
+               var msg = await _composeMsgHR.ComposeMsgToAckToCandidateBySMS(paramDto);
                if (paramDto.DirectlySendMessage)
                {
                     _smsService.sendMessage(msg.PhoneNo, msg.SMSText);
@@ -223,7 +228,7 @@ namespace api.Controllers
           [HttpGet("ComposeSelAdvToCandidateBySMS")]
           public async Task<SMSMessage> ComposeSelAdviseToCandidateBySMS(SelectionDecisionMessageParamDto paramDto)
           {
-               var msg = await _composeMessages.AdviseSelectionStatusToCandidateBySMS(paramDto);
+               var msg = await _composeMsgAdmin.AdviseSelectionStatusToCandidateBySMS(paramDto);
                if (paramDto.DirectlySendMessage)
                {
                     _smsService.sendMessage(msg.PhoneNo, msg.SMSText);
@@ -236,7 +241,7 @@ namespace api.Controllers
           [HttpGet("ComposeRejAdvToCandidateBySMS")]
           public async Task<SMSMessage> ComposeRejAdviseToCandidateBySMS(SelectionDecisionMessageParamDto paramDto)
           {
-               var msg = await _composeMessages.AdviseRejectionStatusToCandidateBySMS(paramDto);
+               var msg = await _composeMsgAdmin.AdviseRejectionStatusToCandidateBySMS(paramDto);
                if (paramDto.DirectlySendMessage)
                {
                     _smsService.sendMessage(msg.PhoneNo, msg.SMSText);
@@ -249,7 +254,7 @@ namespace api.Controllers
           [HttpGet("ComposeProcessAdvToCandidateBySMS")]
           public async Task<SMSMessage> ComposeProcessAdviseToCandidateBySMS(DeployMessageParamDto paramDto)
           {
-               var msg = await _composeMessages.AdviseProcessTransactionUpdatesToCandidateBySMS(paramDto);
+               var msg = await _composeMsgProcess.AdviseProcessTransactionUpdatesToCandidateBySMS(paramDto);
                if (paramDto.DirectlySendMessage)
                {
                     _smsService.sendMessage(msg.PhoneNo, msg.SMSText);

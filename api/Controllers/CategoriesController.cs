@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {    
-     [Authorize(Policy = "Employee")]
+     //[Authorize(Policy = "Employee")]
      public class CategoriesController : BaseApiController
      {
           private readonly IUnitOfWork _unitOfWork;

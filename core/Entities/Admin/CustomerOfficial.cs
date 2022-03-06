@@ -17,7 +17,7 @@ namespace core.Entities
                OfficialName = officialName;
                Designation = designation;
                PhoneNo = phoneNo;
-               Mobile = mobile;
+               Mobile = mobile;   //used as whatsApp
                Email = email;
                ImageUrl = imageUrl;
                IsValid = isValid;
@@ -33,7 +33,7 @@ namespace core.Entities
                OfficialName = officialName;
                Designation = designation;
                PhoneNo = phoneNo;
-               Mobile = mobile;
+               Mobile = mobile;   //also used as whatsApp
                Email = email;
                ImageUrl = imageUrl;
                LogInCredential = login;

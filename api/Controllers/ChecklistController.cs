@@ -14,6 +14,7 @@ using System.Net;
 using System.Text;
 using core.Entities.Orders;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 
 namespace api.Controllers
 {
@@ -23,7 +24,7 @@ namespace api.Controllers
           private readonly UserManager<AppUser> _userManager;
           private readonly IEmployeeService _empService;
 
-          public ChecklistController(IChecklistService checklistService, UserManager<AppUser> userManager, 
+          public ChecklistController(IChecklistService checklistService, UserManager<AppUser> userManager,
                IEmployeeService empService)
           {
                _empService = empService;
@@ -46,7 +47,7 @@ namespace api.Controllers
           }
 
           [HttpPut("checklisthr")]
-          public async Task<ActionResult<bool>> EditChecklistHRAsync(ChecklistHR checklistHR)
+          public async Task<ActionResult<bool>> EditChecklistHRAsync(ChecklistHRDto checklistHR)
           {
                var loggedInUserDto = await GetLoggedInUserDto();
                if (loggedInUserDto == null) return BadRequest(new ApiResponse(404, "User not logged in"));
@@ -60,12 +61,12 @@ namespace api.Controllers
           }
 
           
-          [Authorize]
+          //[Authorize]
           [HttpGet("checklisthr/{candidateid}/{orderitemid}")]
-          public async Task<ActionResult<ChecklistHR>> GetChecklistHR(int candidateid, int orderitemid)
+          public async Task<ActionResult<ChecklistDto>> GetChecklistHR(int candidateid, int orderitemid)
           {
                var loggedInUserDto = await GetLoggedInUserDto();
-               if (loggedInUserDto == null) return BadRequest(new ApiResponse(404, "this option requires log in"));
+               //if (loggedInUserDto == null) return BadRequest(new ApiResponse(404, "this option requires log in"));
 
                var checklist = await _checklistService.GetChecklistHR(candidateid, orderitemid, loggedInUserDto);
                if (checklist == null) return BadRequest(new ApiResponse(404, "No data returned"));
@@ -74,7 +75,7 @@ namespace api.Controllers
           }
           
           [HttpDelete("hrchecklist")]
-          public async Task<ActionResult<bool>> DeleteChecklistHRAsync(ChecklistHR checklistHR)
+          public async Task<ActionResult<bool>> DeleteChecklistHRAsync(ChecklistHRDto checklistHR)
           {
                var loggedInUserDto = await GetLoggedInUserDto();
                return await _checklistService.DeleteChecklistHR(checklistHR, loggedInUserDto);
@@ -117,10 +118,9 @@ namespace api.Controllers
           {
                var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
                if (loggedInUser == null) return null;
-               
-               var empId = await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
+               var empId = loggedInUser == null ? 0 :   await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
                var loggedInUserDto = new LoggedInUserDto{
-                    LoggedIAppUsername = loggedInUser.UserName, LoggedInAppUserEmail=loggedInUser.Email, LoggedInAppUserId = loggedInUser.Id,
+                    LoggedIAppUsername = loggedInUser.UserName, LoggedInAppUserEmail=loggedInUser.Email, LoggedInAppUserId = loggedInUser.Id ,
                     LoggedInEmployeeId = empId
                };
                

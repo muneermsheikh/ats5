@@ -35,7 +35,8 @@ namespace infra.Services
           public async Task<ICollection<OpeningsDto>> GetCurrentOpenings(StatsParams param)
           {
                //first construct queryable by filtering OrderItems.
-               var qry = _context.OrderItems.Where(x => x.Status == EnumOrderItemStatus.ReviewedAndAccepted)
+               var qry = _context.OrderItems
+                    .Where(x => x.Status == (int)EnumOrderItemStatus.NotStarted || x.Status == (int)EnumOrderItemStatus.UnderProcess)
                     .Select(x => new { x.Id, x.CategoryId, x.OrderId, x.CompleteBefore, x.Quantity, x.RequireAssess })
                     .AsQueryable();
 

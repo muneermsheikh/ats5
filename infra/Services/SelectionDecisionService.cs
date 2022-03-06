@@ -26,9 +26,11 @@ namespace infra.Services
           private readonly IComposeMessages _composeMessages;
           private readonly IEmailService _emailService;
           private readonly IMapper _mapper;
-          public SelectionDecisionService(IUnitOfWork unitOfWork, ATSContext context, ICommonServices commonServices,
+          private readonly IComposeMessagesForAdmin _composeMsgForAdmin;
+          public SelectionDecisionService(IUnitOfWork unitOfWork, ATSContext context, ICommonServices commonServices, IComposeMessagesForAdmin composeMsgForAdmin,
           IComposeMessages composeMessages, IDeployService deployService, IEmailService emailService, IMapper mapper)
           {
+               _composeMsgForAdmin = composeMsgForAdmin;
                _mapper = mapper;
                _emailService = emailService;
                _composeMessages = composeMessages;
@@ -166,7 +168,7 @@ namespace infra.Services
                          selDecDto.Add(new SelectionDecisionMessageParamDto { SelectionDecision = s, DirectlySendMessage = true });
                     }
 
-                    var msg = await _composeMessages.AdviseSelectionStatusToCandidateByEmail(selDecDto);
+                    var msg = await _composeMsgForAdmin.AdviseSelectionStatusToCandidateByEmail(selDecDto);
                     if (msg != null)
                     {
                          foreach (var m in msg) { msgs.Add(m); }
@@ -178,7 +180,7 @@ namespace infra.Services
                //var rejected = new selDto.Where(x => x.SelectionStatusId != (int)EnumSelStatus.Selected).ToList();
                if (rejected != null)
                {
-                    var msg = _composeMessages.AdviseRejectionStatusToCandidateByEmail(rejected);
+                    var msg = _composeMsgForAdmin.AdviseRejectionStatusToCandidateByEmail(rejected);
                     if (msg != null)
                     { foreach (var m in msg) { msgs.Add(m); } }
                }

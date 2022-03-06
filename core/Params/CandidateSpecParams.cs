@@ -21,8 +21,8 @@ namespace core.Params
         public string State {get; set;}
         public string Email {get; set;}
         public string Mobile {get; set;}
-        
-
+        public string PassportNo {get; set;}
+        public int? AgentId {get; set;}
         public bool IncludeAttachments {get; set;}
         public bool IncludeUserPhones {get; set;}
         public bool IncludeUserQualifications {get; set;}

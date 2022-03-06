@@ -53,9 +53,9 @@ namespace core.Entities.HR
         public int RefStatus { get; set; }=(int)EnumCVRefStatus.Referred;
         public DeployStage DeployStage {get; set;}
         public DateTime? DeployStageDate {get; set;}
-        public ICollection<Candidate> Candidates {get; set;}
-        [ForeignKey("OrderItemId")]
-        public ICollection<OrderItem> OrderItems { get; set; }
+        //public ICollection<Candidate> Candidates {get; set;}
+        //[ForeignKey("OrderItemId")]
+        //public ICollection<OrderItem> OrderItems { get; set; }
         public ICollection<Deploy> Deploys {get; set;}
 
         //public virtual SelectionDecision SelectionDecision {get; set;}

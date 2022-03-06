@@ -15,7 +15,7 @@ namespace infra.Data.Config
                 o => (EnumEmployeeStatus) Enum.Parse(typeof(EnumEmployeeStatus), o)
             );
 
-            builder.HasMany(s => s.Qualifications).WithOne().OnDelete(DeleteBehavior.NoAction);
+            builder.HasMany(s => s.EmployeeQualifications).WithOne().OnDelete(DeleteBehavior.NoAction);
             builder.HasMany(s => s.HrSkills).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(s => s.OtherSkills).WithOne().OnDelete(DeleteBehavior.Cascade);
 

@@ -15,7 +15,8 @@ namespace infra.Data.Config
                builder.HasIndex(p => p.TaskOwnerId);
                builder.HasIndex(p => p.AssignedToId);
                builder.Property(x => x.TaskDate).IsRequired().HasMaxLength(250);
-               builder.HasIndex(x => new{x.AssignedToId, x.OrderItemId, x.CandidateId, x.TaskTypeId}).IsUnique();
+               builder.HasIndex(x => new{x.AssignedToId, x.OrderItemId, x.CandidateId, x.TaskTypeId})
+                    .HasFilter("CandidateId > 0") .IsUnique();
 
                builder.HasMany(o => o.TaskItems).WithOne().OnDelete(DeleteBehavior.Cascade);
           }

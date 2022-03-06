@@ -5,15 +5,15 @@ namespace core.Entities.Orders
     public enum EnumOrderStatus
     {
         [EnumMember(Value="Awaiting Review")]
-        AwaitingReview, 
+        AwaitingReview = 0, 
         [EnumMember(Value="Reviewed and Accepted")]
-        ReviewedAndAccepted,
+        ReviewedAndAccepted = 100,
         [EnumMember(Value="Reviewed and declined")]
-        ReviewedAndDeclined,
+        ReviewedAndDeclined = 200,
         [EnumMember(Value="Assigned to HR")]
-        AssignedToHR,
+        AssignedToHR = 400,
         [EnumMember(Value="Concluded")]
-        Concluded
+        Concluded = 1000
         
     }
 }

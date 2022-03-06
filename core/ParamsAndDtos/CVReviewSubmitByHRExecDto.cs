@@ -14,6 +14,6 @@ namespace core.ParamsAndDtos
         public string ExecRemarks { get; set; }
         public int Charges { get; set; }
         public int AssignedToId { get; set; }
-        public CommonDataDto CommonDataDto {get; set;}
+        public CommonDataDto CommonDataDto {get; set;}      //passed on as null to api
     }
 }

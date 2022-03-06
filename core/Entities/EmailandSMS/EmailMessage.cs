@@ -14,7 +14,7 @@ namespace core.Entities.EmailandSMS
 
           public EmailMessage(string messageGroup, int senderId, int recipientId, string senderEmailAddress, 
             string senderUserName, string recipientUserName, string recipientEmailAddress, string ccEmailAddress, 
-            string bccEmailAddress, string subject, string content, int messageTypeId)
+            string bccEmailAddress, string subject, string content, int messageTypeId, int postaction)
           {
                MessageGroup = messageGroup;
                SenderId = senderId;
@@ -28,11 +28,10 @@ namespace core.Entities.EmailandSMS
                Subject = subject;
                Content = content;
                MessageTypeId = messageTypeId;
+               PostAction = postaction;
           }
 
         public string MessageGroup {get; set;}
-        public int SenderId {get; set;}
-        public int RecipientId { get; set; }
         [EmailAddress]
         public string SenderEmailAddress{get; set;}
         public string SenderUserName { get; set; }
@@ -52,10 +51,13 @@ namespace core.Entities.EmailandSMS
         public DateTime MessageSentOn {get; set;}=DateTime.Now;
         public bool SenderDeleted { get; set; }
         public bool RecipientDeleted { get; set; }
-        [ForeignKey("SenderId")]
-        public AppUser Sender { get; set; }
-        [ForeignKey("RecipientId")]
-        public AppUser Recipient { get; set; }
+        public int SenderId { get; set; }
+        //[ForeignKey("SenderId")]
+        //public AppUser Sender { get; set; }
+        public int PostAction {get; set;}
+        public int RecipientId { get; set; }
+        //[ForeignKey("RecipientId")]
+        //public AppUser Recipient { get; set; }
 
         //public ICollection<EmailMessage> MessagesReceived {get; set;}
         //public ICollection<EmailMessage> MessagesSent {get; set;}

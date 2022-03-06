@@ -1,0 +1,19 @@
+<div *ngIf="emp===null">
+     No employee data available
+</div>
+<div *ngIf="emp!==null">
+     <div class="row mb-0" style="padding: 0px; font-size:smaller; display: inline-block; line-height: 1em;">
+          <div style="font-size:small; display: inline-block; width: 50px;"> {{emp.id}}</div>
+          <div style="font-size:small; display: inline-block; width: 70px;"> {{emp.gender}}</div>
+          <div style="font-size:small; display: inline-block; width: 200px;"> {{emp.firstName + ' ' + emp.secondName??'' + '' + emp.familyName ?? ''}}</div>
+          <div style="font-size:small; display: inline-block; width: 70px;">{{emp.knownAs}}</div>
+          <div style="font-size:small; display: inline-block; width: 200px;">{{emp.position}}</div>
+          <div style="font-size:small; display: inline-block; width: 250px;">{{emp.department}}</div>
+          <div style="display: inline-block; width: 200px; line-height: 1em;">
+               <button class="btn btn-outline-success fa fa-pencil" style="color: blue;" type="button" routerLink="/employee/edit/{{emp.id}}" ></button>
+               <button class="mx-1 btn btn-outline-secondary fa fa-eye" type="button" style="color: blue;" routerLink="/employee/view/{{emp.id}}"  ></button>
+               <button class="btn btn-outline-secondary fa fa-trash" style="color: red;" type="button" routerLink="/employee/delete/{{emp.id}}" ></button>
+          </div>
+     </div>
+</div>
+

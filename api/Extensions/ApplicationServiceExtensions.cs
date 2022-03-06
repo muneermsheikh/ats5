@@ -16,6 +16,8 @@ namespace api.Extensions
                 
                 services.AddScoped<ITokenService, TokenService>();
                 services.AddScoped<ICategoryRepository, CategoryRepository>();
+                services.AddScoped<ICustomerReviewService, CustomerReviewService>();
+                
                 //services.AddScoped<IMessageRepository, MessageRepository>();
                 services.AddScoped<IUnitOfWork, UnitOfWork>();
                 services.AddScoped<IOrderService, OrderService>();
@@ -34,6 +36,9 @@ namespace api.Extensions
                 services.AddScoped<IEmailService, EmailService>();
                 services.AddScoped<ICommonServices, CommonServices>();
                 services.AddScoped<IComposeMessages, ComposeMessages>();
+                services.AddScoped<IComposeMessagesForAdmin, ComposeMessagesForAdmin>();
+                services.AddScoped<IComposeMessagesForHR, ComposeMessagesForHR>();
+                services.AddScoped<IComposeMessagesForProcessing, ComposeMessagesForProcessing>();
                 services.AddScoped<ITaskService, TaskServices>();
                 services.AddScoped<ICVReviewService, CVRvwService>();
                 services.AddScoped<IVerifyService, VerifyService>();
@@ -41,8 +46,10 @@ namespace api.Extensions
                 services.AddScoped<IChecklistService, ChecklistService>();
                 services.AddScoped<IInterviewService, InterviewService>();
                 services.AddScoped<IInterviewFollowupService, InterviewFollowupService>();
-                services.AddScoped<IUserContactService, UserContactService>();
-                
+                services.AddScoped<IUserHistoryService, UserHistoryService>();
+                services.AddScoped<IDLForwardService, DLForwardService>();
+                services.AddScoped<IAssessmentQBankService, AssessmentQBankService>();
+                services.AddScoped<IAssessmentStandardQService, AssessmentStandardQService>();
                 /*
                 services.AddScoped<IPaymentService, PaymentService>();
                 
@@ -66,6 +73,14 @@ namespace api.Extensions
 
                         return new BadRequestObjectResult(errorResponse);
                     };
+                });
+
+                services.AddAuthorization(opt => {
+                    opt.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                    opt.AddPolicy("RequireHRSupervisorRole", policy => policy.RequireRole("HRSupervisor"));
+                    opt.AddPolicy("RequirePPReleaseRole", policy => policy.RequireRole("PPRelease"));
+                    opt.AddPolicy("RequireProcessingManagerRole", policy => policy.RequireRole("ProcessingManager"));
+                    opt.AddPolicy("RequireRegisterSelectionRole", policy => policy.RequireRole("AddEditSelection"));
                 });
 
                 return services;

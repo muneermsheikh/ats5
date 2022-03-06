@@ -7068,11 +7068,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\ats6\\api\\api.csproj",
+      "projectUniqueName": "D:\\ats8\\api\\api.csproj",
       "projectName": "api",
-      "projectPath": "D:\\ats6\\api\\api.csproj",
+      "projectPath": "D:\\ats8\\api\\api.csproj",
       "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-      "outputPath": "D:\\ats6\\api\\obj\\",
+      "outputPath": "D:\\ats8\\api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -7087,8 +7087,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "D:\\ats6\\infra\\infra.csproj": {
-              "projectPath": "D:\\ats6\\infra\\infra.csproj"
+            "D:\\ats8\\infra\\infra.csproj": {
+              "projectPath": "D:\\ats8\\infra\\infra.csproj"
             }
           }
         }

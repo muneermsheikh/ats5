@@ -11,6 +11,7 @@ using core.Entities.Orders;
 using core.Entities.Process;
 using core.Entities.Tasks;
 using core.Entities.Users;
+using core.ParamsAndDtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -27,19 +28,21 @@ namespace infra.Data
           {
           }
 
-
           public DbSet<FileOnFileSystem> FilesOnFileSystem {get; set;}
           //general
           public DbSet<Customer> Customers {get; set;}
           public DbSet<CustomerIndustry> CustomerIndustries {get; set;}
           public DbSet<CustomerOfficial> CustomerOfficials {get; set;}
           public DbSet<AgencySpecialty> AgencySpecialties {get; set;}
+          public DbSet<CustomerReview> CustomerReviews {get; set;}
+          public DbSet<CustomerReviewItem> CustomerReviewItems {get; set;}
+          public DbSet<CustomerReviewData> CustomerReviewDatas {get; set;}
 
      //HR
           public DbSet<ChecklistHR> ChecklistHRs {get; set;}
           public DbSet<CandidateAssessment> CandidateAssessments {get; set;}
           public DbSet<CandidateAssessmentItem> CandidateAssessmentItems {get; set;}
-          public DbSet<ChecklistItemHR> CheckListItemHRs {get; set;}
+          public DbSet<ChecklistHRItem> ChecklistHRItems {get; set;}
           public DbSet<CVRef> CVRefs {get; set;}
           public DbSet<CVRefRestriction> CVRefRestrictions {get; set;}
           public DbSet<SelectionDecision> SelectionDecisions {get; set;}
@@ -51,18 +54,24 @@ namespace infra.Data
           public DbSet<InterviewItemCandidate> InterviewItemCandidates {get; set;}
           public DbSet<InterviewItemCandidateFollowup> InterviewItemCandidatesFollowup {get; set;}
 
+          //Not mapped
+          //public DbSet<CandidateBriefDto> CandidateDto {get; set;}
+
      //Admin
-          public DbSet<UserContact> UserContacts {get; set;}
-          //public DbSet<UserContactedItem> UserContactedItems {get; set;}
+          public DbSet<UserHistory> UserHistories {get; set;}
+          public DbSet<UserHistoryItem> UserHistoryItems {get; set;}
 
 
        // masters
           //public DbSet<core.Entities.Users.Address> Addresses {get; set;}
-          public DbSet<AssessmentQBank> AssessmentQsBank { get; set; }
+          public DbSet<AssessmentQBank> AssessmentQBank { get; set; }
+          public DbSet<AssessmentQBankItem> AssessmentQBankItems {get; set;}
+          public DbSet<AssessmentStandardQ> AssessmentStandardQs {get; set;}
           public DbSet<Category> Categories {get; set;}
           public DbSet<ChecklistHRData> ChecklistHRDatas {get; set;}
           //public DbSet<DeployStage> DeployStages {get; set;}
           public DbSet<Employee> Employees {get; set;}
+          public DbSet<EmployeeAddress> EmployeeAddresses {get; set;}
           public DbSet<EmployeeQualification> EmployeeQualifications {get; set;}
           public DbSet<EmployeeHRSkill> EmployeeHRSkills {get; set;}
           public DbSet<EmployeeOtherSkill> EmployeeOtherSkills {get; set;}
@@ -76,6 +85,7 @@ namespace infra.Data
           public DbSet<SkillData> SkillDatas {get; set;}
           public DbSet<SelectionStatus> SelectionStatuses {get; set;}
           public DbSet<InterviewAttendanceStatus> InterviewAttendancesStatus {get; set;}
+          public DbSet<ContactResult> ContactResults {get; set;}
           
      ///orders
           
@@ -87,7 +97,7 @@ namespace infra.Data
           public DbSet<ReviewItemData> ReviewItemDatas{get; set;}
           public DbSet<OrderItemAssessment> OrderItemAssessments {get; set;}
           public DbSet<OrderItemAssessmentQ> OrderItemAssessmentQs {get; set;}
-          
+          public DbSet<DLForward> DLForwards {get; set;}
 
       //Process
           public DbSet<Deploy> Deploys {get; set;}

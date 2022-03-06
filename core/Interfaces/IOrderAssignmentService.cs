@@ -10,7 +10,6 @@ namespace core.Interfaces
     public interface IOrderAssignmentService
     {
         Task<ICollection<EmailMessage>> DesignOrderAssessmentQs(int orderId, AppUser loggedInUser);
-        Task<ICollection<EmailMessage>> AssignTasksToHRExecutives(int orderId, string LoggedInAppUserEmail);
         Task<bool> DeleteHRExecAssignment(int orderItemId);
         Task<bool> OrderItemsNeedAssessment(int orderId);
         Task<bool> EditOrderAssignment(ApplicationTask task);

@@ -18,5 +18,6 @@ namespace core.Interfaces
           Task<bool> DeleteCVSubmittedToHRMForReview(int CVReviewByHRMId);
           Task<ICollection<CVReviewsPendingDto>>PendingCVReviewsByUserIdAsync(int userId);
           Task<ICollection<CVReviewsPendingDto>>PendingCVReviews();
+          Task<int> NextReviewBy(int orderItemId);
      }
 }

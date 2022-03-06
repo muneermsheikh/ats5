@@ -73,7 +73,7 @@ namespace api
                          .WithOrigins("https://localhost:4200");
                     });
                });
-
+               
                services.Configure<MailSettings>(_config.GetSection("MailSettings"));
           }
 
@@ -97,7 +97,7 @@ namespace api
                app.UseRouting();
 
                app.UseCors("CorsPolicy");
-
+               
                app.UseAuthentication();
                app.UseAuthorization();
 

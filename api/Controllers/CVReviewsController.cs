@@ -30,11 +30,13 @@ namespace api.Controllers
           }
 
           [Authorize]
-          [HttpPost("{candidateid}/{orderitemid}")]
+          [HttpPost("newCVReviews")]
           public async Task<ActionResult<CVRvw>> AddNewCVReview(ICollection<CVReviewSubmitByHRExecDto> cvsSubmitted)
           {
                var loggedInDto = await GetLoggedInUserDto();
                if (loggedInDto == null) return BadRequest(new ApiResponse(401, "this option requires logged in User"));
+               
+               //check if the order item requires internal reviews, or cv can be directly sent to the customer
                
                var rvws = await _cvreviewService.AddNewCVReview(cvsSubmitted, loggedInDto);
                if (rvws == null || rvws.Count == 0) return BadRequest(new ApiResponse(404, "the CV Review result for the candidate/orderitem is not created"));

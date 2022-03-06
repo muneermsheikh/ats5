@@ -15,13 +15,12 @@ namespace core.Entities.Orders
           }
 
           public Order(int orderNo, int customerId, string customerName, string cityOfWorking, string orderRef, DateTime orderRefDate,
-            int salesmanId, int estimatedRevenue, DateTime completeBy, OrderAddress orderAddress,ICollection<OrderItem> orderItems)
+            int salesmanId, int estimatedRevenue, DateTime completeBy, ICollection<OrderItem> orderItems)
           {
                OrderNo = orderNo;
                CustomerId = customerId;
                CustomerName = customerName;
                CityOfWorking = cityOfWorking;
-               OrderAddress = orderAddress;
                OrderRef = orderRef;
                OrderRefDate = orderRefDate;
                SalesmanId = salesmanId;
@@ -31,8 +30,7 @@ namespace core.Entities.Orders
           }
 
         public int OrderNo { get; set; }
-        public OrderAddress OrderAddress { get; set; }
-        public DateTimeOffset OrderDate { get; set; }=DateTimeOffset.Now;
+        public DateTime OrderDate { get; set; }=DateTime.Now;
         public int CustomerId { get; set; }
         public string CustomerName {get; set;}
         public string BuyerEmail {get; set;}
@@ -50,6 +48,8 @@ namespace core.Entities.Orders
         public DateTime CompleteBy { get; set; }
         public string Country { get; set; }
         public string CityOfWorking { get; set; }
+        public int ContractReviewId { get; set; }
+        public int ContractReviewStatusId {get; set;}
         public int EstimatedRevenue {get; set;}
         public Customer Customer {get; set;}
         public EnumOrderStatus Status { get; set; } = EnumOrderStatus.AwaitingReview;

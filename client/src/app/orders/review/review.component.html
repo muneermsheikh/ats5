@@ -1,0 +1,75 @@
+
+<div class="mt-2" *ngIf="review">
+    <div class="col-3 py-0 my-0" style="display: inline-block;">
+        <h3>Your profile</h3>
+    </div>
+    <div class="col-9 py-0 my-0" style="display: inline-block;" >
+        <div class="alert alert-info" *ngIf="form.dirty">
+            <strong>Information: </strong> You have made changes.  Any unsaved changes will be lost
+        </div>
+    </div>
+    <div class="col-3" style="display: inline-block; margin-top: 0px; padding-top: 0px;">
+        <div class="card">
+            <div class="card-body">
+                <div>
+                    <strong>Customer Name:</strong> {{review.customerName}}
+                </div>
+                <div>
+                    <strong>Order No:</strong> {{review.orderNo}}
+                </div>
+                <div>
+                    <strong>Order Dated:</strong> {{review.orderDate | date}}
+                </div>
+                <div>
+                    <strong>Current Status</strong> {{review.rvwStatusId}}
+                </div>
+            </div>
+            <div class="card-footer">
+                <button [disabled]="!form.dirty" type="submit" class="btn btn-success btn-block fa fa-save" (click)="onSubmit()" >
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1">Update</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col-9" style="display: inline-block; vertical-align: top; ">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="my-2" style="font-size: small;">
+                <label class="stdd" for="categoryName">Category: </label><input type="text" formControlName="categoryName">
+                <button class="stddBtn fa fa-plus" type="button" (click)="addContractReviewItem()" ></button>
+            </div>
+
+            <div formArrayName="contractReviewItems" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                <div *ngFor="let q of contractReviewItems.controls; let i=index">
+                    <div [formGroupName]="i" >
+                        <div style="display: inline-block; width: 35px;">{{i+1}}</div>
+                        <label class="stdd">Category: {{review.categoryName}}</label>
+                        <label class="stdd">Quantity: {{review.quantity}}</label>
+                        <label class="stdd">ECNR:{{review.ecnr}}</label>
+                        <label class="stdd">Require Assess: {{review.requireAssess}}</label>
+
+
+                        <div style="width: 50px; display: inline-block;">
+                            <button (click)="removeContractReviewItem(i)" class="fa fa-trash" style="color:red; float: right;"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>            
+
+         <ul class="text-danger list-unstyled" *ngIf="errors">
+            <li *ngFor="let error of errors">
+                 {{error}}
+            </li>
+        </ul>
+
+  
+    </div>
+    <div>
+        {{this.form.value | json}}
+    </div>
+
+
+</div>
+

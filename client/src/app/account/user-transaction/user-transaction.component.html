@@ -1,0 +1,34 @@
+ <form [formGroup]="form" (ngSubmit)="onSubmit()"> 
+     <div class="ml-5 ml-3">
+          <div class="stdd w100"> Mobile No.:</div><input type="text" formControlName="phoneNo" class="stdd w100 mx-2">
+          <div class="stdd w100"> email Id:</div><input type="text" formControlName="emailId" #emailId class="stdd w200 mx-2">
+          <div class="stdd w100">Application No.:</div><input type="number" formControlName="applicationNo" #applicationNo class="stdd w100 ml-2">
+               <button type="button" class="stdd btn btn-primary fa fa-binoculars w30 alignR" (click)="onSubmit()"></button>
+               <button type="button" class="stdd btn btn-success fa fa-times-circle w30 alignR" (click)="cancelDto()"></button>
+               <div class="stdd" *ngIf="firstTime && !histories">awaiting search inputs</div>
+          </div>
+</form>
+<div *ngIf="!histories && !firstTime">No search results returned</div>
+<div *ngIf="histories" class="ml-3">
+     Search Results
+     <table style="border-style: solid;">
+          <tr>
+               <th class="stdd w40">Id</th>
+               <th class="stdd w100">User Name</th>
+               <th class="stdd w75" >Phone No</th>
+               <th class="stdd w100" >email Id</th>
+               <th class="stdd w75">Applicn No.</th>
+               <th class="stdd w75">Action</th>
+          </tr>
+          <tr *ngFor="let hist of histories">
+               <td class="stdd w40">{{hist.id}}</td>
+               <td class="stdd w100">{{hist.partyName}}</td>
+               <td class="stdd w100">{{hist.phoneNo}}</td>
+               <td class="stdd w100">{{hist.emailId}}</td>
+               <td class="stdd w75">{{hist.applicationNo}}</td>
+               <td class="stdd w75 fa fa-binoculars" title="click for transactions" routerLink="/candidate/historybyid/{{hist.id}}" ></td>
+          </tr>
+     </table>
+</div>
+
+

@@ -1,0 +1,60 @@
+<div class="modal-header">
+     <div class="modal-title pull-left">Set Task Reminder</div>
+     <br>
+     
+     <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+         <span aria-hidden="true">&times;</span>
+     </button>
+ </div>
+    <div class="modal-body">
+      <form #taskForm="ngForm" id="taskForm">
+          <label class="stdd mx-2 w150">Task Type: </label>
+          <div class="stdd mx-2 mb-2 w200" name="obj.taskTypeName">{{obj.taskTypeName}} </div>
+          <br>
+          <label class="stdd mx-2 w150">Task Dated:</label>
+          <input class="stdd mx-2 mb-2" name="obj.taskDate" class="input"
+               type="text"
+               placeholder="task dated"
+               [(ngModel)]="obj.taskDate"
+               bsDatepicker
+               [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+          >
+          <br>
+          <label class="stdd mx-2 w150">Task Ownership:</label>
+          <div class="stdd mx-2 mb-2 w200">{{obj.taskOwnerName}} </div>
+          <br>
+          <label class="stdd mx-2 w150">Assigned To:</label>
+          <ng-select *ngIf="emps" class="stdd mx-2 mb-2 w200"
+               name="obj.assignedToId"
+               [items]="emps"
+               bindLabel="knownAs"
+               bindValue="id"
+               labelForId="id"
+               [(ngModel)]="obj.assignedToId"
+               placeholder="Assigned To"
+               clearAllText="Clear">
+          </ng-select>
+          <br>
+          <label class="stdd mx-2 w150">Task Description</label>
+          <textarea class="stdd mx-2 mb-2" name="obj.taskDescription" id="obj.taskDescription" 
+               cols="50" rows="2" [(ngModel)]="obj.taskDescription">
+          </textarea> 
+          <br>
+          <label class="stdd mx-2 w150">Complete by:</label>
+          <input class="stdd mx-2 w200 input mb-2"
+               name="obj.completeBy"
+               type="text"
+               placeholder="Complete By"
+               [(ngModel)]="obj.completeBy"
+               bsDatepicker
+               [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+          >
+          <br>
+          <label class="stdd b mx-2 w150">Task status</label>
+          <input type="text" class="stdd mx-2 w200" name="obj.taskStatus" [(ngModel)]="obj.taskStatus" >
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default fa fa-cancel" (click)="bsModalRef.hide()"></button>
+      <button type="button" class="btn btn-success fa fa-save" (click)="emitObject()"></button>
+    </div>

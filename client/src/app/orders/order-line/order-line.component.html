@@ -1,0 +1,23 @@
+<div *ngIf="order===null">
+     No Order data available
+</div>
+<div *ngIf="order!==null">
+     <div style="display: inline-block; width: max-content;" >
+          <div class="stdd w70" title="View order No.  {{order.orderNo}}"  routerLink="/orders/view/{{order.id}}">{{order.orderNo}}</div>
+          <div class="stdd w100" title="assess client {{order.customerName}}" routerLink="/orders/history/{{order.id}}" >{{order.orderDate | date}}</div>
+          <div class="stdd w200" title="edit order No.  {{order.orderNo}}"  routerLink="/orders/edit/{{order.id}}" >{{order.customerName}}</div>
+          <div class="stdd w100" >{{order.cityOfWorking}}</div>
+          <div class="stdd w100" title="technical & commercial review" routerLink="/orders/review/{{order.id}}" >{{order.reviewedOn | date}}</div>
+          <div class="stdd w150">{{order.reviewStatus}}</div>
+          <div class="stdd w100" routerLink="/orders/" >{{order.forwardedToHRDeptOn.getFullYear < 2000 ? 'Not Forwarded' : order.forwardedToHRDeptOn | date}}</div>
+          <div class="stdd w150">{{order.status}}</div>
+          
+          <div style="display: inline-block; width: 250px;"> 
+               <!-- <button class="stdd fa fa-pencil blue" title="edit the DL" type="button" routerLink="/orders/edit/{{order.id}}" ></button> -->
+               <!-- <button class="stdd fa fa-eye blue" title="view the DL" type="button" routerLink="/orders/view/{{order.id}}"  ></button> -->
+               <button class="stdd fa fa-trash red" title="delete the DL" type="button" routerLink="/orders/delete/{{order.id}}" ></button>
+               <!-- <button class="stdd green fa fa-balance-scale" title="contract review" type="button" routerLink="/orders/review/{{order.id}}" ></button> -->
+          </div>
+     </div>
+</div>
+

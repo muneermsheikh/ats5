@@ -32,6 +32,9 @@ namespace infra.Data.Migrations
                     b.Property<int>("IndustryId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProfessionId")
                         .HasColumnType("int");
 
@@ -40,6 +43,100 @@ namespace infra.Data.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("AgencySpecialties");
+                });
+
+            modelBuilder.Entity("core.Entities.Admin.ContactResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("ContactResults");
+                });
+
+            modelBuilder.Entity("core.Entities.Admin.CustomerReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("CurrentStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerReviews");
+                });
+
+            modelBuilder.Entity("core.Entities.Admin.CustomerReviewData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("CustomerReviewStatusName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerReviewDatas");
+                });
+
+            modelBuilder.Entity("core.Entities.Admin.CustomerReviewItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<int>("ApprovedById")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ApprovedBySup")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CustomerReviewDataId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ReviewTransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerReviewId");
+
+                    b.ToTable("CustomerReviewItems");
                 });
 
             modelBuilder.Entity("core.Entities.Admin.Employee", b =>
@@ -52,28 +149,16 @@ namespace infra.Data.Migrations
                     b.Property<string>("AadharNo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Add")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Address2")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("AppUserId")
                         .HasColumnType("int");
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DOB")
+                    b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DOJ")
+                    b.Property<DateTime>("DateOfJoining")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Department")
@@ -105,6 +190,9 @@ namespace infra.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Nationality")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhotoUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PlaceOfBirth")
@@ -207,14 +295,53 @@ namespace infra.Data.Migrations
                     b.ToTable("EmployeeQualifications");
                 });
 
-            modelBuilder.Entity("core.Entities.Admin.UserContact", b =>
+            modelBuilder.Entity("core.Entities.Admin.UserHistory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<string>("AadharNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ApplicationNo")
+                        .HasColumnType("int");
+
                     b.Property<int>("CandidateId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerOfficialId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmailId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PartyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserHistories");
+                });
+
+            modelBuilder.Entity("core.Entities.Admin.UserHistoryItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("CategoryRef")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ContactResult")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateOfContact")
@@ -226,29 +353,20 @@ namespace infra.Data.Migrations
                     b.Property<int>("LoggedInUserId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("NextReminderOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderItemId")
-                        .HasColumnType("int");
+                    b.Property<string>("PhoneNo")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Subject")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserPhoneNoContacted")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("enumContactResult")
+                    b.Property<int>("UserHistoryId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserContacts");
+                    b.HasIndex("UserHistoryId");
+
+                    b.ToTable("UserHistoryItems");
                 });
 
             modelBuilder.Entity("core.Entities.Attachments.FileOnFileSystem", b =>
@@ -291,8 +409,8 @@ namespace infra.Data.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("AttachmentType")
                         .HasColumnType("nvarchar(max)");
@@ -361,6 +479,9 @@ namespace infra.Data.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("CustomerName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -380,10 +501,16 @@ namespace infra.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Introduction")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("KnownAs")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
+
+                    b.Property<string>("LogoUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
@@ -420,6 +547,9 @@ namespace infra.Data.Migrations
 
                     b.Property<int>("IndustryId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -514,6 +644,9 @@ namespace infra.Data.Migrations
                     b.Property<int>("MessageTypeId")
                         .HasColumnType("int");
 
+                    b.Property<int>("PostAction")
+                        .HasColumnType("int");
+
                     b.Property<bool>("RecipientDeleted")
                         .HasColumnType("bit");
 
@@ -548,10 +681,6 @@ namespace infra.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RecipientId");
-
-                    b.HasIndex("SenderId");
 
                     b.ToTable("EmailMessages");
                 });
@@ -654,6 +783,38 @@ namespace infra.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SMSMessages");
+                });
+
+            modelBuilder.Entity("core.Entities.HR.AssessmentStandardQ", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("AssessmentParameter")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxPoints")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QNo")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QNo")
+                        .IsUnique();
+
+                    b.HasIndex("Question")
+                        .IsUnique();
+
+                    b.ToTable("AssessmentStandardQs");
                 });
 
             modelBuilder.Entity("core.Entities.HR.CVRef", b =>
@@ -948,6 +1109,9 @@ namespace infra.Data.Migrations
                     b.Property<DateTime>("CheckedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("HrExecComments")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("OrderItemId")
                         .HasColumnType("int");
 
@@ -964,7 +1128,7 @@ namespace infra.Data.Migrations
                     b.ToTable("ChecklistHRs");
                 });
 
-            modelBuilder.Entity("core.Entities.HR.ChecklistItemHR", b =>
+            modelBuilder.Entity("core.Entities.HR.ChecklistHRItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -998,7 +1162,7 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("ChecklistHRId");
 
-                    b.ToTable("CheckListItemHRs");
+                    b.ToTable("ChecklistHRItems");
                 });
 
             modelBuilder.Entity("core.Entities.HR.Employment", b =>
@@ -1436,62 +1600,6 @@ namespace infra.Data.Migrations
                     b.ToTable("SelectionStatuses");
                 });
 
-            modelBuilder.Entity("core.Entities.Identity.Address", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Add")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AddressType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DOB")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("District")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FamilyName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<string>("Location")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Pin")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SecondName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("State")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StreetAdd")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Address");
-                });
-
             modelBuilder.Entity("core.Entities.Identity.AppRole", b =>
                 {
                     b.Property<int>("Id")
@@ -1521,9 +1629,6 @@ namespace infra.Data.Migrations
                         .UseIdentityColumn();
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -1585,8 +1690,6 @@ namespace infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
-
                     b.ToTable("AppUser");
                 });
 
@@ -1597,9 +1700,6 @@ namespace infra.Data.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("AppUserId")
-                        .HasColumnType("int");
-
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
@@ -1608,9 +1708,10 @@ namespace infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("RoleId", "UserId")
+                        .IsUnique();
 
                     b.ToTable("AppUserRole");
                 });
@@ -1642,10 +1743,32 @@ namespace infra.Data.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("AssessmentParameter")
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CategoryId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId")
+                        .IsUnique();
+
+                    b.ToTable("AssessmentQBank");
+                });
+
+            modelBuilder.Entity("core.Entities.MasterEntities.AssessmentQBankItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("AssessmentParameter")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AssessmentQBankId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsStandardQ")
@@ -1659,18 +1782,14 @@ namespace infra.Data.Migrations
 
                     b.Property<string>("Question")
                         .IsRequired()
-                        .HasMaxLength(400)
-                        .HasColumnType("nvarchar(400)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("QNo", "CategoryId")
+                    b.HasIndex("AssessmentQBankId", "QNo")
                         .IsUnique();
 
-                    b.HasIndex("Question", "CategoryId")
-                        .IsUnique();
-
-                    b.ToTable("AssessmentQsBank");
+                    b.ToTable("AssessmentQBankItems");
                 });
 
             modelBuilder.Entity("core.Entities.MasterEntities.ChecklistHRData", b =>
@@ -1756,6 +1875,9 @@ namespace infra.Data.Migrations
                         .UseIdentityColumn();
 
                     b.Property<bool>("IsMandatoryTrue")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsResponseBoolean")
                         .HasColumnType("bit");
 
                     b.Property<bool>("Response")
@@ -1924,13 +2046,22 @@ namespace infra.Data.Migrations
                     b.Property<int>("ContractReviewId")
                         .HasColumnType("int");
 
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("Ecnr")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<int>("OrderItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderNo")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -1953,6 +2084,51 @@ namespace infra.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("ContractReviewItems");
+                });
+
+            modelBuilder.Entity("core.Entities.Orders.DLForward", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryRefAndName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CustomerOfficialId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateOnlyForwarded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateTimeForwarded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EmailIdForwardedTo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LoggedInAppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhoneNoForwardedTo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WhatsAppNoForwardedTo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderItemId", "CustomerOfficialId", "DateOnlyForwarded")
+                        .IsUnique();
+
+                    b.ToTable("DLForwards");
                 });
 
             modelBuilder.Entity("core.Entities.Orders.JobDescription", b =>
@@ -2018,6 +2194,12 @@ namespace infra.Data.Migrations
                     b.Property<DateTime>("CompleteBy")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ContractReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContractReviewStatusId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
@@ -2039,8 +2221,8 @@ namespace infra.Data.Migrations
                     b.Property<int?>("MedicalProcessInchargeEmpId")
                         .HasColumnType("int");
 
-                    b.Property<DateTimeOffset>("OrderDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("OrderNo")
                         .HasColumnType("int");
@@ -2150,9 +2332,6 @@ namespace infra.Data.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderItemId")
-                        .HasColumnType("int");
-
                     b.Property<int>("OrderNo")
                         .HasColumnType("int");
 
@@ -2177,9 +2356,8 @@ namespace infra.Data.Migrations
                     b.Property<int>("SrNo")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -2192,8 +2370,6 @@ namespace infra.Data.Migrations
                         .HasFilter("[JobDescriptionId] IS NOT NULL");
 
                     b.HasIndex("OrderId");
-
-                    b.HasIndex("OrderItemId");
 
                     b.HasIndex("RemunerationId")
                         .IsUnique()
@@ -2368,6 +2544,9 @@ namespace infra.Data.Migrations
                     b.Property<bool>("IsMandatoryTrue")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsResponseBoolean")
+                        .HasColumnType("bit");
+
                     b.Property<int>("OrderItemId")
                         .HasColumnType("int");
 
@@ -2376,6 +2555,9 @@ namespace infra.Data.Migrations
 
                     b.Property<bool>("Response")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ResponseText")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReviewParameter")
                         .IsRequired()
@@ -2528,7 +2710,7 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("AssignedToId", "OrderItemId", "CandidateId", "TaskTypeId")
                         .IsUnique()
-                        .HasFilter("[OrderItemId] IS NOT NULL AND [CandidateId] IS NOT NULL");
+                        .HasFilter("CandidateId > 0");
 
                     b.ToTable("Tasks");
                 });
@@ -2541,9 +2723,6 @@ namespace infra.Data.Migrations
                         .UseIdentityColumn();
 
                     b.Property<int>("ApplicationTaskId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ApplicationTaskId1")
                         .HasColumnType("int");
 
                     b.Property<int>("CandidateId")
@@ -2592,8 +2771,6 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("ApplicationTaskId");
 
-                    b.HasIndex("ApplicationTaskId1");
-
                     b.HasIndex("TransactionDate");
 
                     b.HasIndex("UserId")
@@ -2634,12 +2811,6 @@ namespace infra.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("ApplicationNo")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CVRefId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CandidateId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CandidateStatus")
@@ -2698,6 +2869,9 @@ namespace infra.Data.Migrations
                     b.Property<bool>("NotificationDesired")
                         .HasColumnType("bit");
 
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Pin")
                         .HasColumnType("nvarchar(max)");
 
@@ -2706,6 +2880,9 @@ namespace infra.Data.Migrations
 
                     b.Property<string>("PpNo")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReferredBy")
+                        .HasColumnType("int");
 
                     b.Property<string>("SecondName")
                         .HasMaxLength(75)
@@ -2718,11 +2895,51 @@ namespace infra.Data.Migrations
                         .IsUnique()
                         .HasFilter("[ApplicationNo] > 0");
 
-                    b.HasIndex("CVRefId");
-
-                    b.HasIndex("CandidateId");
-
                     b.ToTable("Candidates");
+                });
+
+            modelBuilder.Entity("core.Entities.Users.EmployeeAddress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Add")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AddressType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("District")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Pin")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StreetAdd")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeAddresses");
                 });
 
             modelBuilder.Entity("core.Entities.Users.EmployeePhone", b =>
@@ -2745,9 +2962,6 @@ namespace infra.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("MobileNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNo")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -2814,6 +3028,9 @@ namespace infra.Data.Migrations
                     b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CandidateId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
 
@@ -2821,6 +3038,8 @@ namespace infra.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
 
                     b.ToTable("Photos");
                 });
@@ -2832,13 +3051,25 @@ namespace infra.Data.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("AppUserId")
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("AttachmentSizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AttachmentType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CandidateId")
                         .HasColumnType("int");
 
-                    b.Property<string>("FileName")
+                    b.Property<DateTime>("DateUploaded")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UploadedByEmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -2899,6 +3130,9 @@ namespace infra.Data.Migrations
 
                     b.Property<int>("CandidateId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Ecnr")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsValid")
                         .HasColumnType("bit");
@@ -2978,6 +3212,9 @@ namespace infra.Data.Migrations
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Profession")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CandidateId")
@@ -3018,13 +3255,20 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.Admin.AgencySpecialty", b =>
                 {
-                    b.HasOne("core.Entities.Customer", "Customer")
+                    b.HasOne("core.Entities.Customer", null)
                         .WithMany("AgencySpecialties")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.Navigation("Customer");
+            modelBuilder.Entity("core.Entities.Admin.CustomerReviewItem", b =>
+                {
+                    b.HasOne("core.Entities.Admin.CustomerReview", null)
+                        .WithMany("CustomerReviewItems")
+                        .HasForeignKey("CustomerReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("core.Entities.Admin.EmployeeHRSkill", b =>
@@ -3048,9 +3292,18 @@ namespace infra.Data.Migrations
             modelBuilder.Entity("core.Entities.Admin.EmployeeQualification", b =>
                 {
                     b.HasOne("core.Entities.Admin.Employee", null)
-                        .WithMany("Qualifications")
+                        .WithMany("EmployeeQualifications")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("core.Entities.Admin.UserHistoryItem", b =>
+                {
+                    b.HasOne("core.Entities.Admin.UserHistory", null)
+                        .WithMany("UserHistoryItems")
+                        .HasForeignKey("UserHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -3070,25 +3323,6 @@ namespace infra.Data.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("core.Entities.EmailandSMS.EmailMessage", b =>
-                {
-                    b.HasOne("core.Entities.Identity.AppUser", "Recipient")
-                        .WithMany()
-                        .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("core.Entities.Identity.AppUser", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Recipient");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("core.Entities.HR.CVRef", b =>
@@ -3145,10 +3379,10 @@ namespace infra.Data.Migrations
                     b.Navigation("OrderItem");
                 });
 
-            modelBuilder.Entity("core.Entities.HR.ChecklistItemHR", b =>
+            modelBuilder.Entity("core.Entities.HR.ChecklistHRItem", b =>
                 {
                     b.HasOne("core.Entities.HR.ChecklistHR", null)
-                        .WithMany("ChecklistItemHRs")
+                        .WithMany("ChecklistHRItems")
                         .HasForeignKey("ChecklistHRId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3192,15 +3426,6 @@ namespace infra.Data.Migrations
                     b.Navigation("CVRef");
                 });
 
-            modelBuilder.Entity("core.Entities.Identity.AppUser", b =>
-                {
-                    b.HasOne("core.Entities.Identity.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("AddressId");
-
-                    b.Navigation("Address");
-                });
-
             modelBuilder.Entity("core.Entities.Identity.AppUserRole", b =>
                 {
                     b.HasOne("core.Entities.Identity.AppRole", "Role")
@@ -3218,6 +3443,15 @@ namespace infra.Data.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("core.Entities.MasterEntities.AssessmentQBankItem", b =>
+                {
+                    b.HasOne("core.Entities.MasterEntities.AssessmentQBank", null)
+                        .WithMany("AssessmentQBankItems")
+                        .HasForeignKey("AssessmentQBankId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("core.Entities.Messages.Connection", b =>
@@ -3259,64 +3493,7 @@ namespace infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("core.Entities.Orders.OrderAddress", "OrderAddress", b1 =>
-                        {
-                            b1.Property<int>("OrderId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int")
-                                .UseIdentityColumn();
-
-                            b1.Property<string>("Add")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("City")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("CompanyName")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Country")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("District")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Location")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int?>("OrderId1")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Pin")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("State")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("StreetAdd")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("OrderId");
-
-                            b1.HasIndex("OrderId1");
-
-                            b1.ToTable("Orders");
-
-                            b1.WithOwner()
-                                .HasForeignKey("OrderId");
-
-                            b1.HasOne("core.Entities.Orders.Order", "Order")
-                                .WithMany()
-                                .HasForeignKey("OrderId1");
-
-                            b1.Navigation("Order");
-                        });
-
                     b.Navigation("Customer");
-
-                    b.Navigation("OrderAddress");
                 });
 
             modelBuilder.Entity("core.Entities.Orders.OrderItem", b =>
@@ -3341,11 +3518,6 @@ namespace infra.Data.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("core.Entities.HR.CVRef", null)
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderItemId")
-                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("core.Entities.Orders.Remuneration", "Remuneration")
                         .WithOne()
@@ -3403,35 +3575,26 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.Tasks.TaskItem", b =>
                 {
-                    b.HasOne("core.Entities.Tasks.ApplicationTask", "ApplicationTask")
-                        .WithMany()
+                    b.HasOne("core.Entities.Tasks.ApplicationTask", null)
+                        .WithMany("TaskItems")
                         .HasForeignKey("ApplicationTaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("core.Entities.Tasks.ApplicationTask", null)
-                        .WithMany("TaskItems")
-                        .HasForeignKey("ApplicationTaskId1");
-
-                    b.Navigation("ApplicationTask");
                 });
 
-            modelBuilder.Entity("core.Entities.Users.Candidate", b =>
+            modelBuilder.Entity("core.Entities.Users.EmployeeAddress", b =>
                 {
-                    b.HasOne("core.Entities.HR.CVRef", null)
-                        .WithMany("Candidates")
-                        .HasForeignKey("CVRefId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("core.Entities.Admin.UserContact", null)
-                        .WithMany("Candidates")
-                        .HasForeignKey("CandidateId");
+                    b.HasOne("core.Entities.Admin.Employee", null)
+                        .WithMany("EmployeeAddresses")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("core.Entities.Users.EmployeePhone", b =>
                 {
                     b.HasOne("core.Entities.Admin.Employee", null)
-                        .WithMany("UserPhones")
+                        .WithMany("EmployeePhones")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3444,6 +3607,13 @@ namespace infra.Data.Migrations
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("core.Entities.Users.Photo", b =>
+                {
+                    b.HasOne("core.Entities.Users.Candidate", null)
+                        .WithMany("UserPhotos")
+                        .HasForeignKey("CandidateId");
                 });
 
             modelBuilder.Entity("core.Entities.Users.UserAttachment", b =>
@@ -3500,20 +3670,27 @@ namespace infra.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("core.Entities.Admin.CustomerReview", b =>
+                {
+                    b.Navigation("CustomerReviewItems");
+                });
+
             modelBuilder.Entity("core.Entities.Admin.Employee", b =>
                 {
+                    b.Navigation("EmployeeAddresses");
+
+                    b.Navigation("EmployeePhones");
+
+                    b.Navigation("EmployeeQualifications");
+
                     b.Navigation("HrSkills");
 
                     b.Navigation("OtherSkills");
-
-                    b.Navigation("Qualifications");
-
-                    b.Navigation("UserPhones");
                 });
 
-            modelBuilder.Entity("core.Entities.Admin.UserContact", b =>
+            modelBuilder.Entity("core.Entities.Admin.UserHistory", b =>
                 {
-                    b.Navigation("Candidates");
+                    b.Navigation("UserHistoryItems");
                 });
 
             modelBuilder.Entity("core.Entities.Customer", b =>
@@ -3527,11 +3704,7 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.HR.CVRef", b =>
                 {
-                    b.Navigation("Candidates");
-
                     b.Navigation("Deploys");
-
-                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("core.Entities.HR.CandidateAssessment", b =>
@@ -3541,7 +3714,7 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.HR.ChecklistHR", b =>
                 {
-                    b.Navigation("ChecklistItemHRs");
+                    b.Navigation("ChecklistHRItems");
                 });
 
             modelBuilder.Entity("core.Entities.HR.Interview", b =>
@@ -3567,6 +3740,11 @@ namespace infra.Data.Migrations
             modelBuilder.Entity("core.Entities.Identity.AppUser", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("core.Entities.MasterEntities.AssessmentQBank", b =>
+                {
+                    b.Navigation("AssessmentQBankItems");
                 });
 
             modelBuilder.Entity("core.Entities.Messages.Group", b =>
@@ -3617,6 +3795,8 @@ namespace infra.Data.Migrations
                     b.Navigation("UserPassports");
 
                     b.Navigation("UserPhones");
+
+                    b.Navigation("UserPhotos");
 
                     b.Navigation("UserProfessions");
 

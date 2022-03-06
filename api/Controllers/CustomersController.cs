@@ -46,13 +46,13 @@ namespace api.Controllers
         [HttpPost("registercustomer")]
         public async Task<ActionResult<CustomerDto>> RegisterCustomer(RegisterCustomerDto dto)
         {
-
             return await _customerService.AddCustomer(dto);
         }
 
         [HttpGet]
-        public async Task<ActionResult<Pagination<Customer>>> GetCustomers(CustomerSpecParams custParams)
+        public async Task<ActionResult<Pagination<Customer>>> GetCustomers([FromQuery] CustomerSpecParams custParams)
         {
+            if (custParams.CustomerCityName == "All") custParams.CustomerCityName="";
             var specs = new CustomerWithOfficialsSpecs(custParams);
             var countSpec = new CustomersWithFiltersForCountSpecs(custParams);
             var customers = await _unitOfWork.Repository<Customer>().ListAsync(specs);
@@ -71,8 +71,10 @@ namespace api.Controllers
         [HttpGet("byId/{id}")]
         public async Task<ActionResult<CustomerDto>> GetCustomerById(int Id)
         {
-            var cust = await _unitOfWork.Repository<Customer>().GetByIdAsync(Id);
-            return Ok(_mapper.Map<Customer, CustomerDto>(cust));
+            //var cust = await _unitOfWork.Repository<Customer>().GetByIdAsync(Id);
+            var cust = await _customerService.GetCustomerByIdAsync(Id);
+            var cus = _mapper.Map<Customer, CustomerDto>(cust);
+            return Ok(cus);
         }
 
 
@@ -93,7 +95,20 @@ namespace api.Controllers
             var users = await _customerService.GetCustomerIdAndName(custType);
             return Ok(users);
         }
+        
+        [HttpGet("getagentdetails")]
+        public async Task<ActionResult<ICollection<ChooseAgentDto>>> GetCustomerOfficialIds()
+        {
+            var users = await _customerService.GetOfficialDetails();
+            return Ok(users);
+        }
 
+        [HttpGet("customerCities/{customerType}")]
+        public async Task<ICollection<CustomerCity>> GetCustomerCities (string customerType)
+        {
+            return await _customerService.GetCustomerCityNames(customerType);
+        }
+        
         private async Task<ActionResult<bool>> CheckEmailExistsAsync(string email)
         {
             return await _usermanager.FindByEmailAsync(email) != null;

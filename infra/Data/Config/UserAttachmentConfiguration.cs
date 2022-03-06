@@ -13,7 +13,7 @@ namespace infra.Data.Config
                //builder.Property(p => p.AttachmentUrl).IsRequired();
                //builder.HasIndex(p => p.AttachmentUrl).IsUnique();
                //builder.HasOne(p => p.Candidate).WithMany().HasForeignKey(p => p.CandidateId);
-               builder.Property(p => p.FileName).IsRequired();
+               builder.Property(p => p.url).IsRequired();
           }
      }
 }

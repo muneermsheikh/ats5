@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9+Tz7/R+oIWExxVsp60fTkrSBxG9Rkx4tdC1Ylz0IDSHpdNhJtgmSl6d08FE4yw78SeeLXm0U4ox1GLjPH0tuA==",
+  "dgSpecHash": "hx6NQ6uXoZA9vjeeVDn3cnDbtugnokpiklRCmMoqE95IEMVmVFIpspUG/dLzhip+1FEkiiYogS49l2pMhHvgsQ==",
   "success": true,
-  "projectFilePath": "D:\\ats6\\core\\core.csproj",
+  "projectFilePath": "D:\\ats8\\core\\core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hp\\.nuget\\packages\\mailkit\\2.6.0\\mailkit.2.6.0.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication\\2.1.0\\microsoft.aspnetcore.authentication.2.1.0.nupkg.sha512",

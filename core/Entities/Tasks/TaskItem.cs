@@ -11,10 +11,30 @@ namespace core.Entities.Tasks
           {
           }
 
+        public TaskItem(int taskTypeId, DateTime transactionDate, string taskStatus, 
+                string taskItemDescription, int employeeId, int orderId, int orderItemId, int orderNo, 
+                int userId, DateTime? nextFollowupOn, int NextFollowupById, 
+                int quantity)
+          {
+               TaskTypeId = taskTypeId;
+               TransactionDate = transactionDate;
+               TaskStatus = taskStatus;
+               TaskItemDescription = taskItemDescription;
+               EmployeeId = employeeId;
+               OrderId = orderId;
+               OrderItemId = orderItemId;
+               OrderNo = orderNo;
+               UserId = userId;
+               NextFollowupOn = nextFollowupOn;
+               Quantity = quantity;
+          }
+
           public TaskItem(int taskTypeId, int taskId, DateTime transactionDate, string taskStatus, 
                 string taskItemDescription, int employeeId, int orderId, int orderItemId, int orderNo, 
                 int userId, DateTime? nextFollowupOn, int candidateid, int NextFollowupById, 
-                int quantity, ApplicationTask applicationTask)
+                int quantity
+                //, ApplicationTask applicationTask
+                )
           {
                TaskTypeId = taskTypeId;
                ApplicationTaskId = taskId;
@@ -28,7 +48,7 @@ namespace core.Entities.Tasks
                UserId = userId;
                CandidateId = candidateid;
                NextFollowupOn = nextFollowupOn;
-               ApplicationTask = applicationTask;
+               //ApplicationTask = applicationTask;
                Quantity = quantity;
           }
 
@@ -55,6 +75,6 @@ namespace core.Entities.Tasks
         public int Quantity { get; set; }=1;
         public DateTime? NextFollowupOn {get; set;}
         public int? NextFollowupById {get; set;}
-        public ApplicationTask ApplicationTask {get; set;}
+        //public ApplicationTask ApplicationTask {get; set;}
     }
 }

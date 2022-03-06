@@ -26,16 +26,6 @@ namespace infra.Services
                _unitOfWork = unitOfWork;
           }
 
-          public async Task<bool> AddStddQs(ICollection<AssessmentQBank> Qs)
-          {
-               var nextQuestionNo = await _context.AssessmentQsBank.MaxAsync(x => (int?)x.QNo) ?? 1;
-               foreach (var q in Qs)
-               {
-                    q.QNo = ++nextQuestionNo;
-                    _unitOfWork.Repository<AssessmentQBank>().Add(q);
-               }
-               return await _unitOfWork.Complete() > 0;
-          }
 
           public Task<ICollection<EmailMessage>> AssignTasksToHRExecutives(ICollection<HRTaskAssignmentDto> assignmentsDto)
           {
@@ -48,7 +38,7 @@ namespace infra.Services
                var assessmentitem = await _context.OrderItemAssessments.Where(x => x.OrderItemId == orderitemid).FirstOrDefaultAsync();
                if (assessmentitem != null) return assessmentitem;
 
-               var qs = await _context.AssessmentQsBank.Where(x => x.IsStandardQ).OrderBy(x => x.QNo).ToListAsync();
+               var qs = await _context.AssessmentStandardQs.OrderBy(x => x.QNo).ToListAsync();
                var lst = new List<OrderItemAssessmentQ>();
                foreach (var q in qs)
                {
@@ -80,12 +70,6 @@ namespace infra.Services
                return await _unitOfWork.Complete() > 0;
           }
 
-          public async Task<bool> DeleteStddQ(AssessmentQBank Q)
-          {
-               _unitOfWork.Repository<AssessmentQBank>().Delete(Q);
-               return await _unitOfWork.Complete() > 0;
-          }
-
           public async Task<bool> EditOrderAssessmentItem(OrderItemAssessment assessmentItem)
           {
                _unitOfWork.Repository<OrderItemAssessment>().Update(assessmentItem);
@@ -98,21 +82,16 @@ namespace infra.Services
                return await _unitOfWork.Complete() > 0;
           }
 
-          public async Task<bool> EditStddQs(ICollection<AssessmentQBank> qs)
-          {
-               foreach (var q in qs)
-               {
-                    _unitOfWork.Repository<AssessmentQBank>().Update(q);
-               }
-               return await _unitOfWork.Complete() > 0;
-          }
-
           public async Task<IReadOnlyList<AssessmentQBank>> GetAssessmentQsFromBankBySubject(AssessmentStddQsParams qsParams)
           {
-               return await _context.AssessmentQsBank
-                    .Where(x => x.AssessmentParameter.ToLower() == qsParams.Subject.ToLower())
-                    .OrderBy(x => x.QNo)
+               var qs = await _context.AssessmentQBank
+                    .Include(x => x.AssessmentQBankItems
+                         .Where(x => x.AssessmentParameter.ToLower() == qsParams.Subject.ToLower())
+                         .OrderBy(x => x.QNo)
+                         )
+                    .OrderBy(x => x.CategoryName)
                     .ToListAsync();
+               return qs;
           }
 
           public async Task<OrderItemAssessment> GetOrderAssessmentItemQs(int orderItemId)

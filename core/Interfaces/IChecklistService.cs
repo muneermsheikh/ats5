@@ -14,12 +14,13 @@ namespace core.Interfaces
         Task<bool> DeleteChecklistHRDataAsync(ChecklistHRData checklistHRData);
         Task<bool> EditChecklistHRDataAsync(ChecklistHRData checklistHRData);
         Task<IReadOnlyList<ChecklistHRData>> GetChecklistHRDataListAsync();
+        
 
         //checklistHR
         Task<ChecklistHR> AddNewChecklistHR(int candidateId, int orderItemId,  LoggedInUserDto loggedInUserDto);
-        Task<bool> EditChecklistHR(ChecklistHR model, LoggedInUserDto loggedInUserDto);
-        Task<ChecklistHR> GetChecklistHR(int candidateId, int orderItemId, LoggedInUserDto loggedInUserDto);
-        Task<bool> DeleteChecklistHR(ChecklistHR checklistHR, LoggedInUserDto loggedInDto);
+        Task<bool> EditChecklistHR(ChecklistHRDto model, LoggedInUserDto loggedInUserDto);
+        Task<ChecklistDto> GetChecklistHR(int candidateId, int orderItemId, LoggedInUserDto loggedInUserDto);
+        Task<bool> DeleteChecklistHR(ChecklistHRDto checklistHR, LoggedInUserDto loggedInDto);
 
     }
 }

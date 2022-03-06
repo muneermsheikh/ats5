@@ -1,0 +1,283 @@
+
+<div class="mt-2">
+     <div class="col-3 py-0 my-0" style="display: inline-block;">
+         <h3>Your profile</h3>
+     </div>
+     <div class="col-9 py-0 my-0 alignR" style="display: inline-block;" >
+        <button [disabled]="!form.dirty" type="submit" class="btn btn-success btn-block alignR W30 fa fa-save" (click)="onSubmit()" >
+            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1">Update</span>
+        </button> 
+        <!--
+        <div class="alert alert-info" *ngIf="form.dirty">
+             <strong>Information: </strong> You have made changes.  Any unsaved changes will be lost
+         </div>
+        -->
+     </div>
+     <div class="col-3" style="display: inline-block; margin-top: 0px; padding-top: 0px;">
+         <div class="card">
+               <img src="{{employee?.photoUrl || './assets/images/user.png'}}" alt="{{employee?.knownAs}}" 
+                    class="card-img-top img-thumbnail">
+               <div class="card-body">
+                    <div>
+                         <strong>EmployeeId:</strong> {{employee?.id}} 
+                    </div>
+                    <div>
+                         <strong>Employee Name:</strong> <div *ngIf="employee">
+                            {{employee?.firstName + ' ' + employee?.secondName + ' ' + employee?.familyName}} 
+                        </div>
+                    </div>
+                    <div>
+                         <strong>Position:</strong>{{employee?.position}} 
+                     </div>
+                <div>
+                    <strong>Joined On:</strong> {{employee?.dateOfJoining | date}} 
+                </div>
+                 <div>
+                     <strong>Date of Birth:</strong>
+                     {{employee?.dateOfBirth | date}} {{employee?.dateOfBirth}}
+                 </div>
+
+             </div>
+             <div class="card-footer">
+                 
+             </div>
+         </div>
+     </div>
+ 
+     
+    <div class="col-9" style="display: inline-block; vertical-align: top; ">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <tabset class="member-tabset">
+            <tab heading='About {{employee?.knownAs}}' (selectTab)="onTabActivated($event)">
+                <div style="line-height: 1em;">
+                    <div class="lbl w80 b">Gender</div>
+                    <input class="stdd w30" type="text" formControlName="gender">
+                    <div class="lbl w150 b alignR" >Aadhar No</div>
+                    <input class="stdd w150" type="text" formControlName="aadharNo" >
+                    <div class="lbl w150 b alignR" >Id No: {{employee?.id}}</div>
+
+                    <br><div class="lbl w130 b">First Name</div> 
+                    <input class="stdd w150 " type="text" formControlName="firstName" >
+                    <div class="lbl w130 b">Second Name</div>
+                    <input class="stdd w150" type="text" formControlName="secondName" >
+                    <div class="lbl w130 b">Family Name</div>
+                    <input class="stdd w150" type="text" formControlName="familyName" >
+                    
+                    <br><div class="lbl w130 b">Known As</div> 
+                    <input class="stdd w150" type="text" formControlName="knownAs" >
+                    <div class="lbl w130 b">Position</div> 
+                    <input class="stdd w150" type="text" formControlName="position" >
+                    <div class="lbl w130 b">Department</div> 
+                    <input class="stdd w150" type="text" formControlName="department" >
+                    <!--   [minDate]="minDate"  [maxDate]="maxDate"  [daysDisabled]="[6,0]"  [datesDisabled]="disabledDates" -->
+                    <br>
+                    <div class="stdd w175">
+                        <input type="text"
+                            placeholder="Date of birth"
+                            formControlName="dateOfBirth"
+                            bsDatepicker
+                            [bsValue]="bsValueDOB"
+                            [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                        >
+                    </div>
+                    <div class="stdd w175">
+                        <input type="text"
+                            placeholder="Date of Joining"
+                            formControlName="dateOfJoining"
+                            bsDatepicker
+                            [bsValue]="bsValueDOJ"
+                            [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                        >
+                    </div>
+                
+                    <br><div class="lbl w130 b">Email</div>
+                    <input class="stdd w300" type="text" formControlName="email" >
+                    <div *ngIf="isAddMode" >
+                        <div class="stdd w130 b"> Password</div>
+                        <input type="password" formControlName="password" class="stdd w150">
+                        <div class="stdd w130 b">Confirm Psword</div>
+                        <input type="password" formControlName="confirmPassword" class="stdd w150 ">
+                    </div>
+                </div>
+                
+            </tab>
+            
+            <tab heading='Phones' (selectTab)="onTabActivated($event)">
+                <div style="display: inline-block; font-size: small; vertical-align: top;" class="col-5">
+                    <div style="font-weight: bold;">Phones</div>
+                    <label class="stdd w40 b">Sr#</label>
+                    <label class="stdd w100 b" >Mobile No</label>
+                    <label class="stdd w50 b" >Is Main</label>
+                    <label class="stdd w150 b">Remarks</label>
+                    <div class="stdd w50" >
+                        <button type="button" (click)="addPhone()" class="stdd alignR blue fa fa-plus" ></button>
+                    </div>
+                    <div formArrayName="employeePhones" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                        <div *ngFor="let q of employeePhones.controls; let j=index">
+                            <div [formGroupName]="j" >
+                                <div class="stdd w40" >{{j+1}}</div>
+                                <input class="stdd w100" type="text" formControlName="mobileNo" class="mx-1" >
+                                <input class="stdd w50" type="checkbox" formControlName="isMain" >
+                                <input class="stdd w50" type="checkbox" formControlName="isValid"  >
+                                <div class="stdd w40" >
+                                    <button class="stdd red alignR red fa fa-trash" (click)="removePhone(j)" ></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </tab>
+            <tab heading='Address' (selectTab)="onTabActivated($event)">
+                <div class="col-7" style="display: inline-block; vertical-align: top;" >
+                   <button type="button" (click)="addEmployeeAddress()" class="stdd alignR blue fa fa-plus"></button>
+                   <div formArrayName="employeeAddresses" style="height: 10px; font-size: small; " class="my-1 px-0"> 
+                       <div *ngFor="let ph of employeeAddresses.controls; let i=index"> 
+                           <div [formGroupName]="i">
+                              <div class="stdd w40 alignR b">Sr.No.</div>
+                              <div style="display: inline-block; width: 40px; ">{{i+1}}</div>
+                              <div class="stdd w40 alignR b">Type</div>
+                              <input class="stdd w30 mx-2" type="text" formControlName="addressType" >
+                              <div class="stdd w175 alignR b" >Is Main Address</div> 
+                              <input class="stdd mx-20" type="checkbox" formControlName="isMain">
+                              <br><div class="stdd w100 alignR b">Address</div> 
+                              <input class="stdd w400" type="text" formControlName="add" >
+                              <br><div class="stdd w100 alignR b" >Street Address</div> 
+                              <input class="stdd w400" type="text" formControlName="streetAdd" >
+                              <br><div class="stdd w100 alignR b" >City</div> 
+                              <input class="stdd w100" type="text" formControlName="city" >
+                              <div class="stdd w40 alignR b" >PIN</div> 
+                              <input class="stdd w60" type="text" formControlName="pin" >
+                              <br><div class="stdd w100 alignR b">District</div>
+                              <input class="stdd w100" type="text" formControlName="district" >
+                              <div class="stdd w40 alignR b" >State</div>
+                              <input class="stdd w100" type="text" formControlName="state" >
+                              <div class="stdd w50 alignR b" >Country</div>
+                              <input class="stdd w100" type="text" formControlName="country" >
+                              <div class="stdd w50" >
+                                   <button (click)="removeEmployeeAddress(i)" class="stdd red alignR fa fa-trash" ></button>
+                               </div>    
+                           </div>
+                           <hr>
+                       </div>
+                   </div>
+               </div>
+               
+           </tab>
+
+            <tab heading='Qualifications' (selectTab)="onTabActivated($event)">
+                <label class="stdd w50">Sr. No.</label>
+                <label class="stdd w300">Qualification</label>
+                <label class="stdd w50">Is Main</label>
+                <button type="button" (click)="addQualification()" class="px-15 fa fa-plus" style="color: blue;"></button>
+                <div formArrayName="employeeQualifications" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                    <div *ngFor="let q of employeeQualifications.controls; let i=index">
+                        <div [formGroupName]="i" >
+                            <div class="stdd w50">{{i+1}}</div>
+                            <ng-select *ngIf="employeeQualifications" style="display: inline-block; width: 300px;" class="px-5"
+                                [items]="masterQualifications"
+                                bindLabel="name"
+                                bindValue="id"
+                                labelForId="Qualification"
+                                placeholder="Select Qualification"
+                                clearAllText="Clear"
+                                formControlName="qualificationId">
+                            </ng-select>
+                            <input type="checkbox" formControlName="isMain" class="ml-50 stdd w50" >
+                            <button (click)="removeEmployeeQualification(i)" style="margin-left: 10px;" class="stdd red fa fa-trash"></button>
+                        </div>
+                    </div>
+                </div>
+            </tab>
+            <tab heading='Skills' (selectTab)="onTabActivated($event)">
+                
+                    <div><strong>HR Skills</strong></div>
+                    <div style="border: blue;">
+                        <label class="stdd w50 b">Sr#</label>
+                        <label class="stdd w350 b">Category</label>
+                        <label class="stdd w350 b" >Industry</label>
+                        <label class="stdd w75 b">Skill Lvl</label>
+                        <label class="stdd w50 b">Main</label>
+                        <button type="button" (click)="addHRSkill()" class="px-15 fa fa-plus" style="color: blue;"></button>
+                        <div formArrayName="hrSkills"  >
+                            <div *ngFor="let hr of hrSkills.controls; let i=index">
+                                <div [formGroupName]="i" >
+                                    <div class="stdd w50">{{i+1}}</div>
+                                    <ng-select *ngIf="hrSkills" class="stdd w350"
+                                        [items]="categories"
+                                        bindLabel="name"
+                                        bindValue="id"
+                                        labelForId="categoryId"
+                                        placeholder="Select Category"
+                                        clearAllText="Clear"
+                                        formControlName="categoryId">
+                                    </ng-select>
+                                    <ng-select *ngIf="hrSkills" class="stdd w250"
+                                        [items]="industries"
+                                        bindLabel="name"
+                                        bindValue="id"
+                                        labelForId="industryId"
+                                        placeholder="Select Industry"
+                                        clearAllText="Clear"
+                                        formControlName="industryId">
+                                    </ng-select>
+                                    
+                                    <input type="number" formControlName="skillLevel" class="stdd w50 alignR" >
+                                    <button (click)="removeHRSkill(i)" class="stdd ml-10 fa fa-trash red" ></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div><strong>Other Skills</strong></div>
+                    <div style="border: blue;">
+                        <label class="stdd w50 b">Sr#</label>
+                        <label class="stdd w500 b">Skill</label>
+                        <label class="stdd w50 b" >Level</label>
+                        <label class="stdd w50 b">Main</label>
+
+                        <button type="button" (click)="addOtherSkill()" class="px-15 fa fa-plus" style="color: blue;"></button>
+        
+                        <div formArrayName="otherSkills" >
+                            <div *ngFor="let ot of otherSkills.controls; let j=index">
+                                <div [formGroupName]="j" >
+                                    <div class="stdd w50">{{j+1}}</div>
+                                    <ng-select *ngIf="otherSkills" class="stdd w500"
+                                        [items]="skillData"
+                                        bindLabel="skillName"
+                                        bindValue="id"
+                                        labelForId="skilLDataId"
+                                        placeholder="Select Skill"
+                                        clearAllText="Clear"
+                                        formControlName="skillDataId">
+                                    </ng-select>
+                                    <input type="number" formControlName="skillLevel" class="stdd w50 alignR" >
+                                    <input type="checkbox" formControlName="isMain" class="ml-10 stdd w50" >
+                                    <button (click)="removeOtherSkill(i)" class="stdd ml-10 fa fa-trash red" ></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </tab>
+            <tab heading='Edit Photos' (selectTab)="onTabActivated($event)">
+                <div *ngIf="employee">
+                    <app-photo-editor [employee]="employee"></app-photo-editor>
+                </div>
+            </tab>
+            </tabset>
+        </form>            
+
+        <ul class="text-danger list-unstyled" *ngIf="eerrors">
+            <li *ngFor="let error of errors">
+                {{error}}
+            </li>
+        </ul>
+
+
+    </div>
+     <div style="font-size: smaller;" >
+         {{this.form.value | json}}
+     </div>
+ 
+ 
+</div>
+

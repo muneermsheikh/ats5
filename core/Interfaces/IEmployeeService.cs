@@ -11,11 +11,14 @@ namespace core.Interfaces
          Task<bool> EditEmployee(Employee employee);
          Task<bool> DeleteEmployee(Employee employee);
          Task<ICollection<Employee>> AddNewEmployees(ICollection<EmployeeToAddDto> employees);
-         Task<Pagination<Employee>> GetEmployeePaginated(EmployeeSpecParams empParams);
+         Task<Pagination<EmployeeBriefDto>> GetEmployeePaginated(EmployeeSpecParams empParams);
          Task<EmployeeDto> GetEmployeeFromIdAsync(int employeeId);
+         Task<Employee> GetEmployeeById(int id);
+         Task<ICollection<EmployeeIdAndKnownAsDto>> GetEmployeeIdAndKnownAs();
          Task<int> GetEmployeeIdFromAppUserIdAsync(int appUserId);
          Task<EmployeeDto> GetEmployeeBriefAsyncFromAppUserId(int appUserId);
         Task<EmployeeDto> GetEmployeeBriefAsyncFromEmployeeId(int id);
         Task<string> GetEmployeeNameFromEmployeeId(int id);
+        Task<ICollection<EmployeePosition>> GetEmployeePositions();
     }
 }

@@ -6,7 +6,7 @@ namespace core.Entities.Admin
     public enum EnumContactResult
     {
         //100 to 1000 - connectivity problems
-        [Display(Name = "PHone Not Reachable."), EnumMember(Value="Phone Not Reachable")] PhoneNotReachable = 100,
+        [Display(Name = "Phone Not Reachable."), EnumMember(Value="Phone Not Reachable")] PhoneNotReachable = 100,
         [Display(Name = "Phone out of network."), EnumMember(Value="Phone Out of network")] PhoneOutOfNetwork = 200,
         [Display(Name = "Phone unanswered."), EnumMember(Value="Phone unanswered")] PhoneUnanswered = 300,
         [Display(Name = "PHone answered by someone else."), EnumMember(Value="Phone answered by someone else")] PhoneAnsweredBySomeoneElse = 400,

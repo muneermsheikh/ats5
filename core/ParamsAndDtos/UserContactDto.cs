@@ -9,37 +9,22 @@ namespace core.ParamsAndDtos
           {
           }
 
-          public UserContactDto(int id, string candidateName, int applicationNo, int orderItemId, string orderRef, 
-            string orderItemCategory, string subject, DateTime dateOfContact, string loggedInUserName, 
-            string userPhoneNoContacted, string contactResult, string gistOfDiscussions, DateTime nextReminderOn)
+          public UserContactDto(int id, string candidateName, int applicationNo, string passportno, string aadharno, string phoneno)
           {
                Id = id;
                CandidateName = candidateName;
                ApplicationNo = applicationNo;
-               OrderItemId = orderItemId;
-               OrderRef = orderRef;
-               OrderItemCategory = orderItemCategory;
-               Subject = subject;
-               DateOfContact = dateOfContact;
-               LoggedInUserName = loggedInUserName;
-               UserPhoneNoContacted = userPhoneNoContacted;
-               ContactResult = contactResult;
-               GistOfDiscussions = gistOfDiscussions;
-               NextReminderOn = nextReminderOn;
+               PassportNo = passportno;
+               AadharNo = aadharno;
+               PhoneNo = phoneno;
           }
 
         public int Id {get; set;}
         public string CandidateName { get; set; }
         public int ApplicationNo {get; set;}
-        public int OrderItemId {get; set;}
-        public string OrderRef {get; set;}
-        public string OrderItemCategory {get; set;}
-        public string Subject {get; set;}
-        public DateTime DateOfContact { get; set; }
-        public string LoggedInUserName { get; set; }
-        public string UserPhoneNoContacted {get; set;}
-        public string ContactResult { get; set; }
-        public string GistOfDiscussions { get; set; }
-        public DateTime NextReminderOn { get; set; }
+        public string PassportNo {get; set;}
+        public string AadharNo {get; set;}
+        public string PhoneNo {get; set;}
+        
     }
 }

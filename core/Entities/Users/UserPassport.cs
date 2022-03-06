@@ -29,6 +29,7 @@ namespace core.Entities.Users
         public DateTime? IssuedOn { get; set; }
         public DateTime Validity { get; set; }
         public bool IsValid { get; set; }=true;
+        public bool Ecnr {get; set;}=false;
         //public Candidate Candidate {get; set;}
     }
 }

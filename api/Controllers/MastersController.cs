@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Errors;
 using core.Entities;
@@ -27,7 +28,7 @@ namespace api.Controllers
                return Ok(categoryAdded);
           }
 
-          [Authorize]         //(Policy = "MastersEditRole")]
+          //[Authorize]         //(Policy = "MastersEditRole")]
           [HttpPut("editcategory")]
           public async Task<ActionResult<bool>> EditCategory(Category category)
           {
@@ -81,6 +82,16 @@ namespace api.Controllers
                return true;
           }
 
+          [HttpGet("industry")]
+          public async Task<ActionResult<Industry>> GetIndustry(int id)
+          {
+               var item = await _mastersService.GetIndustry(id);
+               if (item!=null) return BadRequest(new ApiResponse(404, "Not Found"));
+               return Ok(item);
+          }
+
+     //qualification
+
           [Authorize]         //(Policy = "MastersAddRole")]
           //qualifications
           [HttpPost("addqualification/{qualificationname}")]
@@ -109,6 +120,14 @@ namespace api.Controllers
                return true;
           }
 
+          [HttpGet("qlist")]
+          public async Task<ActionResult<Qualification>> GetQListAsync()
+          {
+               var lst = await _mastersService.GetListAsync();
+               if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
+               return Ok(lst);
+          }
+
           [Authorize]         //(Policy = "MastersEditRole")]
           [HttpGet("qualificationlist")]
           public async Task<ActionResult<Qualification>> GetQualificationListAsync(QualificationSpecParams specParams)
@@ -123,6 +142,21 @@ namespace api.Controllers
           public async Task<ActionResult<Industry>> GetIndustryListAsync(IndustrySpecParams industryParams)
           {
                var lst = await _mastersService.GetIndustryListAsync(industryParams);
+               if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
+               return Ok(lst);
+          }
+
+          [HttpGet("industrieslist")]
+          public async Task<ActionResult<ICollection<Industry>>> GetIndustriesListAsync()
+          {
+               var lst = await _mastersService.GetIndustryListWOPaginationAsync();
+               return Ok(lst);
+          }
+          
+          [HttpGet("skilldatalist")]
+          public async Task<ActionResult<ICollection<SkillData>>> GetSkillDataListAsync()
+          {
+               var lst = await _mastersService.GetSkillDataListAsync();
                if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
                return Ok(lst);
           }

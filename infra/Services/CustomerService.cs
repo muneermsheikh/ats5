@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using core.Entities;
 using core.Entities.Admin;
 using core.Entities.Identity;
@@ -103,10 +104,13 @@ namespace infra.Services
                                    if (!string.IsNullOrEmpty(off.Email) && !CheckEmailExistsAsync(off.Email).Result) {
                                         if (off.LogInCredential) 
                                         {
-                                             var dtoCust = dtos.Where(x => x.CustomerName.ToLower() == customer.CustomerName.ToLower() && x.City.ToLower() == customer.City.ToLower()).FirstOrDefault();
-                                             var dtoOff = dtoCust.CustomerOfficials.Where(x => x.FirstName.ToLower() + " " + x.SecondName.ToLower() + " " + x.FamilyName.ToLower() == off.OfficialName.ToLower())
-                                                  .Select(y => new {y.FirstName, y.SecondName, y.FamilyName, y.KnownAs, y.Password, y.Add, y.StreetAdd, y.City, y.Country})
+                                              var dtoCust = dtos.Where(x => x.CustomerName.ToLower() == customer.CustomerName.ToLower() && x.City.ToLower() == customer.City.ToLower()).FirstOrDefault();
+                                             var dtoOff = dtoCust.CustomerOfficials.Where(x => 
+                                                  x.FirstName.ToLower() + " " + x.SecondName.ToLower() + " " + x.FamilyName.ToLower() 
+                                                  == off.OfficialName.ToLower())
+                                                  .Select(y => new {y.KnownAs, y.Password})
                                                   .FirstOrDefault();
+                                             
                                              var appuser = new AppUser
                                              {
                                                   UserType = "official",
@@ -116,13 +120,14 @@ namespace infra.Services
                                                   UserName = off.Email,
                                                   PhoneNumber = off.PhoneNo,
                                                   KnownAs = dtoOff.KnownAs,
-                                                  Address = new Address{AddressType="O", Gender=off.Gender,
+                                                 /* Address = new Address{AddressType="O", Gender=off.Gender,
                                                             FirstName=dtoOff.FirstName,
                                                             Add = dtoOff.Add, StreetAdd=dtoOff.StreetAdd, 
                                                             City=dtoOff.City, Country=dtoOff.Country}
+                                                  */
                                              };
 
-                                             var added = await _userManager.CreateAsync(appuser, dtoOff.Password);
+                                             var added = await _userManager.CreateAsync(appuser,  dtoOff.Password);
                                              if (added.Succeeded) {
                                                   off.AppUserId = appuser.Id;
                                                   _unitOfWork.Repository<CustomerOfficial>().Update(off);
@@ -140,7 +145,6 @@ namespace infra.Services
           }
 
      
-
           public async Task<CustomerDto> AddCustomer(RegisterCustomerDto dto)
           {
                var custIndustries = new List<CustomerIndustry>();
@@ -162,10 +166,12 @@ namespace infra.Services
                               DisplayName = off.KnownAs,
                               Email = off.Email,
                               UserName = off.Email,
-                              PhoneNumber = off.PhoneNo,
-                              Address = new Address{AddressType="O", Gender=off.Gender,
+                              PhoneNumber = off.PhoneNo
+
+                              /*Address = new Address{AddressType="O", Gender=off.Gender,
                                         FirstName=off.FirstName + " " + off.SecondName + " " + off.FamilyName,
                                         Add = dto.Add, StreetAdd=dto.Add2, City=dto.City, Country=dto.Country}
+                              */
                          };
 
                          var added = await _userManager.CreateAsync(appuser, off.Password);
@@ -221,9 +227,27 @@ namespace infra.Services
                throw new System.NotImplementedException();
           }
 
-          public Task<CustomerDto> GetCustomerByIdAsync(int id)
+          public async Task<Customer> GetCustomerByIdAsync(int id)
           {
-               throw new System.NotImplementedException();
+               //var indChanged = false;
+               var c = await _context.Customers 
+                    .Where(x => x.Id == id)
+                    .Include(x => x.CustomerOfficials)
+                    .Include(x => x.CustomerIndustries)
+                    .Include(x => x.AgencySpecialties)
+                    .FirstOrDefaultAsync();
+               /* foreach(var item in c.CustomerIndustries) {
+                    if (string.IsNullOrEmpty(item.Name)) {
+                         item.Name = await _context.Industries.Where(x => x.Id == item.IndustryId).Select(x => x.Name).FirstOrDefaultAsync();
+                         _unitOfWork.Repository<CustomerIndustry>().Update(item);
+                         indChanged=true;
+                    }
+               }
+               if (indChanged) {
+                    await _unitOfWork.Complete();
+               }
+               */
+               return c;
           }
 
           public Task<CustomerDto> GetCustomerByUserNameAsync(string username)
@@ -235,13 +259,13 @@ namespace infra.Services
           {
                var qry = await _context.Customers
                     .Where(x => x.CustomerType.ToLower() == customerType)
-                    .Select(x => new {x.Id, x.CustomerName})
+                    .Select(x => new {x.Id, x.CustomerName, x.City})
                     .OrderBy(x => x.CustomerName)
                     .ToListAsync();
                var lst = new List<CustomerIdAndNameDto>();
                foreach(var item in qry)
                {
-                    lst.Add(new CustomerIdAndNameDto{Id=item.Id, CustomerName=item.CustomerName});
+                    lst.Add(new CustomerIdAndNameDto{Id=item.Id, CustomerName=item.CustomerName, City=item.City});
                }
                return lst;
           }
@@ -274,5 +298,34 @@ namespace infra.Services
           {
                return await _userManager.FindByEmailAsync(email) != null;
           }
-    }
+
+          public async Task<ICollection<CustomerCity>> GetCustomerCityNames(string customerType)
+          {
+               var c = await _context.Customers.Where(x => x.CustomerType.ToLower() == customerType.ToLower())
+                    .Select(x => x.City).Distinct().ToListAsync();
+               var lsts = new List<CustomerCity>();
+               foreach(var lst in c)
+               {
+                    lsts.Add(new CustomerCity{CityName = lst});
+               }
+               return lsts;
+          }
+
+          public Task<ICollection<string>> GetCustomerIndustryTypes(string customerType)
+          {
+               throw new NotImplementedException();
+          }
+
+          public async Task<ICollection<ChooseAgentDto>> GetOfficialDetails()
+          {
+               var offs = await (from c in _context.Customers
+                         .Where(x => x.CustomerType == "associate" && x.CustomerStatus==EnumCustomerStatus.Active )
+                         join o in _context.CustomerOfficials on c.Id equals o.CustomerId where o.IsValid
+                         select new ChooseAgentDto(c.Id, c.CustomerName, o.Id, o.OfficialName, c.City, 
+                              o.Designation, o.Title, o.Email, o.PhoneNo, o.Mobile)
+                    ).ToListAsync();
+               
+               return offs;
+          }
+     }
 }

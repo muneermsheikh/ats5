@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using core.Entities.Admin;
 
@@ -34,7 +35,7 @@ namespace core.Entities
                AgencySpecialties = agencySpecialties;
           }
 
-          public string CustomerType { get; set; }
+        public string CustomerType { get; set; }
         public string CustomerName { get; set; }
         public string KnownAs { get; set; }
         public string Add { get; set; }
@@ -48,6 +49,10 @@ namespace core.Entities
         public string Website {get; set;}
         public string Phone {get; set;}
         public string Phone2 {get; set;}
+        public string LogoUrl {get; set;}
+        public DateTime CreatedOn { get; set; }
+        public string Introduction { get; set; }
+      
         public EnumCustomerStatus CustomerStatus {get; set;}=EnumCustomerStatus.Active;
         public ICollection<CustomerIndustry> CustomerIndustries { get; set; }
         public ICollection<CustomerOfficial> CustomerOfficials { get; set; }

@@ -35,19 +35,19 @@ namespace api.Controllers
                if (string.IsNullOrEmpty(task.TaskDescription)) return BadRequest(new ApiResponse(404, "Task Description cannot be blank"));
                if (task.AssignedToId == 0) return BadRequest(new ApiResponse(404, "Task not assigned to any one"));
 
-               //TODO - verify assignedToId and TaskOwnerId exist
+               // ** TODO ** - verify assignedToId and TaskOwnerId exist
                var loggedIn = new LoggedInUserDto
                {
-                    LoggedIAppUsername = User.GetUsername(),
-                    LoggedInAppUserEmail = User.GetIdentityUserEmailId(),
-                    LoggedInAppUserId = User.GetIdentityUserId()
+                    LoggedIAppUsername = "Sanjay patil", // User.GetUsername(),
+                    LoggedInAppUserEmail = "sanjaypatil@agenterprises.com", //User.GetIdentityUserEmailId(),
+                    LoggedInAppUserId = 1026 //     User.GetIdentityUserId()
                };
 
                var emailMessages = await _taskService.CreateNewApplicationTask(task, loggedIn);
                var AttachmentFilePaths = new List<string>();
                if (emailMessages != null &&
                    task.PostTaskAction != EnumPostTaskAction.OnlyComposeEmailAndSMSMessages
-                   && task.PostTaskAction != EnumPostTaskAction.OnlyComposeEmailMessage)   //Send involved
+                   && task.PostTaskAction != EnumPostTaskAction.OnlyComposeEmailMessage)   //Send involed
                {
                     foreach (var msg in emailMessages)
                     {
@@ -85,6 +85,15 @@ namespace api.Controllers
           public async Task<ActionResult<Pagination<ApplicationTask>>> GetPendingTasks(string taskstatus, int pageIndex, int pageSize)
           {
                var emps = await _taskService.GetApplicationPendingTasksPaginated(taskstatus, pageIndex, pageSize);
+               if (emps == null || emps.Count == 0) return BadRequest(new ApiResponse(404, "Failed to retrieve any tasks"));
+
+               return Ok(emps);
+          }
+
+          [HttpGet("pendingtasksofauser/{userid}/{pageIndex}/{pageSize}")]
+          public async Task<ActionResult<Pagination<ApplicationTask>>> GetPendingTasksOfAUserId(int userid, int pageIndex, int pageSize)
+          {
+               var emps = await _taskService.GetApplicationPendingTasksOfAUserPaginated(userid, pageIndex, pageSize);
                if (emps == null || emps.Count == 0) return BadRequest(new ApiResponse(404, "Failed to retrieve any tasks"));
 
                return Ok(emps);

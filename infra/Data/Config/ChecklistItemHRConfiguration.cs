@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace infra.Data.Config
 {
-     public class ChecklistItemHRConfiguration : IEntityTypeConfiguration<ChecklistItemHR>
+     public class ChecklistItemHRConfiguration : IEntityTypeConfiguration<ChecklistHRItem>
      {
-        public void Configure(EntityTypeBuilder<ChecklistItemHR> builder)
+        public void Configure(EntityTypeBuilder<ChecklistHRItem> builder)
         {
             builder.Property(x => x.SrNo).IsRequired();
             builder.Property(x => x.Parameter).IsRequired().HasMaxLength(200);            

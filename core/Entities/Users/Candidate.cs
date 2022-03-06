@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
+using Microsoft.AspNetCore.Http;
 
 namespace core.Entities.Users
 {
@@ -14,7 +14,10 @@ namespace core.Entities.Users
           public Candidate(string gender, int appUserId,  bool appUserIdNotEnforced, int applicationNo, 
                 string firstName, string secondName, string familyName, string knownAs, DateTime dOB, 
                 string placeOfBirth, string aadharNo, string email, string introduction, 
-                string interests, bool notificationDesired, ICollection<UserQualification> userQualifications, 
+                string interests, bool notificationDesired, string nationality, 
+                int companyId, string ppno, string city, string pin, int referredby,
+                
+                ICollection<UserQualification> userQualifications, 
                 ICollection<UserProfession> userProfessions, ICollection<UserPassport> userPassports, 
                 ICollection<UserAttachment> userAttachments)
             {
@@ -23,11 +26,12 @@ namespace core.Entities.Users
                 AppUserIdNotEnforced = appUserIdNotEnforced;
                 ApplicationNo = applicationNo;
                 FirstName = firstName;  SecondName = secondName; FamilyName=familyName;
-                KnownAs= knownAs; DOB = dOB; AadharNo=AadharNo; Email = Email;
+                KnownAs= knownAs; DOB = dOB; AadharNo=aadharNo; PpNo = ppno; Email = email;
                 PlaceOfBirth = placeOfBirth; 
                 Introduction = introduction;
                 Interests = interests;
-                
+                City = city; Pin=pin; ReferredBy = referredby;
+                Nationality = nationality; NotificationDesired = notificationDesired;
                 UserQualifications = userQualifications;
                 UserProfessions = userProfessions;
                 UserPassports = userPassports;
@@ -44,6 +48,7 @@ namespace core.Entities.Users
         public string FamilyName { get; set; }
         [Required]         
         public string KnownAs { get; set; }
+        public int ReferredBy { get; set; }
         [Required]
         public DateTime DOB { get; set; }
         public string PlaceOfBirth { get; set; }
@@ -67,13 +72,16 @@ namespace core.Entities.Users
         public bool NotificationDesired {get; set;}
 
         public int? CandidateStatus {get; set;} = (int)EnumCandidateStatus.NotReferred;
+        public string PhotoUrl { get; set; }
         public ICollection<UserPhone> UserPhones {get; set;}
         public ICollection<UserQualification> UserQualifications { get; set; }
         public ICollection<UserProfession> UserProfessions {get; set;}
         public ICollection<UserPassport> UserPassports {get; set;}
         public ICollection<UserAttachment> UserAttachments { get; set; }
+        //public ICollection<IFormFile> UserFormFiles {get; set;}
         public ICollection<EntityAddress> EntityAddresses {get; set;}
         public ICollection<UserExp> UserExperiences {get; set;}
+        public ICollection<Photo> UserPhotos {get; set;}
         public string FullName {get => FirstName + " " + SecondName + " " + FamilyName;}
     }
 }

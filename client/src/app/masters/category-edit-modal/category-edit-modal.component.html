@@ -1,0 +1,11 @@
+
+<h4 class="modal-title pull-left">Edit value {{str}}</h4>
+<button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+     <span aria-hidden="true">&times;</span>
+</button>
+<input class="form-text-input" id="str" name = "str" 
+     [(ngModel)]="str" type="text" 
+> 
+
+<button type="button" class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
+<button type="button" class="btn btn-success" (click)="updateString()">Submit</button>

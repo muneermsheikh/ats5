@@ -14,7 +14,7 @@ namespace core.Interfaces
         Task<bool> DeleteInterview(int interviewId);
         Task<Interview> AddInterviewCategories(int orderId);
         Task<bool>DeleteInterviewItem(InterviewItem interviewItem);
-        Task<ICollection<CandidateInBriefDto>> GetCandidatesMatchingInterviewCategory(InterviewSpecParams interviewParams);
+        Task<ICollection<CandidateBriefDto>> GetCandidatesMatchingInterviewCategory(InterviewSpecParams interviewParams);
         Task<ICollection<Interview>> GetInterviews (string interviewStatus);
         Task<ICollection<Interview>> GetInterviewsWithItems (string interviewStatus);
         Task<InterviewItem> EditInterviewItem (InterviewItem interviewItem);

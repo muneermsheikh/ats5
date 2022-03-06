@@ -5,7 +5,7 @@ namespace core.Entities.Attachments
 {
     public class FileUpload: BaseEntity
     {
-          public FileUpload(string appUserId, string attachmentType, long length, string name, 
+          public FileUpload(int appUserId, string attachmentType, long length, string name, 
             int uploadedbyUserId, DateTime uploadedOn, bool isCurrent)
           {
                AppUserId = appUserId;
@@ -17,7 +17,7 @@ namespace core.Entities.Attachments
                IsCurrent = isCurrent;
           }
 
-        public string AppUserId { get; set; }
+        public int AppUserId { get; set; }
         //public EnumAttachmentType AttachmentType { get; set; }
         public string AttachmentType { get; set; }
         public long Length { get; set; }

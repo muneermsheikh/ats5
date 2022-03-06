@@ -354,7 +354,7 @@ namespace infra.Services
                if (item.SelectionStatusId > 0) throw new Exception("candidate has bene interviewed and itnerview decision made");
                if(item.ScheduledFrom.Date != interviewedAt.Date) throw new Exception("Interviewed Date not as scheduled");
 
-               if (item.ReportedDateTime == null) item.ReportedDateTime = interviewedAt;
+               if (item.ReportedDateTime.Year < 2000) item.ReportedDateTime = interviewedAt;
                
                item.InterviewMode = interviewMode;
                item.InterviewedDateTime = interviewedAt;
@@ -391,7 +391,7 @@ namespace infra.Services
 
           }
 
-          public async Task<ICollection<CandidateInBriefDto>> GetCandidatesMatchingInterviewCategory(InterviewSpecParams iParams)
+          public async Task<ICollection<CandidateBriefDto>> GetCandidatesMatchingInterviewCategory(InterviewSpecParams iParams)
           {
                var AllowedCandidateStatus = new List<int>();
                AllowedCandidateStatus.Add((int)EnumCandidateStatus.Referred);
@@ -440,15 +440,16 @@ namespace infra.Services
                 var cands = await _unitOfWork.Repository<Candidate>().ListAsync(specs);
                */
 
-                var dto = new List<CandidateInBriefDto>();
+                var dto = new List<CandidateBriefDto>();
                 foreach(var cand in cands)
                 {
                     if (cand.UserPhones == null) cand.UserPhones = new List<UserPhone>(); 
                     if (cand.UserProfessions == null) cand.UserProfessions = new List<UserProfession>();
-                    dto.Add(new CandidateInBriefDto{Id = cand.Id, FirstName = cand.FirstName, FamilyName = cand.FamilyName ?? "",
+                    dto.Add(new CandidateBriefDto{Id = cand.Id, FullName = cand.FullName,
                         ApplicationNo = cand.ApplicationNo, 
-                        PassportNo = cand.UserPassports?.Where(x => x.IsValid).Select(x => x.PassportNo).FirstOrDefault(),
-                        UserPhones = cand.UserPhones, UserProfessions = cand.UserProfessions
+                        //PassportNo = cand.UserPassports?.Where(x => x.IsValid).Select(x => x.PassportNo).FirstOrDefault(),
+                        UserProfessions = cand.UserProfessions, ReferredById = cand.ReferredBy,
+                        ReferredByName= await _userService.GetCustomerNameFromCustomerId(cand.ReferredBy)
                         });
                 }
                 

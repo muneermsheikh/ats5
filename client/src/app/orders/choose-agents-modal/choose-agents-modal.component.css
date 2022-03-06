@@ -1,0 +1,18 @@
+.stdd {
+     display: inline-block;
+     font-size: x-small;
+     vertical-align: top;
+}
+.headerTitle {
+     display: inline-block !important;
+     font-size: x-small !important;
+     vertical-align: middle;
+     text-decoration: underline;
+     font-weight: bold;
+}
+.w10 {width: 10px;}
+.w35 {width: 35px;}
+.w50 {width: 50px;}
+.w75 {width: 75px;}
+.w100 {width: 100px;}
+.w150 {width: 150px;}

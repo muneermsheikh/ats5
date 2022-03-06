@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Errors;
 using api.Extensions;
-using api.Helpers;
 using AutoMapper;
-using core.Entities;
 using core.Entities.Attachments;
 using core.Entities.HR;
 using core.Entities.Identity;
@@ -16,12 +15,12 @@ using core.Interfaces;
 using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
-using MimeKit;
+using Microsoft.Extensions.Logging;
 
 namespace api.Controllers
 {
@@ -34,12 +33,15 @@ namespace api.Controllers
           private readonly SignInManager<AppUser> _signInManager;
           private readonly IUserService _userService;
           private readonly IGenericRepository<Candidate> _candRepo;
+          private readonly IWebHostEnvironment _environment;
           private readonly IEmployeeService _empService;
+          private readonly ILogger<CandidateController> _logger;
           public CandidateController(IUnitOfWork unitOfWork, IMapper mapper, IEmployeeService empService,
-               IGenericRepository<Candidate> candRepo,
-               UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
+               IGenericRepository<Candidate> candRepo, ILogger<CandidateController> logger,
+               UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IWebHostEnvironment environment,
                IUserService userService)
           {
+               _environment = environment;
                _candRepo = candRepo;
                _userService = userService;
                _signInManager = signInManager;
@@ -47,33 +49,120 @@ namespace api.Controllers
                _mapper = mapper;
                _unitOfWork = unitOfWork;
                _empService = empService;
+               _logger = logger;
           }
 
      
-          [HttpGet("candidatelist")]
-          public async Task<ActionResult<ICollection<CandidateInBriefDto>>> GetCandidateListAsync(CandidateSpecParams candidateParam)
+          [HttpGet("candidatepages")]
+          public async Task<ActionResult<Pagination<CandidateBriefDto>>> GetCandidatePagesAsync([FromQuery]CandidateSpecParams candidateParam)
           {
+               //if (!User.IsUserAuthenticated()) return Unauthorized("user is not authenticated");
+               var email = User.GetIdentityUserEmailId();
+
+               var userClaim = User;
+
+               var cands = new List<Candidate>();
+               var dtos = new List<CandidateBriefDto>();
+               int totalItems=0;
+
+               /* if (candidateParam.ProfessionId.HasValue) {
+                    cands = (List<Candidate>)await _userService.GetCandidatesWithProfessions(candidateParam);
+                    totalItems = cands.Count();
+                    //ApplyPaging(candidateParam.PageSize * (candidateParam.PageIndex - 1), candidateParam.PageSize);
+               } else {
+               */
+                    candidateParam.IncludeUserProfessions=true;
+                    var spec = new CandidateSpecs(candidateParam);
+                    var countSpec = new CandidateForCountSpecs(candidateParam);
+                    totalItems = await _unitOfWork.Repository<Candidate>().CountAsync(countSpec);
+
+                    if (totalItems == 0) return NotFound(new ApiResponse(404, "No records returned"));
+                    cands = (List<Candidate>)await _unitOfWork.Repository<Candidate>().ListAsync(spec);
+               //}
+               
+               foreach(var cand in cands)
+               {
+                    if (cand.UserProfessions != null && cand.UserProfessions.Count > 0) {
+                         foreach(var prof in cand.UserProfessions) {
+                              if (string.IsNullOrEmpty(prof.Profession)) prof.Profession = await _userService.GetCategoryNameFromCategoryId(prof.CategoryId);
+                         }
+                    }
+                    dtos.Add(new CandidateBriefDto{Id = cand.Id, FullName = cand.FirstName + cand.SecondName??"" + " " + cand.FamilyName??"", 
+                         City = cand.City, ApplicationNo = cand.ApplicationNo, ReferredById=cand.ReferredBy,
+                         ReferredByName= await _userService.GetCustomerNameFromCustomerId(cand.ReferredBy),
+                         UserProfessions = cand.UserProfessions});
+               }
+               //var data = _mapper.Map<IReadOnlyList<CandidateToReturnDto>>(cands);
+               
+               return Ok(new Pagination<CandidateBriefDto>(candidateParam.PageIndex,
+                    candidateParam.PageSize, totalItems, dtos));
+          }
+
+          [HttpGet("briefdtofromparams")]
+          public async Task<ActionResult<CandidateBriefDto>> GetCandidateBriefDtoFromParams([FromQuery]CandidateSpecParams candidateParam)
+          {
+               candidateParam.IncludeUserProfessions=false;
+               candidateParam.PageSize=0;
+               
+               var spec = new CandidateSpecs(candidateParam);
+               var cand = await _userService.GetCandidateBriefByParams(candidateParam);
+               //var cand = await _unitOfWork.Repository<Candidate>().GetEntityWithSpec(spec);
+
+               if (cand==null) return null;
+               //return Ok(_mapper.Map<Candidate, CandidateBriefDto>(cand));
+               return cand;
+          }
+
+
+          [HttpGet("candidatelist")]
+          public async Task<ActionResult<ICollection<CandidateBriefDto>>> GetCandidateListAsync(CandidateSpecParams candidateParam)
+          {
+               if (!User.IsUserAuthenticated()) return Unauthorized("user is not authenticated");
+
                var spec = new CandidateSpecs(candidateParam);
                var countSpec = new CandidateForCountSpecs(candidateParam);
 
-               var totalItems = await _candRepo.CountAsync(countSpec);
+               var totalItems = await _unitOfWork.Repository<Candidate>().CountAsync(countSpec);
                if (totalItems == 0) return NotFound(new ApiResponse(404, "No records returned"));
-               var cands = await _candRepo.ListAsync(spec);
+               var cands = await _unitOfWork.Repository<Candidate>().ListAsync(spec);
 
-               var dtos = new List<CandidateInBriefDto>();
+               var dtos = new List<CandidateBriefDto>();
                foreach(var cand in cands)
                {
-                    dtos.Add(new CandidateInBriefDto{Id = cand.Id, FirstName = cand.FirstName, FamilyName = cand.FamilyName, 
-                         ApplicationNo = cand.ApplicationNo, PassportNo = cand.PpNo, UserPhones = cand.UserPhones,
+                    if (cand.UserProfessions != null && cand.UserProfessions.Count > 0) {
+                         foreach(var prof in cand.UserProfessions) {
+                              if (string.IsNullOrEmpty(prof.Profession)) prof.Profession = await _userService.GetCategoryNameFromCategoryId(prof.CategoryId);
+                         }
+                    }
+
+                    dtos.Add(new CandidateBriefDto{Id = cand.Id, FullName = cand.FirstName + " " + cand.SecondName??"" + " " + cand.FamilyName??"", 
+                         City=cand.City, ApplicationNo = cand.ApplicationNo, ReferredById = cand.ReferredBy,
+                         ReferredByName= await _userService.GetCustomerNameFromCustomerId(cand.ReferredBy),
                          UserProfessions = cand.UserProfessions});
                }
                //var data = _mapper.Map<IReadOnlyList<CandidateToReturnDto>>(cands);
                
                return Ok(dtos);
-               //return Ok(new Pagination<CandidateInBriefDto>(candidateParam.PageIndex,
+               //return Ok(new Pagination<CandidateBriefDto>(candidateParam.PageIndex,
                     //candidateParam.PageSize, totalItems, cands));
           }
 
+          [HttpGet("byid/{id}")]
+          public async Task<ActionResult<Candidate>> GetCandidateById(int id)
+          {
+               
+               var cand = await _userService.GetCandidateByIdWithAllIncludes(id);
+               return Ok(cand);
+          }
+
+          [HttpGet("byappno/{appno}")]
+          public async Task<ActionResult<CandidateBriefDto>> GetCandidateFromApplicationNo(int appno) {
+               var cv = await _userService.GetCandidateByAppNo(appno);
+               if (cv==null) return NotFound(new ApiResponse(404, "Application No. " + appno + " not found"));
+
+               return Ok(cv);
+          }
+          
           /*
           [HttpGet("candidatebyid/{userid}")]
           public async Task<ActionResult<Candidate>> GetCandidatebyUserId(int userid)
@@ -96,8 +185,17 @@ namespace api.Controllers
                return await _userManager.FindByEmailAsync(email) != null;
           }
 
+          [HttpGet("cities")]
+          public async Task<ActionResult<ICollection<CandidateCity>>> GetCandidateCities()
+          {
+               var c = await _userService.GetCandidateCityNames();
+
+               if (c.Count() == 0) return NotFound();
+               return Ok(c);
+          }
+          
           [HttpPost("attachment/{candidateAppUserId}")]
-          public async Task<ActionResult<bool>> UploadUserAttachments(ICollection<IFormFile> files, string candidateAppUserId)
+          public async Task<ActionResult<bool>> UploadUserAttachments(ICollection<IFormFile> files, int candidateAppUserId)
           {
                if (files.Count() == 0) return BadRequest(new ApiResponse(404, "No files to attach"));
           
@@ -128,7 +226,7 @@ namespace api.Controllers
                               }
                               
                               var f = new FileUpload(candidateAppUserId, file.FileName.Substring(0,3),
-                                   file.Length, candidateAppUserId, loggedInUser == null ? 0 : loggedInEmployeeId,
+                                   file.Length, User.GetUsername(), loggedInUser == null ? 0 : loggedInEmployeeId,
                                    DateTime.Now, true);
                               _unitOfWork.Repository<FileUpload>().Add(f);
                               filesUploaded.Add(f);
@@ -251,13 +349,17 @@ namespace api.Controllers
                return Ok(new UserAndProfessions{CandidateId = userProfessions.CandidateId, CandidateProfessions = profs});
           }
      
-          [HttpPut]
-          public async Task<ActionResult<Candidate>> EditCandidate(Candidate candidate)
+          [HttpPut("{{UserFormFiles}}")]
+          public async Task<ActionResult<Candidate>> EditCandidate(Candidate candidate, ICollection<IFormFile> UserFormFiles)
           {
-               var cand = await _userService.UpdateCandidateAsync(candidate);
+               var cand = await _userService.UpdateCandidateAsync(candidate, UserFormFiles);
                if (cand == null) return BadRequest(new ApiResponse(404, "Failed to update the candidate"));
                return Ok(cand);
           }
-     }
+
+         
+
+    }
+
 
 }

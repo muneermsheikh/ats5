@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Entities.EmailandSMS;
+using core.Entities.HR;
 using core.Entities.MasterEntities;
 using core.Entities.Orders;
 using core.ParamsAndDtos;
@@ -10,9 +11,6 @@ namespace core.Interfaces
     public interface IOrderAssessmentService
     {
         //stddASsessment
-        Task<bool> AddStddQs(ICollection<AssessmentQBank> Qs);
-        Task<bool> EditStddQs(ICollection<AssessmentQBank> qs);
-        Task<bool> DeleteStddQ(AssessmentQBank Q);
         Task<OrderItemAssessment> CopyStddQToOrderAssessmentItem(int orderitemid);
         Task<IReadOnlyList<AssessmentQBank>> GetAssessmentQsFromBankBySubject (AssessmentStddQsParams qsParams);
         

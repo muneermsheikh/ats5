@@ -1,0 +1,60 @@
+.stdd {
+     margin: 1px;
+     padding: 1px;
+     display: inline-block !important;
+}
+.lbl {
+     margin: 1px;
+     padding: 1px;
+     color: darkblue;
+     display: inline-block !important;
+}
+
+.alignR {
+     text-align: right;
+}
+
+.w30 {
+     width: 30px;
+}
+.w35{width: 35px;}
+.w40 {width: 40px;}
+.w50 {width: 50px;}
+.w75 {width: 75px;}
+.w80 {
+     width: 80px;
+}
+.w100 {width: 100px;}
+
+.w130 {
+     width: 130px;
+}
+.w150 {
+     width: 150px;
+}
+.w175 {width: 175px;}
+.w250 {width: 250px;}
+.w300 {width: 300px;}
+.w350 {width: 350px;}
+.w400 {width: 400px;}
+.w500 {width: 500px;}
+.b {
+     font-weight: bold;
+}
+
+.red {
+     color: red;
+}
+.blue {color: blue;}
+
+.vAlignTop {
+     vertical-align: top;
+}
+
+.fontSmall {
+     font-size: small;
+}
+
+.borderAqua {
+     border: aqua;
+}

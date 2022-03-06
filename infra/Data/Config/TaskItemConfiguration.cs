@@ -26,7 +26,7 @@ namespace infra.Data.Config
 
                builder.HasIndex(p => p.TransactionDate);
                builder.Property(x => x.TaskItemDescription).IsRequired().HasMaxLength(250);
-               builder.HasOne(p => p.ApplicationTask).WithMany().HasForeignKey(p => p.ApplicationTaskId);
+               //builder.HasOne(p => p.ApplicationTask).WithMany().HasForeignKey(p => p.ApplicationTaskId);
 
           }
      }

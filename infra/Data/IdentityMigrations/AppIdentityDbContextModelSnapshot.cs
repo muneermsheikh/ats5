@@ -105,62 +105,6 @@ namespace infra.Data.IdentityMigrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("core.Entities.Identity.Address", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Add")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AddressType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DOB")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("District")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FamilyName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<string>("Location")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Pin")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SecondName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("State")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StreetAdd")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Address");
-                });
-
             modelBuilder.Entity("core.Entities.Identity.AppRole", b =>
                 {
                     b.Property<int>("Id")
@@ -198,9 +142,6 @@ namespace infra.Data.IdentityMigrations
                         .UseIdentityColumn();
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -267,8 +208,6 @@ namespace infra.Data.IdentityMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -286,9 +225,6 @@ namespace infra.Data.IdentityMigrations
                         .HasColumnType("int");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AppUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("Id")
@@ -335,15 +271,6 @@ namespace infra.Data.IdentityMigrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("core.Entities.Identity.AppUser", b =>
-                {
-                    b.HasOne("core.Entities.Identity.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("AddressId");
-
-                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("core.Entities.Identity.AppUserRole", b =>

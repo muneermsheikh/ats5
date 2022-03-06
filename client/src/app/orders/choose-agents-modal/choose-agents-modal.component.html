@@ -1,0 +1,57 @@
+<div class="modal-header">
+
+     <div class="modal-title pull-left" style="font-size: smaller; font-weight:bold;">choose Agents to Forward Demand Letter No {{order.orderNo}} dt {{order.orderDate|date}} of {{order.customerName}} </div>
+     <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+       <span aria-hidden="true">&times;</span>
+     </button>
+     
+   </div>
+   <div class="modal-body">
+    <div class="headerTitle w100" style="margin-left: 17px;">Official Name</div>
+    <div class="headerTitle w150">Customer Name</div>
+    <div class="headerTitle w75">City</div>
+    <div class="headerTitle w150">Email</div>
+    <div class="headerTitle w100">Phone No</div>
+    <div class="headerTitle w100">WhatsApp No</div>
+    <hr style="display: inline-inline-block; margin-top: 0px; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px;">
+     <form #agentsForm="ngForm" id="agentsForm">
+         <div class="form-check stdd" *ngFor="let agent of agents">
+            <div class="stdd w100">{{agent.officialName}}</div>
+            <div class="stdd w150">{{agent.customerName}}</div>
+            <div class="stdd w75">{{agent.city}}</div>
+            <span style="width: 3px; display: inline-block; padding: 0px; vertical-align: top;">
+                <input type="checkbox" 
+                    class="form-check-input"
+                    [checked]="agent.checked"
+                    (change)="agent.checked = !agent.checked" 
+                    [disabled]="agent.isBlocked && agent.email === undefined"
+                >
+            </span>
+            <span style="display: inline-block; width: 150px; vertical-align: top; ">{{agent.email}}</span>
+            
+            <span style="display: inline-block; width: 5px; vertical-align: top; " >
+                <input type="checkbox" 
+                    class="form-check-input"
+                    [checked]="agent.checkedPhone"
+                    (change)="agent.checkedPhone = !agent.checkedPhone" 
+                    [disabled]="agent.isBlocked && agent.phoneNo === undefined"
+                >
+            </span>
+            <span style="width: 100px; display: inline-block;">{{agent.phoneNo}}</span>
+            
+            <span style="width: 5px; display: inline-block; vertical-align: top;">
+                <input type="checkbox" 
+                  class="form-check-input"
+                  [checked]="agent.checkedMobile"
+                  (change)="agent.checkedMobile = !agent.checkedMobile" 
+                  [disabled]="agent.isBlocked && agent.mobile === undefined"
+                >    
+            </span>
+            <span style="width: 100px; display: inline-block;">{{agent.mobile}}</span>
+         </div> 
+     </form>
+   </div>
+   <div class="modal-footer">
+     <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
+     <button type="button" class="btn btn-success" (click)="updateAgentsSelected()">Submit</button>
+   </div>

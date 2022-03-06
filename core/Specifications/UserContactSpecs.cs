@@ -1,38 +1,26 @@
 using System;
+using System.Linq;
 using core.Entities.Admin;
 using core.Params;
 
 namespace core.Specifications
 {
-     public class UserContactSpecs: BaseSpecification<UserContact>
+     public class UserContactSpecs: BaseSpecification<UserHistory>
     {
-        public UserContactSpecs(UserContactSpecParams specParams)
+        public UserContactSpecs(UserHistorySpecParams specParams)
             : base(x => 
-                (!specParams.CandidateId.HasValue || x.CandidateId == specParams.CandidateId) 
-                && (!specParams.OrderItemId.HasValue || x.OrderItemId == specParams.OrderItemId) 
-                && (!specParams.OrderId.HasValue || x.OrderId == specParams.OrderId) 
-                && (string.IsNullOrEmpty(specParams.Subject) || 
-                    x.Subject.ToLower().Contains(specParams.Subject.ToLower())) 
-                && (string.IsNullOrEmpty(specParams.UserPhoneNoContacted) || 
-                    x.UserPhoneNoContacted.Contains(specParams.UserPhoneNoContacted)) 
-                && (!specParams.DateOfContactFrom.HasValue && !specParams.DateOfContactUpto.HasValue || 
-                    (DateTime.Compare(x.DateOfContact.Date, ((DateTime)specParams.DateOfContactFrom).Date) >= 0 && 
-                    DateTime.Compare(x.DateOfContact.Date, ((DateTime)specParams.DateOfContactUpto).Date) <= 0)) 
-                && (!specParams.DateOfContactFrom.HasValue || 
-                    x.DateOfContact.Date == ((DateTime)specParams.DateOfContactFrom).Date) 
-                && (!specParams.enumContactResult.HasValue || x.enumContactResult == specParams.enumContactResult) 
-                && (!specParams.loggedInUserId.HasValue || x.LoggedInUserId == specParams.loggedInUserId) 
-                
+                (string.IsNullOrEmpty(specParams.PartyName) || (x.PartyName.ToLower().Contains(specParams.PartyName.ToLower())) &&
+                (string.IsNullOrEmpty(specParams.AadharNo) || x.AadharNo == specParams.AadharNo) &&
+                (string.IsNullOrEmpty(specParams.EmailId) || x.EmailId == specParams.EmailId) &&
+                (string.IsNullOrEmpty(specParams.PhoneNo) || x .AadharNo == specParams.PhoneNo) &&
+                (!specParams.Id.HasValue || x.Id == (int)specParams.Id) &&
+                (!specParams.CandidateId.HasValue || x.CandidateId == (int)specParams.CandidateId) &&
+                (!specParams.CustomerOfficialId.HasValue || x.CustomerOfficialId == (int)specParams.CustomerOfficialId) &&
+                (!specParams.ApplicationNo.HasValue || x.ApplicationNo == (int)specParams.ApplicationNo))
             )
         {
-            ApplyPaging(specParams.PageIndex * (specParams.PageIndex - 1), specParams.PageSize);
-            AddOrderBy(x => x.OrderItemId);
-            //AddOrderByDescending(x => x.DateOfContact);
+            //ApplyPaging(specParams.PageIndex * (specParams.PageIndex - 1), specParams.PageSize);
+            AddInclude(x => x.UserHistoryItems.OrderByDescending(x => x.DateOfContact));
         }
-
-        public UserContactSpecs(int id) : base(x => x.Id == id)
-        {
-        }
-  
     }
 }

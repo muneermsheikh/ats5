@@ -11,20 +11,28 @@ namespace core.ParamsAndDtos
 {
     public class RegisterDto
     {
-        [Required]
+        public int Id { get; set; }
         public string UserType {get; set;}
+        public string Gender { get; set; }="M";
+        public string FirstName { get; set; }
+        public string SecondName { get; set; }
+        public string FamilyName { get; set; }
+        [Required] public string KnownAs { get; set; }
+        public int ReferredBy { get; set; }
         public Address Address {get; set;}
-        [Required]
+        
         public string DisplayName { get; set; }
-        [Required]
+
         public string UserName {get; set;}
         [Required]
         [RegularExpression("(?=^.{6,10}$)(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&amp;*()_+}{&quot;:;'?/&gt;.&lt;,])(?!.*\\s).*$", 
             ErrorMessage = "Password must have 1 Uppercase, 1 Lowercase, 1 number, 1 non alphanumeric and at least 6 characters")]
         public string Password { get; set; }
+
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+        public DateTime DOB {get; set;}
         public string PlaceOfBirth { get; set; }
         public string Department {get; set;}    //for employees
         public DateTime DOJ {get; set;}         //for employees
@@ -49,7 +57,8 @@ namespace core.ParamsAndDtos
         public ICollection<UserPassport> UserPassports {get; set;}
         public ICollection<EmployeeHRSkill> HrSkills {get; set;}        //for employees
         public ICollection<EmployeeOtherSkill> OtherSkills{get; set;}   //for employees
-        //public ICollection<IFormFile> UserAttachments { get; set; }
+        public ICollection<UserAttachment> UserAttachments {get; set;}
+        //public ICollection<IFormFile> UserFormFiles { get; set; }
 
 
 

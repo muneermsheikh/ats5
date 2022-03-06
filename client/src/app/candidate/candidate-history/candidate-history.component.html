@@ -1,0 +1,80 @@
+<div class="stdd col-2 borderBlue" >
+    <div *ngIf="member">
+            <div class="b" >User Name:</div>
+            <div class="ml-2 my-2">{{member.partyName}}</div>
+            
+            <div class="b">Phone No.:</div>
+            <div class="ml-2 my-2" >{{member.phoneNo}}</div>
+            <div class="b">Email:</div>
+            <div class="ml-2 my-2">{{member.Email}}</div>
+            <div class="b">App No.:</div>
+            <div class="ml-2 my-2">{{member.applicationNo}}</div>
+            <div class="b">Created on:</div>
+            <div class="ml-2 my-2">{{member.createdOn | date}}</div>
+            <hr>
+            <button [disabled]="!form.dirty" style="vertical-align: bottom;" type="submit" class="stdd btn btn-success btn-block pull-right fa fa-save w30" (click)="onSubmit()" >
+                <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+            </button>
+    </div>
+</div>
+<div class="stdd col-9 mx-2 vAlignT" >
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="my-2">
+            <div style="font-weight: bold;">
+                    <div class="stddmx2 w175" >Contacted On</div>
+                    <div class="stddmx2 w175 mx-1">Subject</div>
+                    <div class="stddmx2 w125" >Category Ref</div>
+                    <div class="stddmx2 w125 mx-1" >Phone No</div>
+                    <div class="stddmx2 w400" >discussion</div>
+                    <div class="stddmx2 w175" >Result</div>
+                    <div class="stddmx2 w150 mx-1">User</div>
+                    <div style="display: inline-block;">
+                        <button type="button" (click)="addUserHistoryItem()"  class="stddmx2 alignR w35 fa fa-plus blue"></button>
+                    </div>
+                </div>
+        </div>
+        <div formArrayName="userHistoryItems" class="my-1 mx-1">
+            <div *ngFor="let item of userHistoryItems.controls; let i=index">
+                <div [formGroupName]="i" >
+                    <input class="stddmx2 w150 input"
+                        type="text"
+                        placeholder="Contacted On"
+                        formControlName="dateOfContact"
+                        bsDatepicker
+                        [bsValue]="bsValueDate"
+                        [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                    >   
+                    <input type="text" formControlName="subject" class="input stddmx2 w175 mx-1" (dblclick)="subjectDblClick(i)" >
+                    <input type="text" formControlName="categoryRef" class="input stddmx2 w125" (dblclick)="categoryDblClick(i)" >
+                    <input type="text" formControlName="phoneNo" class="input stddmx2 w125 mx-1" >
+                    <textarea cols="41" rows="2" formControlName="gistOfDiscussions" class="input stddmx2"></textarea>
+                    
+                    <ng-select *ngIf="contactResults" class="stddmx2 w175"
+                        [items]="contactResults"
+                            bindLabel="name"
+                            bindValue="id"
+                            labelForId="id"
+                            placeholder="Result"
+                            clearAllText="Clear"
+                            formControlName="contactResult">
+                        </ng-select>
+                    
+                    <label class="stdd w150">{{member.loggedInUserName}}</label>
+                    <button (click)="displayModalReminder()" style="display: inline-block; vertical-align: top;" class="ml-1 stdd blue fa fa-bell" title="Create a reminder task"> </button>
+                    <button (click)="removeUserHistoryItem(i)" style="display: inline-block; vertical-align: top;" class="ml-1 stdd red fa fa-trash" title="Remove the transaction record"> </button>
+                </div>
+            </div>
+        </div>
+        </form>            
+    </div>
+
+<ul class="text-danger list-unstyled" *ngIf="errors">
+    <li *ngFor="let error of errors">
+            {{error}}
+    </li>
+</ul>
+    <div>
+        {{this.form.value | json}}
+    </div>
+ 
+

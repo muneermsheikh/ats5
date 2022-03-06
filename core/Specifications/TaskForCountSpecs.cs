@@ -32,5 +32,10 @@ namespace core.Specifications
         {
         }
 
+        public TaskForCountSpecs(int taskownerid, bool includeTaskItems) : 
+            base (x => x.TaskStatus.ToLower() != "completed" && x.TaskStatus.ToLower() != "canceled" && x.TaskOwnerId == taskownerid)
+        {
+        }
+
     }
 }

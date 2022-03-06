@@ -27,17 +27,17 @@ namespace api
                 await ATSContextSeed.SeedAsync(context, loggerFactory);
                 
                 var userManager = services.GetRequiredService<UserManager<AppUser>>();
-                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
                 
                 var identityContext = services.GetRequiredService<AppIdentityDbContext>();
                 await identityContext.Database.MigrateAsync();
                 await AppIdentityDbContextSeed.SeedUsersAsync(userManager, roleManager);
-                //await AppIdentityDbContextSeed.SeedUsersAsync(userManager);
+
             }
             catch (Exception ex)
             {
                 var logger = loggerFactory.CreateLogger<Program>();
-                logger.LogError(ex, "An error occurred during migration");
+                logger.LogError(ex, "An error occurred during migration of AppIdentityDbContext");
             }
 
             host.Run();

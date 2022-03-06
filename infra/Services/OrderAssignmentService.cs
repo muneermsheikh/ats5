@@ -34,41 +34,6 @@ namespace infra.Services
             _context = context;
         }
 
-        public async Task<ICollection<EmailMessage>> AssignTasksToHRExecutives(int orderId, string loggedInAppUserEmail)
-        {
-            var loggedinAppUser = await _userManager.FindByEmailAsync(loggedInAppUserEmail);
-            var loggedInUserDto = new LoggedInUserDto{
-                LoggedIAppUsername = loggedinAppUser.UserName, LoggedInAppUserEmail = loggedInAppUserEmail,
-                LoggedInAppUserId = loggedinAppUser.Id, 
-                LoggedInEmployeeId = await _empService.GetEmployeeIdFromAppUserIdAsync(loggedinAppUser.Id)
-            };
-            var orderitemids = await _context.OrderItems
-                .Where(x => x.OrderId == orderId && x.RequireAssess).Select(x => x.Id).ToListAsync();
-
-            var msgs = await _taskService.CreateTaskForHRExecAssignment(orderitemids, loggedInUserDto);
-            /*
-            var orderAssignmentDto = await _commonServices.GetOrderAssignmentDto(orderId);        //details fo order, and customer
-            var loggedInAppUser = await _userManager.FindByEmailAsync(loggedInAppUserEmail);
-            var loggedInEmployeeId = await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInAppUser.Id);
-
-            var task = new ApplicationTask((int)EnumTaskType.AssignTaskToHRExec, DateTime.Now,
-                loggedInEmployeeId, orderAssignmentDto.ProjectManagerId, orderAssignmentDto.OrderId,
-                0, "Task assignments to HR Executives for Order No. " +
-                orderAssignmentDto.OrderNo + " dated " + orderAssignmentDto.OrderDate + " for " + orderAssignmentDto.CustomerName,
-                DateTime.Now.AddDays(_targetDaysForHRExecutivesToSourceCVs), "Open", null);
-
-            task.PostTaskAction = EnumPostTaskAction.OnlyComposeEmailMessage;
-            
-            var msgs = await _taskService.CreateNewApplicationTask(task, new LoggedInUserDto
-            {
-                LoggedIAppUsername = loggedInAppUser.UserName,
-                LoggedInAppUserEmail = loggedInAppUser.Email,
-                LoggedInAppUserId = loggedInAppUser.Id,
-                LoggedInEmployeeId = loggedInEmployeeId
-            });
-            */
-            return msgs;
-        }
 
         public async Task<ICollection<EmailMessage>> DesignOrderAssessmentQs(int orderId, AppUser loggedInAppUser)
         {
@@ -95,6 +60,7 @@ namespace infra.Services
             return msgs;
 
         }
+
 
         public async Task<bool> DeleteHRExecAssignment(int id)
         {

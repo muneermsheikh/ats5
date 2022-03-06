@@ -26,9 +26,9 @@ namespace infra.Services
           private readonly int gDocControllerId;
           private readonly IVerifyService _verifyService;
           private readonly IUnitOfWork _unitOfWork;
-          private readonly IComposeMessages _composeMessages;
+          private readonly IComposeMessagesForHR _composeMessages;
           private readonly IEmailService _emailService;
-          public CVRvwService(ITaskService taskService, IConfiguration config, IComposeMessages composeMessages,
+          public CVRvwService(ITaskService taskService, IConfiguration config, IComposeMessagesForHR composeMessages,
                IUnitOfWork unitOfWork, IEmailService emailService,
                     ICommonServices commonServices, ATSContext context, IVerifyService verifyService)
           {
@@ -59,13 +59,18 @@ namespace infra.Services
                foreach(var item in cvsSubmitted)
                {
                     if (await GetCVReviewId(item.CandidateId, item.OrderItemId) > 0) continue;
-
                     commonData = await _commonServices
                          .CommonDataFromOrderItemCandidateIdWithChecklistId(item.OrderItemId, item.CandidateId);
                     
                     if(commonData == null) continue;
-                    item.AssignedToId = commonData.NoReviewBySupervisor ? gDocControllerId: commonData.HRSupId;
+                    //item.AssignedToId = commonData.NoReviewBySupervisor ? gDocControllerId: commonData.HRSupId;
+                    item.AssignedToId = commonData.RequireInternalReview 
+                         ? commonData.HRSupId==0 ? commonData.HRMId == 0 ? gDocControllerId : commonData.HRMId : commonData.HRSupId 
+                         : commonData.HRMId;
+                    if(item.AssignedToId == 0) continue;
+
                     item.CommonDataDto=commonData;
+
                     var rvw = new CVRvw(commonData.ChecklistHRId, item.CandidateId, commonData.Ecnr, item.OrderItemId,
                          commonData.OrderId, commonData.HRExecId, commonData.HRExecTaskId, commonData.HRSupId, 
                          commonData.HRMId, dateTimeNow, item.ExecRemarks);               
@@ -124,9 +129,9 @@ namespace infra.Services
                     var cvs = filtered.Where(x => x.AssignedToId == assignee).ToList();
                     var cands = cvs.Select(x => x.CommonDataDto).ToList();
                     if(assignee == gDocControllerId) {
-                         msg = await _composeMessages.Publish_CVReadiedToForwardToClient(cands, loggedInUserDto, assignee);
+                         msg = await _composeMessages.ComposeHTMLToPublish_CVReadiedToForwardToClient(cands, loggedInUserDto, assignee);
                     } else {
-                         msg = await _composeMessages.Publish_CVSubmittedToHRSup(cands, loggedInUserDto, assignee);
+                         msg = await _composeMessages.ComposeHTMLToPublish_CVSubmittedToHRSup(cands, loggedInUserDto, assignee);
                     }
                     
                     if (msg!= null)
@@ -225,7 +230,8 @@ namespace infra.Services
                               var hrExecTaskItem = new TaskItem((int)EnumTaskType.SubmitCVToHRSupForReview,hrexecTask.Id, dateTimeNow, "Completed",
                                    "CV reviewed by Sup",loggedInDto.LoggedInEmployeeId, item.CommonDataDto.OrderId, item.CommonDataDto.OrderItemId,
                                    item.CommonDataDto.OrderNo, loggedInDto.LoggedInEmployeeId, dateTimeNow, item.CommonDataDto.CandidateId, item.CommonDataDto.HRSupId,
-                                   1,hrexecTask);
+                                   1  //,hrexecTask
+                                   );
                               _unitOfWork.Repository<TaskItem>().Add(hrExecTaskItem);
                          }
 
@@ -282,9 +288,9 @@ namespace infra.Services
                     foreach (var cv in cvs)
                     {
                          if(assignee == gDocControllerId && cv.CommonDataDto.HRMId == 0) {
-                              msg = await _composeMessages.Publish_CVReadiedToForwardToClient(cands, loggedInDto, cv.AssignedToId);
+                              msg = await _composeMessages.ComposeHTMLToPublish_CVReadiedToForwardToClient(cands, loggedInDto, cv.AssignedToId);
                          } else {
-                              msg = await _composeMessages.Publish_CVReviewedByHRSup(cands, loggedInDto, cv.AssignedToId);
+                              msg = await _composeMessages.ComposeHTMLToPublish_CVReviewedByHRSup(cands, loggedInDto, cv.AssignedToId);
                          }
                          
                          if (msg!= null)
@@ -344,7 +350,8 @@ namespace infra.Services
                                    "CV Forwarded to Doc Controller: " + item.CommonDataDto.CandidateDesc, 
                                    loggedInDto.LoggedInEmployeeId,  item.CommonDataDto.OrderId, item.OrderItemId, 
                                    item.CommonDataDto.OrderNo, loggedInDto.LoggedInEmployeeId,
-                                   dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0, item.ParentTask);
+                                   dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0//, item.ParentTask
+                              );
                               //TODO - remove fields such as nextassigned to, and checkbydate
                               _unitOfWork.Repository<TaskItem>().Add(hrExecTaskItem);
                          }
@@ -374,7 +381,8 @@ namespace infra.Services
                                    "Candidate approved", 
                                    loggedInDto.LoggedInEmployeeId,  item.CommonDataDto.OrderId, item.OrderItemId, 
                                    item.CommonDataDto.OrderNo, loggedInDto.LoggedInEmployeeId,
-                                   dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0, item.ParentTask);
+                                   dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0  //, item.ParentTask
+                              );
                               _unitOfWork.Repository<TaskItem>().Add(hrmtaskitem);
                          } else {
                               hrmtaskitem =  new TaskItem((int)EnumTaskType.SubmitCVToHRMMgrForReview, 
@@ -382,7 +390,8 @@ namespace infra.Services
                                    "Candidate rejected", 
                                    loggedInDto.LoggedInEmployeeId,  0, item.OrderItemId, 
                                    0, loggedInDto.LoggedInEmployeeId,
-                                   dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0, item.ParentTask);
+                                   dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0//, item.ParentTask
+                              );
                               _unitOfWork.Repository<TaskItem>().Add(hrmtaskitem);
                          }
                     }
@@ -415,7 +424,7 @@ namespace infra.Services
                {
                     var cands = cvsSubmittedDto.Where(x => x.AssignedToId == item).Select(x => x.CommonDataDto).ToList();
                     if (cands.Count > 0) {
-                         msg = await _composeMessages.Publish_CVReviewedByHRManager(cands, loggedInDto, item);
+                         msg = await _composeMessages.ComposeHTMLToPublish_CVReviewedByHRManager(cands, loggedInDto, item);
                          if (msg != null) lstMsgs.Add(msg);
                     }
                }
@@ -561,7 +570,7 @@ namespace infra.Services
                     var cands = cvs.Select(x => x.CommonDataDto).ToList();
                     foreach (var cv in cvs)
                     {
-                         msg = await _composeMessages.Publish_CVReadiedToForwardToClient(cands, loggedInDto, cv.AssignedToId);
+                         msg = await _composeMessages.ComposeHTMLToPublish_CVReadiedToForwardToClient(cands, loggedInDto, cv.AssignedToId);
                          if (msg!= null)
                          {
                               var attachments = new List<string>();        // TODO - should this be auto-sent?
@@ -616,6 +625,11 @@ namespace infra.Services
           private async Task<int> GetCVReviewId(int candidateId, int orderItemId)
           {
                return await _context.CVReviews.Where(x => x.CandidateId == candidateId && x.OrderItemId == orderItemId).Select(x => x.Id).FirstOrDefaultAsync();
+          }
+
+          public Task<int> NextReviewBy(int orderItemId)
+          {
+               throw new NotImplementedException();
           }
      }
 }

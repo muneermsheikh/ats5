@@ -1,0 +1,21 @@
+[
+     {"Name": "Phone Not Reachable"},
+     {"Name": "Phone out of network"},
+     {"Name": "Phone unanswered"}, 
+     {"Name": "Phone answered by someone else"}, 
+     {"Name": "Wrong phone number."}, 
+     {"Name": "Not interested in the job"}, 
+     {"Name": "Rude behavior"},
+     {"Name": "Negative approach, does not sound interested"},
+     {"Name": "Wants salary increased"}, 
+     {"Name": "Cannot join as PP not in his possession"},
+     {"Name": "Service Charges not acceptable"}, 
+     {"Name": "Not interested due to unknown reasons"},
+     {"Name": "Medically Unfit"}, 
+     {"Name": "Interested in Offer"}, 
+     {"Name": "Offer Accepted"}, 
+     {"Name": "Unable to connect video conference application"},
+     {"Name": "Video Conference Tool Test Succeeded"}, 
+     {"Name": "Video Conference Interiew concluded"}
+
+]

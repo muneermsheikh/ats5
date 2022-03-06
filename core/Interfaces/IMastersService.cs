@@ -19,7 +19,9 @@ namespace core.Interfaces
         Task<Industry> AddIndustry(string industryName);
         Task<bool> EditIndustryAsync(Industry industry);
         Task<bool> DeleteIndustryyAsync(Industry industry);
+        Task<Industry> GetIndustry(int id);
         Task<Pagination<Industry>> GetIndustryListAsync(IndustrySpecParams industryParams);
+        Task<ICollection<Industry>> GetIndustryListWOPaginationAsync();
         //Task<IReadOnlyList<Industry>> GetIndustryListOfACategoryAsync(IndustryParams industryParams);
         
     //Qualifications
@@ -27,9 +29,10 @@ namespace core.Interfaces
         Task<bool> EditQualificationAsync(Qualification qualification);
         Task<bool> DeleteQualificationAsync(Qualification qualification);
         Task<Pagination<Qualification>> GetQualificationListAsync(QualificationSpecParams specParams);
+        Task<ICollection<Qualification>> GetListAsync();
 
     //ReviewItemStatus.Description for Contract REVIEW RESULTS
-        Task<ReviewItemData> AddReviewItemData(string reviewDescriptionName);
+        Task<ReviewItemData> AddReviewItemData(string reviewDescriptionName, bool isBoolean);
         Task<bool> EditReviewItemDataAsync(ReviewItemData reviewItemData);
         Task<bool> DeleteReviewItemDataAsync(ReviewItemData reviewItemData);
         Task<IReadOnlyList<ReviewItemData>> GetReviewItemDataDescriptionListAsync();

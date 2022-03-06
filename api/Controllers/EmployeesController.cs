@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Errors;
+using api.Extensions;
 using core.Entities.Admin;
 using core.Entities.Identity;
 using core.Interfaces;
@@ -34,14 +35,33 @@ namespace api.Controllers
                _empRepo = empRepo;
           }
 
-          [HttpGet]
-          public async Task<ActionResult<Pagination<Employee>>> GetEmployees(EmployeeSpecParams empParams)
+          [HttpGet("employeepages")]
+          public async Task<ActionResult<Pagination<EmployeeBriefDto>>> GetEmployees([FromQuery]EmployeeSpecParams empParams)
           {
+               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               int loggedInEmployeeId = loggedInUser == null ? 0 : await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
+               
                var emps = await _empService.GetEmployeePaginated(empParams);
                if (emps == null) return NotFound(new ApiResponse(404, "No employees found"));
                return Ok(emps);
           }
 
+     
+          [HttpGet("byId/{id}")]
+          public async Task<ActionResult<Employee>> GetEmployeeById(int id)
+          {
+               var emp = await _empService.GetEmployeeById(id);
+               if (emp == null) return NotFound();
+               return Ok(emp);
+          }
+
+          [HttpGet("idandknownas")]
+          public async Task<ActionResult<ICollection<EmployeeIdAndKnownAsDto>>> GetEmployeIdAndKnownAs() 
+          {
+               var emps = await _empService.GetEmployeeIdAndKnownAs();
+
+               return Ok(emps);
+          }
           [HttpPut]
           public async Task<ActionResult<bool>> EditEmployee(Employee employee)
           {
@@ -49,18 +69,19 @@ namespace api.Controllers
                if (string.IsNullOrEmpty(email)) return BadRequest(new
                     ApiResponse(400, "email Id for employee " + employee.FirstName + " " + employee.SecondName + " " + employee.FamilyName +
                     " not provided"));
-               var user = (await _userManager.FindByIdAsync(employee.AppUserId.ToString()) == null);
-               if (user == false)
+               var user = (await _userManager.FindByIdAsync(employee.AppUserId.ToString()) );
+               if (user == null)
                {
                     return BadRequest(new ApiResponse(404, "Bad Request - this employee identity is not registered - go for employee add and not edit"));
                }
 
-               if (await _userManager.FindByEmailAsync(email) != null)
+               if (user.Email != email)
                {
-                    return !await _empService.EditEmployee(employee);
-               }
+                    //user email has changed
+                    return BadRequest(new ApiResponse(400, "Failed to update the employee - The AppUserId exists, but email Id does not match"));
+               } 
+               return !await _empService.EditEmployee(employee);
 
-               return BadRequest(new ApiResponse(400, "failed to update the employee"));
           }
 
           [HttpDelete]
@@ -78,27 +99,6 @@ namespace api.Controllers
                return BadRequest(new ApiResponse(400, "Failed to delete the employee"));
           }
 
-     /*
-          [HttpPost]
-          public async Task<ActionResult<Employee>> AddNewEmployee(Employee employee)
-          {
-               var email = employee.Email;
-               if (string.IsNullOrEmpty(email)) return BadRequest(new
-                    ApiResponse(400, "email Id for employee " + employee.FirstName + " " + employee.SecondName + " " + employee.FamilyName +
-                    " not provided"));
-               if (await _userManager.FindByEmailAsync(email) != null)
-               {
-                    return BadRequest(new ApiValidationErrorResponse { Errors = new[] { "Email address " + email + " is in use" } });
-               }
-
-               if (string.IsNullOrEmpty(employee.Password))
-               {
-                    return BadRequest(new ApiResponse(400, "Password essential"));
-               }
-
-               return await _empService.AddNewEmployee(employee);
-          }
-     */
           [HttpPost("employees")]
           public async Task<ActionResult<ICollection<UserDto>>> AddNewEmployees(ICollection<EmployeeToAddDto> employees)
           {
@@ -115,12 +115,24 @@ namespace api.Controllers
                     var appuser = await _userManager.FindByIdAsync(emp.AppUserId.ToString());
                     users.Add(new UserDto {
                          DisplayName = emp.KnownAs,
-                         Token = _tokenService.CreateToken(appuser),
+                         Token = await _tokenService.CreateToken(appuser),
                          Email = emp.Email
                     });
                }
 
                return users;
           }
+     
+          [HttpGet("employeepositions")]
+          public async Task<ActionResult<ICollection<EmployeePosition>>> GetEmployeePositions()
+          {
+               var posn =  await _empService.GetEmployeePositions();
+
+               if (posn == null) return NotFound();
+
+               return Ok(posn);
+          
+          }
+          
      }
 }

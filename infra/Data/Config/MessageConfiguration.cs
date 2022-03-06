@@ -27,11 +27,11 @@ namespace infra.Data.Config
                 .HasOne(u => u.Sender)
                 .WithMany(m => m.MessagesSent)
                 .OnDelete(DeleteBehavior.Restrict)
-               */
+               
 
                builder.HasOne(x => x.Sender).WithMany().OnDelete(DeleteBehavior.NoAction);
                builder.HasOne(x => x.Recipient).WithMany().OnDelete(DeleteBehavior.NoAction);
-               
+               */
 
           }
      }

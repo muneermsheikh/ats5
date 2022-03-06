@@ -19,8 +19,9 @@ namespace infra.Data.Config
                builder.HasIndex(p => new{p.CandidateId, p.OrderItemId}).IsUnique();
 
                builder.HasMany(o => o.Deploys).WithOne().OnDelete(DeleteBehavior.Cascade);
-               builder.HasMany(o => o.Candidates).WithOne().OnDelete(DeleteBehavior.Restrict);
+               /*builder.HasMany(o => o.Candidates).WithOne().OnDelete(DeleteBehavior.Restrict);
                builder.HasMany(o => o.OrderItems).WithOne().OnDelete(DeleteBehavior.Restrict);
+               */
                //builder.HasOne(o => o.SelectionDecision).WithOne().OnDelete(DeleteBehavior.Cascade);
                
           }

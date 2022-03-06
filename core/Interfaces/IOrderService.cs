@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Entities.Orders;
@@ -10,11 +11,13 @@ namespace core.Interfaces
         {
             Task<Order> CreateOrderAsync(OrderToCreateDto dto);
             Task<ICollection<Order>> CreateOrdersAsync(int loggedInUserId, ICollection<OrderToCreateDto> dtos);
-            Task<bool> EditOrder(Order order);
+            Task<bool> EditOrder(Order order, int loggedInUserId);
             Task<bool> DeleteOrder(Order order);
-            Task<Pagination<OrderToReturnDto>> GetOrdersAllAsync(OrdersSpecParams orderSpecParams);
+            Task<Pagination<OrderBriefDto>> GetOrdersAllAsync(OrdersSpecParams orderSpecParams);
+            Task<Pagination<OrderBriefDto>> GetOrdersBriefAllAsync(OrdersSpecParams orderParams);
             Task<bool> OrderForwardedToHRDept(int orderId);
-
+            Task<ICollection<CustomerCity>> GetOrderCityNames();
+            Task<Order> GetOrderByIdAsyc (int id);
 
         //order items
             Task<IReadOnlyList<OrderItem>> GetOrderItemsByOrderIdAsync(int OrderId);
@@ -24,21 +27,26 @@ namespace core.Interfaces
             void EditOrderItem(OrderItem orderItem);
             bool EditOrderItemWithNavigationObjects(OrderItem modelItem);
             Task<bool> DeleteOrderItem (OrderItem orderItem);
+            Task<ICollection<OrderItemBriefDto>> GetOpenOrderItemsNotPaged();
 
         //Job descriptions
             Task<ICollection<JobDescription>> GetJobDescriptionsByOrderIdAsync(int Id);
-            Task<JobDescription> GetJobDescriptionByOrderItemIdAsync(int Id);
+            Task<JDDto> GetOrAddJobDescription(int Id);
             
             void AddJobDescription(JobDescription jobDescription);
-            void EditJobDescription(JobDescription jobDescription);
+            Task<bool> EditJobDescription(JDDto dto);
             void DeleteJobDescription (JobDescription jobDescription);
 
     // Remuneations
             Task<IReadOnlyList<Remuneration>> GetRemunerationsByOrderIdAsync(int Id);
-            Task<Remuneration> GetRemunerationOfOrderItemAsync(int Id);
+            Task<RemunerationFullDto> GetOrAddRemunerationByOrderItemAsync(int OrderItemId);
             
             Task<Remuneration> AddRemuneration(Remuneration remuneration);
-            Task<bool> EditRemuneration(Remuneration remuneration);
+            Task<bool> EditRemuneration(RemunerationFullDto dto);
             Task<bool> DeleteRemuneration (Remuneration remuneration);
+    
+    // forwardedtOHRO
+            Task<bool> UpdateDLForwardedDateToHR(int orderid, DateTime forwardedToHROn);
+            
     }
 }

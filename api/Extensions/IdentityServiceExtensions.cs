@@ -17,34 +17,20 @@ namespace api.Extensions
     {
         public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
         {
-            var builder = services.AddIdentityCore<AppUser>(
-                opt => {
+            var builder = services.AddIdentityCore<AppUser>(opt => 
+                {
                     opt.Password.RequiredLength=8;
                     opt.Password.RequireDigit=true;
                     opt.Password.RequireUppercase=true;
                 }
-            );
-
-            services.AddAuthorization(options =>
-                {
-                    options.AddPolicy("Admin", new AuthorizationPolicyBuilder()
-                        .RequireAuthenticatedUser()
-                        .RequireClaim("role", "Admin")
-                        .Build());
-                });
-
-            builder = new IdentityBuilder(builder.UserType, builder.Services);
-            /* comment out 30, 31, 34 */
-            //builder.AddRoles<IdentityRole>()
-                //.AddRoleManager<RoleManager<IdentityRole>>();
-            builder
+            )
+                .AddRoles<AppRole>()
+                .AddRoleManager<RoleManager<AppRole>>()
                 .AddSignInManager<SignInManager<AppUser>>()
-                //.AddRoleValidator<RoleValidator<IdentityRole>>()
+                .AddRoleValidator<RoleValidator<AppRole>>()
                 .AddEntityFrameworkStores<AppIdentityDbContext>();
 
-
-            builder.AddEntityFrameworkStores<AppIdentityDbContext>();
-            builder.AddSignInManager<SignInManager<AppUser>>();
+            //builder = new IdentityBuilder(builder.UserType, builder.Services);
             
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -54,11 +40,17 @@ namespace api.Extensions
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Token:Key"])),
                         ValidIssuer = config["Token:Issuer"],
-                        ValidateIssuer = true,
-                        ValidateAudience = false
+                        ValidateIssuer =  false,
+                        ValidateAudience = false,
                     };
                 });
-            /*
+                  
+            services.AddAuthorization(options =>
+                {
+                    options.AddPolicy("AdminRole", policy => policy.RequireRole("Admin"));
+                    options.AddPolicy("HRManagerRole", policy => policy.RequireRole("HRManager", "HRSupervisor", "HRExecutive"));
+        
+                });
             services.AddAuthorization(options => { options.AddPolicy("Admin", new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser().RequireClaim("role", "Admin").Build());});
             services.AddAuthorization(options => { options.AddPolicy("Candidate", new AuthorizationPolicyBuilder()
@@ -69,7 +61,7 @@ namespace api.Extensions
                     .RequireAuthenticatedUser().RequireClaim("role", "Customer").Build());});
             services.AddAuthorization(options => { options.AddPolicy("Associate", new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser().RequireClaim("role", "Associate").Build());});
-            */
+        
             return services;
         }
     }

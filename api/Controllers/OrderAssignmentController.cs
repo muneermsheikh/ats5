@@ -25,13 +25,16 @@ namespace api.Controllers
         //private readonly ICommonServices _commonServices;
         private readonly string _loggedInUserEmail;
         private readonly IOrderAssignmentService _orderAssignmentService;
-
-        public OrderAssignmentController(IOrderAssignmentService orderAssignmentService,
-            UserManager<AppUser> userManager)
+        private ITaskService _taskService;
+        public OrderAssignmentController(
+            IOrderAssignmentService orderAssignmentService,
+            UserManager<AppUser> userManager,
+            ITaskService taskService)
         {
             _orderAssignmentService = orderAssignmentService;
             _userManager = userManager;
             _loggedInUserEmail = User.GetIdentityUserEmailId();
+            _taskService = taskService;
         }
 
 
@@ -52,19 +55,6 @@ namespace api.Controllers
             
         }
 
-        [HttpPost("hrexec/{orderId}")]
-        [Authorize]
-        public async Task<ActionResult<ICollection<EmailMessage>>> AssignHRExecutives(int orderId)
-        {
-            var loggedInAppUserEmail = User.GetIdentityUserEmailId();
-
-            var msgs = await _orderAssignmentService.AssignTasksToHRExecutives(orderId, loggedInAppUserEmail);
-            
-            if (msgs != null && msgs.Count > 0) return Ok(msgs);
-
-            return BadRequest(new ApiResponse (404, "Failed to create tasks for the HR Executives"));
-        }
-
         [HttpDelete("hrexec/{taskid}")]
         [Authorize]
         public async Task<ActionResult<bool>> DeleteHRExecAssignment(int taskid)
@@ -72,6 +62,16 @@ namespace api.Controllers
             return await _orderAssignmentService.DeleteHRExecAssignment(taskid);
         }
 
+        [HttpPost("orderitems")]
+        public async Task<ActionResult<ICollection<EmailMessage>>> AssignHRExecTasks(ICollection<OrderAssignmentDto> orderassignments)
+        {
+            // var loggedInEmployeeId = User.GetIdentityUserEmployeeId(); ** TODO ** this is not working
+            if (orderassignments==null || orderassignments.Count() ==0) return BadRequest(new ApiResponse(400, "no data provided"));
+            var loggedInEmployeeId = 2;
+            var msgs = await _taskService.CreateTaskForHRExecOnOrderItemIds(orderassignments, loggedInEmployeeId);
+            if (msgs!=null && msgs.Count > 0) return Ok(msgs);
+            return BadRequest(new ApiResponse(404, "failed to create tasks"));
+        }
 
     }
 }

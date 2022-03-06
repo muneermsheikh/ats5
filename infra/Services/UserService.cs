@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using core.Entities;
 using core.Entities.Admin;
 using core.Entities.EmailandSMS;
+using core.Entities.HR;
 using core.Entities.Identity;
 using core.Entities.Users;
 using core.Interfaces;
@@ -18,6 +23,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
+
 namespace infra.Services
 {
      public class UserService : IUserService
@@ -26,55 +32,72 @@ namespace infra.Services
           private readonly ATSContext _context;
           private readonly UserManager<AppUser> _userManager;
           private readonly ITaskService _taskService;
-          private readonly IComposeMessages _composeMessages;
+          private readonly IComposeMessagesForAdmin _composeMsgAdmin;
+          private readonly IComposeMessagesForHR _composeMsgHR;
           private readonly IConfiguration _config;
+          private readonly IMapper _mapper;
+          //private readonly ILogger _logger;
           //private readonly TokenService _tokenService;
           public UserService(IUnitOfWork unitOfWork, ATSContext context, ITaskService taskService, IConfiguration config,
-               UserManager<AppUser> usermanager, IComposeMessages composeMessages
+               UserManager<AppUser> usermanager, IComposeMessagesForAdmin composeMsgAdmin, IComposeMessagesForHR composeMsgHR,
+               IMapper mapper   //, ILogger logger
                //, TokenService tokenService
                )
           {
                //_tokenService = tokenService;
+               _composeMsgHR = composeMsgHR;
                _userManager = usermanager;
                _context = context;
                _unitOfWork = unitOfWork;
                _taskService = taskService;
-               _composeMessages = composeMessages;
+               _composeMsgAdmin = composeMsgAdmin;
                _config = config;
+               _mapper = mapper;
+               //_logger = logger;
           }
 
-          public async Task<Candidate> CreateCandidateAsync(RegisterDto registerDto)
+          public async Task<Candidate> CreateCandidateAsync(RegisterDto registerDto, int loggedInEmployeeId)
           {
                var NextAppNo = await _context.Candidates.MaxAsync(x => x.ApplicationNo);
                NextAppNo = NextAppNo == 0 ? 10001 : NextAppNo+1;
+               var firstAdd = registerDto.EntityAddresses.FirstOrDefault();
+               if (registerDto.Address == null) {
+                    if (registerDto.EntityAddresses != null && registerDto.EntityAddresses.Count() > 0)
+                         registerDto.Address= new Address{
+                              Gender = registerDto.Gender,
+                              FirstName = registerDto.FirstName, 
+                              SecondName = registerDto.SecondName,
+                              FamilyName = registerDto.FamilyName,
+                              AddressType = firstAdd.AddressType,
+                              Add = firstAdd.Add,
+                              City = firstAdd.City,
+                              StreetAdd = firstAdd.StreetAdd,
+                              District = firstAdd.District,
+                              DOB = registerDto.DOB,
+                              Country = firstAdd.Country
+                    }; 
+               }
 
-               var cand = new Candidate(registerDto.Address.Gender, registerDto.AppUserId, registerDto.AppUserIdNotEnforced,
-                    NextAppNo  ,     //await _context.Candidates.MaxAsync(x => x.ApplicationNo) ?? 1000 + 1,
-                    registerDto.Address.FirstName, registerDto.Address.SecondName,
-                    registerDto.Address.FamilyName, registerDto.DisplayName, registerDto.Address.DOB,
-                    registerDto.PlaceOfBirth, registerDto.AadharNo, registerDto.Email, registerDto.Introduction,
-                    registerDto.Interests, registerDto.NotificationDesired, registerDto.UserQualifications, registerDto.UserProfessions,
+               //registerDto.Address is not forwarded by client, but is populated here from the collection EntityAddresses
+               var cand = new Candidate(registerDto.Gender, registerDto.AppUserId, 
+                    registerDto.AppUserIdNotEnforced ? registerDto.AppUserIdNotEnforced : true,
+                    NextAppNo, registerDto.FirstName, registerDto.SecondName, registerDto.FamilyName, registerDto.DisplayName, 
+                    registerDto.DOB, registerDto.PlaceOfBirth??"", registerDto.AadharNo??"", registerDto.Email, registerDto.Introduction,
+                    registerDto.Interests, registerDto.NotificationDesired, registerDto.Nationality, (int)registerDto.CompanyId, 
+                    registerDto.PpNo, registerDto.EntityAddresses.Where(x => x.IsMain).Select(x => x.City).FirstOrDefault(),
+                    registerDto.EntityAddresses.Where(x => x.IsMain).Select(x => x.Pin).FirstOrDefault(), 
+                    registerDto.ReferredBy,
+                    registerDto.UserQualifications, registerDto.UserProfessions,
                     registerDto.UserPassports, null);
                
                cand.Created = DateTime.UtcNow;
                cand.LastActive = DateTime.UtcNow;
-               cand.CompanyId = registerDto.CompanyId;
-               cand.AppUserId = registerDto.AppUserId;
-               
-               if (registerDto.EntityAddresses != null)
-               {
-                    var lstAdd = new List<EntityAddress>();
-                    foreach(var add in cand.EntityAddresses)
-                    {
-                         lstAdd.Add(add);          
-                    }
-                    cand.EntityAddresses = lstAdd;               
-               }
+
                //PP No is unique in the db - include only those passports that do not already exist in the database
                var lstPP = new List<UserPassport>();
                foreach (var pp in cand.UserPassports)
                {
-                    var existingPP = _context.UserPassports.Where(c => c.PassportNo == pp.PassportNo).FirstOrDefaultAsync();
+                    var existingPP = await _context.UserPassports.Where(c => c.PassportNo == pp.PassportNo).FirstOrDefaultAsync();
                     if (existingPP == null)
                     {
                          lstPP.Add(pp);
@@ -87,7 +110,7 @@ namespace infra.Services
                     var lstP = new List<UserPhone>();
                     foreach (var p in registerDto.UserPhones)
                     {
-                         var existingP = _context.UserPhones.Where(c => c.MobileNo == p.MobileNo).FirstOrDefaultAsync();
+                         var existingP = await _context.UserPhones.Where(c => c.MobileNo == p.MobileNo).FirstOrDefaultAsync();
                          if (existingP == null)
                          {
                               lstP.Add(p);
@@ -120,39 +143,38 @@ namespace infra.Services
 
                if (registerDto.NotificationDesired) {
                     var paramsDto = new CandidateMessageParamDto{Candidate = cand, DirectlySendMessage = false};
-                    await _composeMessages.AckToCandidateByEmail(paramsDto);
-                    await _composeMessages.AckToCandidateBySMS(paramsDto);
+                    await _composeMsgHR.ComposeHTMLToAckToCandidateByEmail(paramsDto);
+                    await _composeMsgHR.ComposeMsgToAckToCandidateBySMS(paramsDto);
                }
                
                var result = await _unitOfWork.Complete();
 
                if (result <= 0) return null;
 
+          /*
                //upload file attachments
-               
+               var attachments = new List<UserAttachment>();
+               if (UserFormFiles != null && UserFormFiles.Count() > 0)
+               {
+                    foreach (var doc in UserFormFiles)
+                    {
+                         var filePath = Path.Combine(@"App_Data", cand.Id.ToString(),  doc.ContentType, doc.FileName);
+                         new FileInfo(filePath).Directory?.Create();
 
+                         await using var stream = new FileStream(filePath, FileMode.Create);
+                         await doc.CopyToAsync(stream);
+                         //_logger.LogInformation($"The uploaded file [{doc.FileName}] is saved as [{filePath}].");
+
+                         attachments.Add(new UserAttachment { url=filePath, AppUserId = cand.AppUserId, DateUploaded = DateTime.Now, 
+                              AttachmentSizeInBytes = doc.Length, UploadedByEmployeeId = loggedInEmployeeId });
+                    }
+               }
+          */
                return cand;
           }
 
-/*          public async Task<Candidate> GetCandidateByIdAsync(int id)
-          {
-               return await _unitOfWork.Repository<Candidate>().GetByIdAsync(id);
-          }
-
-          public async Task<Candidate> GetCandidateBySpecsIdentityIdAsync(int appUserId)
-          {
-               var spec = new CandidateSpecs(1);
-               return await _unitOfWork.Repository<Candidate>().GetEntityWithSpec(spec);
-          }
-
-          public async Task<Candidate> GetCandidateBySpecsUserIdAsync(int userId)
-          {
-               var spec = new CandidateSpecs(userId);
-               return await _unitOfWork.Repository<Candidate>().GetEntityWithSpec(spec);
-          }
-*/
      //employees
-          public async Task<Employee> CreateEmployeeAsync(RegisterDto registerDto)
+          public async Task<Employee> CreateEmployeeAsync(RegisterEmployeeDto registerDto)
           {
                /*
                //CHECK IF PHONES ALREADY TAKEN
@@ -163,24 +185,24 @@ namespace infra.Services
                }
                */
 
-               var person = new Person(registerDto.Address.Gender, registerDto.Address.FirstName, registerDto.Address.SecondName,
-                    registerDto.Address.FamilyName, registerDto.DisplayName, registerDto.Address.DOB,
-                    registerDto.PlaceOfBirth, registerDto.AadharNo, registerDto.PpNo, registerDto.Nationality);
+               var person = new Person(registerDto.Gender, registerDto.FirstName, registerDto.SecondName,
+                    registerDto.FamilyName, registerDto.DisplayName, registerDto.DOB,
+                    registerDto.PlaceOfBirth, registerDto.AadharNo, "", registerDto.Nationality);
                
                var qs = new List<EmployeeQualification>();
-               if(registerDto.UserQualifications !=null && registerDto.UserQualifications.Count > 0)
+               if(registerDto.EmployeeQualifications !=null && registerDto.EmployeeQualifications.Count > 0)
                {
-                    foreach(var q in registerDto.UserQualifications)
+                    foreach(var q in registerDto.EmployeeQualifications)
                     {
                          qs.Add(new EmployeeQualification(q.QualificationId, q.IsMain));
                     }
                }
 
-               var phs = new List<UserPhone>();
-               if(registerDto.UserPhones != null && registerDto.UserPhones.Count() > 0) {
-                    foreach(var p in registerDto.UserPhones)
+               var phs = new List<EmployeePhone>();
+               if(registerDto.EmployeePhones != null && registerDto.EmployeePhones.Count() > 0) {
+                    foreach(var p in registerDto.EmployeePhones)
                     {
-                         phs.Add(new UserPhone(p.MobileNo, p.IsMain));
+                         phs.Add(new EmployeePhone(p.MobileNo, p.IsMain));
                     }
                }
                phs = phs.Count() > 0 ? phs : null;
@@ -200,11 +222,19 @@ namespace infra.Services
                     }
                }
                otherskills = otherskills.Count() > 0 ? otherskills: null;
-
-               var emp = new Employee(registerDto.Address.Gender, registerDto.Address.FirstName,
-                    registerDto.Address.SecondName, registerDto.Address.FamilyName, registerDto.DisplayName,
-                    registerDto.Address.DOB, registerDto.AadharNo, qs, registerDto.DOJ, registerDto.Department, hrskills, 
-                    otherskills, registerDto.Address.Add, registerDto.Address.City, registerDto.Position);
+               
+               var employeeAddresses = new List<EmployeeAddress>();
+               if (registerDto.EmployeeAddresses!=null && registerDto.EmployeeAddresses.Count > 0) {
+                    foreach(var a in registerDto.EmployeeAddresses) {
+                         employeeAddresses.Add(new EmployeeAddress(a.AddressType, a.Add, a.StreetAdd,
+                         a.City, a.Pin, a.State, a.District, a.Country, a.IsMain));
+                    }
+               }
+               
+               var emp = new Employee(registerDto.Gender, registerDto.FirstName,
+                    registerDto.SecondName, registerDto.FamilyName, registerDto.DisplayName,
+                    registerDto.DOB, registerDto.AadharNo, qs, registerDto.DOJ, registerDto.Department, 
+                    registerDto.Position, hrskills, otherskills, employeeAddresses);
 
                _unitOfWork.Repository<Employee>().Add(emp);
 
@@ -265,7 +295,7 @@ namespace infra.Services
                {
                     UserType = dto.UserType,
                     DisplayName = dto.DisplayName,
-                    Address = dto.Address,
+                    //Address = dto.Address,
                     //UserPassport = objPP,
 
                     Email = dto.Email,
@@ -290,6 +320,12 @@ namespace infra.Services
           public async Task<bool> CheckEmailExistsAsync(string email)
           {
                return await _userManager.FindByEmailAsync(email) != null;
+          }
+
+          public async Task<bool> CheckAadharNoExists(string aadharNo)
+          {
+               var emp = await _context.Employees.Where(x => x.AadharNo == aadharNo).FirstOrDefaultAsync();
+               return (emp != null);
           }
 
           public async Task<ICollection<UserProfession>> EditUserProfessions(UserAndProfessions userProfessions)
@@ -345,12 +381,65 @@ namespace infra.Services
                return new Pagination<Candidate>(candidateParams.PageIndex, candidateParams.PageSize, totalItems, candidateList);
           }
 
-          public async Task<Candidate> UpdateCandidateAsync(Candidate model )
+          public async Task<Candidate> GetCandidateByIdWithAllIncludes(int id)
+          {
+               return await _context.Candidates.Where(x => x.Id == id)
+                    .Include(x => x.UserPhones)
+                    .Include(x => x.UserQualifications)
+                    .Include(x => x.EntityAddresses)
+                    .Include(x => x.UserPassports)
+                    .Include(x => x .UserAttachments)
+                    .Include(x => x.UserExperiences)
+                    .Include(x => x.UserProfessions)
+               .FirstOrDefaultAsync();
+          }
+          public async Task<ICollection<Candidate>> GetCandidatesWithProfessions(CandidateSpecParams param)
+          {
+               var query = _context.Candidates.AsQueryable();
+
+               if (param.ApplicationNoFrom.HasValue && param.ApplicationNoUpto.HasValue)
+               {
+                    query = query.Where(x => x.ApplicationNo >= param.ApplicationNoFrom && 
+                         x.ApplicationNo <= param.ApplicationNoUpto);
+               }
+               if (param.AssociateId.HasValue)
+               {
+                    query = query.Where(x => x.CompanyId == param.AssociateId);
+               }
+               if (param.ProfessionId.HasValue)
+               {
+                    var candidateIds = await _context.UserProfessions.Where(x => x.CategoryId == param.ProfessionId).Select(x => x.CandidateId).Distinct().ToListAsync();
+                    query = query.Where(x => candidateIds.Contains(x.Id));
+               }
+               if (param.RegisteredFrom.HasValue)  {
+                    if (param.RegisteredUpto.HasValue) {
+                         query = query.Where(x => 
+                              (DateTime.Compare(x.Created, Convert.ToDateTime(param.RegisteredFrom)) <= 0)
+                              && (DateTime.Compare(x.Created, Convert.ToDateTime(param.RegisteredUpto)) >=0));
+                    } else {
+                         query = query.Where(x => 
+                              DateTime.Compare(x.Created, Convert.ToDateTime(param.RegisteredFrom)) < 1);
+                    }
+               }
+               
+               if (param.IncludeUserProfessions) query = query.Include(x => x.UserProfessions);
+               
+               //var qry = await query.ProjectTo<CandidateBriefDto>(_mapper.ConfigurationProvider).ToListAsync();
+               return await query.ToListAsync();
+               //return new Pagination<CandidateBriefDto>(param.PageIndex, param.PageSize, qry.Count(), qry);
+               
+
+          }
+          public async Task<Candidate> UpdateCandidateAsync(Candidate model, ICollection<IFormFile> UserFormFiles )
           {
                var existingObject = await _context.Candidates.Where(x => x.Id == model.Id)
-                    .Include(x => x.EntityAddresses).Include(x => x.UserPhones)
-                    .Include(x => x.UserQualifications).Include(x => x.UserProfessions)
-                    .Include(x => x.UserExperiences).Include(x => x.UserAttachments)
+                    .Include(x => x.EntityAddresses)
+                    .Include(x => x.UserPhones)
+                    .Include(x => x.UserQualifications)
+                    .Include(x => x.UserProfessions)
+                    .Include(x => x.UserExperiences)
+                    .Include(x => x.UserAttachments)
+                    .Include(x => x.UserPassports)
                .FirstOrDefaultAsync();
 
                if (existingObject == null) return null;
@@ -360,54 +449,50 @@ namespace infra.Services
 
                //start updating related entities
                //start with deleting records from DB whicha are not present in the model
-               foreach(var existingItem in existingObject.EntityAddresses.ToList())
-               {
-                    if (!model.EntityAddresses.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
-                    {
-                         _context.EntityAddresses.Remove(existingItem);
-                         _context.Entry(existingItem).State = EntityState.Deleted;
+               
+               if(existingObject.EntityAddresses != null) {
+                    foreach(var existingItem in existingObject.EntityAddresses.ToList())  {
+                         if (!model.EntityAddresses.Any(c => c.Id == existingItem.Id && c.Id != default(int)))  {
+                              _context.EntityAddresses.Remove(existingItem);
+                              _context.Entry(existingItem).State = EntityState.Deleted;
+                         }
                     }
-               }
-               //records that are present in DB AND model are the ones to be updated;
-               if (model.EntityAddresses != null)
-               {
+                    
                     foreach(var item in model.EntityAddresses)
                     {
                          var existingItem = existingObject.EntityAddresses.Where(c => c.Id == item.Id && c.Id != default(int)).SingleOrDefault();
                          if (existingItem != null)     //record present in DB, therefore update DB record with values from the model
                          {
+                              if (item.CandidateId == 0) item.CandidateId = model.Id;
                               _context.Entry(existingItem).CurrentValues.SetValues(item);
                               _context.Entry(existingItem).State = EntityState.Modified;
-                         } else         //insert new record
-                         {
+                         } else {       //insert new record
                               var newObj = new EntityAddress(item.AddressType, item.Add, item.StreetAdd,
                                    item.City, item.Pin, item.State, item.District, item.Country, item.IsMain);
                               existingObject.EntityAddresses.Add(newObj);
                               _context.Entry(newObj).State = EntityState.Added;
                          }
                     }
-               }
+               } 
 
                //UserPhones
-               if (model.UserPhones != null)
-               {
-                    foreach(var existingItem in existingObject.UserPhones.ToList())
-                    {
-                         if (!model.UserPhones.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
-                         {
-                              _context.UserPhones.Remove(existingItem);
-                              _context.Entry(existingItem).State = EntityState.Deleted;
+               if (model.UserPhones != null) {
+                    if(existingObject.UserPhones != null) {
+                         foreach(var existingItem in existingObject.UserPhones.ToList()) {
+                              if (!model.UserPhones.Any(c => c.Id == existingItem.Id && c.Id != default(int))) {
+                                   _context.UserPhones.Remove(existingItem);
+                                   _context.Entry(existingItem).State = EntityState.Deleted;
+                              }
                          }
                     }
-                    foreach(var item in model.UserPhones)
-                    {
+                    foreach(var item in model.UserPhones) {
                          var existingItem = existingObject.UserPhones.Where(c => c.Id == item.Id && c.Id != default(int)).SingleOrDefault();
                          if (existingItem != null)     //record present in DB, therefore update DB record with values from the model
                          {
+                              if (item.CandidateId == 0) item.CandidateId = model.Id;
                               _context.Entry(existingItem).CurrentValues.SetValues(item);
                               _context.Entry(existingItem).State = EntityState.Modified;
-                         } else         //insert new record
-                         {
+                         } else {        //insert new record
                               var newObj = new UserPhone(existingObject.Id, item.MobileNo, item.IsMain);
                               existingObject.UserPhones.Add(newObj);
                               _context.Entry(newObj).State = EntityState.Added;
@@ -416,110 +501,98 @@ namespace infra.Services
                }
 
                //UserQualifications
-               if(model.UserQualifications != null)
-               {
-                    foreach(var existingItem in existingObject.UserQualifications.ToList())
-                    {
-                         if (!model.UserQualifications.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
-                         {
-                              _context.UserQualifications.Remove(existingItem);
-                              _context.Entry(existingItem).State = EntityState.Deleted;
+               if(model.UserQualifications != null) {
+                    if (existingObject.UserQualifications != null) {
+                         foreach(var existingItem in existingObject.UserQualifications.ToList()) {
+                              if (!model.UserQualifications.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
+                              {
+                                   _context.UserQualifications.Remove(existingItem);
+                                   _context.Entry(existingItem).State = EntityState.Deleted;
+                              }
                          }
-                    }
-                    foreach(var item in model.UserQualifications)
-                    {
-                         var existingItem = existingObject.UserQualifications.Where(c => c.Id == item.Id && c.Id != default(int)).SingleOrDefault();
-                         if (existingItem != null)     //record present in DB, therefore update DB record with values from the model
-                         {
-                              _context.Entry(existingItem).CurrentValues.SetValues(item);
-                              _context.Entry(existingItem).State = EntityState.Modified;
-                         } else         //insert new record
-                         {
-                              var newObj = new UserQualification(existingObject.Id, item.QualificationId, item.IsMain);
-                              existingObject.UserQualifications.Add(newObj);
-                              _context.Entry(newObj).State = EntityState.Added;
+                         foreach(var item in model.UserQualifications) {
+                              if (item.CandidateId == 0) item.CandidateId = model.Id;
+                              var existingItem = existingObject.UserQualifications.Where(c => c.Id == item.Id && c.Id != default(int)).SingleOrDefault();
+                              if (existingItem != null) {    //record present in DB, therefore update DB record with values from the model
+                                   _context.Entry(existingItem).CurrentValues.SetValues(item);
+                                   _context.Entry(existingItem).State = EntityState.Modified;
+                              } else {         //insert new record
+                                   var newObj = new UserQualification(existingObject.Id, item.QualificationId, item.IsMain);
+                                   existingObject.UserQualifications.Add(newObj);
+                                   _context.Entry(newObj).State = EntityState.Added;
+                              }
                          }
                     }
                }
 
-               
                //UserProfessions
-               if(model.UserProfessions != null)
-               {
-                    foreach(var existingItem in existingObject.UserProfessions.ToList())
-                    {
-                         if (!model.UserProfessions.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
+               if(model.UserProfessions != null) {
+                    if (existingObject.UserProfessions != null) {
+                         foreach(var existingItem in existingObject.UserProfessions.ToList())
                          {
-                              _context.UserProfessions.Remove(existingItem);
-                              _context.Entry(existingItem).State = EntityState.Deleted;
+                              if (!model.UserProfessions.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
+                              {
+                                   _context.UserProfessions.Remove(existingItem);
+                                   _context.Entry(existingItem).State = EntityState.Deleted;
+                              }
                          }
-                    }
-
-                    foreach(var item in model.UserProfessions)
-                    {
-                         var existingItem = existingObject.UserProfessions.Where(c => c.Id == item.Id && c.Id != default(int)).SingleOrDefault();
-                         if (existingItem != null)     //record present in DB, therefore update DB record with values from the model
-                         {
-                              _context.Entry(existingItem).CurrentValues.SetValues(item);
-                              _context.Entry(existingItem).State = EntityState.Modified;
-                         } else         //insert new record
-                         {
-                              var newObj = new UserProfession(existingObject.Id, item.CategoryId, item.IndustryId, item.IsMain);
-                              existingObject.UserProfessions.Add(newObj);
-                              _context.Entry(newObj).State = EntityState.Added;
+                         foreach(var item in model.UserProfessions) {
+                              if (item.CandidateId == 0) item.CandidateId = model.Id;
+                              var existingItem = existingObject.UserProfessions.Where(c => c.Id == item.Id && c.Id != default(int)).SingleOrDefault();
+                              if (existingItem != null) {    //record present in DB, therefore update DB record with values from the model
+                                   _context.Entry(existingItem).CurrentValues.SetValues(item);
+                                   _context.Entry(existingItem).State = EntityState.Modified;
+                              } else {         //insert new record
+                                   var newObj = new UserProfession(existingObject.Id, item.CategoryId, item.IndustryId, item.IsMain);
+                                   existingObject.UserProfessions.Add(newObj);
+                                   _context.Entry(newObj).State = EntityState.Added;
+                              }
                          }
                     }
                }
 
                //UserPassports
-               if (model.UserPassports != null)
-               {
-                    foreach(var existingItem in existingObject.UserPassports.ToList())
-                    {
-                         if (!model.UserPassports.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
-                         {
-                              _context.UserPassports.Remove(existingItem);
-                              _context.Entry(existingItem).State = EntityState.Deleted;
+               if (model.UserPassports != null) {
+                    if (existingObject.UserPassports != null) {
+                         foreach(var existingItem in existingObject.UserPassports.ToList())  {
+                              if (!model.UserPassports.Any(c => c.Id == existingItem.Id && c.Id != default(int))) {
+                                   _context.UserPassports.Remove(existingItem);
+                                   _context.Entry(existingItem).State = EntityState.Deleted;
+                              }
                          }
-                    }
 
-                    foreach(var item in model.UserPassports)
-                    {
-                         var existingItem = existingObject.UserPassports.Where(c => c.Id == item.Id && c.Id != default(int)).SingleOrDefault();
-                         if (existingItem != null)     //record present in DB, therefore update DB record with values from the model
-                         {
-                              _context.Entry(existingItem).CurrentValues.SetValues(item);
-                              _context.Entry(existingItem).State = EntityState.Modified;
-                         } else         //insert new record
-                         {
-                              var newObj = new UserPassport(existingObject.Id, item.PassportNo, item.Nationality, item.Validity);
-                              existingObject.UserPassports.Add(newObj);
-                              _context.Entry(newObj).State = EntityState.Added;
+                         foreach(var item in model.UserPassports) {
+                              if (item.CandidateId == 0) item.CandidateId = model.Id;
+                              var existingItem = existingObject.UserPassports.Where(c => c.Id == item.Id && c.Id != default(int)).SingleOrDefault();
+                              if (existingItem != null) {     //record present in DB, therefore update DB record with values from the model
+                                   _context.Entry(existingItem).CurrentValues.SetValues(item);
+                                   _context.Entry(existingItem).State = EntityState.Modified;
+                              } else {         //insert new record
+                                   var newObj = new UserPassport(existingObject.Id, item.PassportNo, item.Nationality, item.Validity);
+                                   existingObject.UserPassports.Add(newObj);
+                                   _context.Entry(newObj).State = EntityState.Added;
+                              }
                          }
                     }
                }
 
                //UserAExperiences
-               if (model.UserExperiences != null)
-               {
-                    foreach(var existingItem in existingObject.UserExperiences.ToList())
-                    {
+               if (model.UserExperiences != null) {
+                    foreach(var existingItem in existingObject.UserExperiences.ToList()) {
                          if (!model.UserExperiences.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
                          {
                               _context.UserExps.Remove(existingItem);
                               _context.Entry(existingItem).State = EntityState.Deleted;
                          }
                     }
-                    foreach(var item in model.UserExperiences)
-                    {
+                    foreach(var item in model.UserExperiences) {
+                         if (item.CandidateId == 0) item.CandidateId = model.Id;
                          var existingItem = existingObject.UserExperiences.Where(c => c.Id == item.Id && c.Id != default(int)).SingleOrDefault();
-                         if (existingItem != null)     //record present in DB, therefore update DB record with values from the model
-                         {
+                         if (existingItem != null) {    //record present in DB, therefore update DB record with values from the model
                               _context.Entry(existingItem).CurrentValues.SetValues(item);
                               _context.Entry(existingItem).State = EntityState.Modified;
-                         } else         //insert new record
-                         {
-                              var nextSrNo = await _context.UserExps.Where(x => x.CandidateId == existingObject.Id).MaxAsync(x => x.SrNo);
+                         } else {         //insert new record
+                              var nextSrNo = (await _context.UserExps.Where(x => x.CandidateId == existingObject.Id).MaxAsync(x => (int?)x.SrNo)) ?? 0;
                               ++nextSrNo;
                               var newObj = new UserExp(existingObject.Id, nextSrNo, item.PositionId, item.Employer, 
                                    item.Position, item.SalaryCurrency, (int)item.MonthlySalaryDrawn, item.WorkedFrom, 
@@ -530,15 +603,107 @@ namespace infra.Services
                     }
                }
           
+               if (UserFormFiles != null && UserFormFiles.Count > 0) {
+                    var id = model.Id;
+                    var attachments = new List<UserAttachment>();
+                    foreach (var doc in UserFormFiles)
+                    {
+                         /*
+                         //check if file alredy exists, if so, delete it
+                         var existingItem = existingObject.UserAttachments.Where(c => c.url.ToLower() == doc.FileName.ToLower()).FirstOrDefault();
+                         */
+
+                         var filePath = Path.Combine(@"App_Data", id.ToString(),  doc.ContentType, doc.FileName);
+                         new FileInfo(filePath).Directory?.Create();
+
+                         await using var stream = new FileStream(filePath, FileMode.Create);
+                         await doc.CopyToAsync(stream);
+                        // _logger.LogInformation($"The uploaded file [{doc.FileName}] is saved as [{filePath}].");
+                         var newObj = new UserAttachment{url= filePath, AttachmentSizeInBytes=doc.Length, DateUploaded = DateTime.Now, 
+                              AttachmentType= doc.ContentType, AppUserId = model.AppUserId, CandidateId = model.Id };
+                         existingObject.UserAttachments.Add(newObj);
+                         _context.Entry(newObj).State = EntityState.Added;
+                         //result.Add(new UserAttachment { FileName = doc.FileName, FileSize = doc.Length });
+                    }
+
+               }
+               
                _context.Entry(existingObject).State = EntityState.Modified;
 
                if (await _context.SaveChangesAsync() > 0) return existingObject;
-
                return null;
           }
 
+          public async Task<ICollection<CandidateCity>> GetCandidateCityNames()
+          {
+               var c = await _context.Candidates
+                    .Select(x => x.City).Distinct() .ToListAsync();
+               var lsts = new List<CandidateCity>();
+               foreach(var lst in c)
+               {
+                    lsts.Add(new CandidateCity{City = lst});
+               }
+               return lsts;
+          }
 
+          public async Task<string> CheckPPNumberExists(string ppNumber)
+          {
+               var pp = await _context.Candidates.Where(x => x.PpNo.ToLower() == ppNumber.ToLower()).Select(x => new {x.ApplicationNo, x.FullName}).FirstOrDefaultAsync();
+               if (pp==null) return null;
+               return pp.ApplicationNo + " - " + pp.FullName;
+          }
 
-          
+          public async Task<string> GetCategoryNameFromCategoryId(int id)
+          {
+               return await _context.Categories.Where(x => x.Id == id).Select(x => x.Name).FirstOrDefaultAsync();
+          }
+
+          public async Task<string> GetCustomerNameFromCustomerId(int id)
+          {
+               return await _context.Customers.Where(x => x.Id == id).Select(x => x.CustomerName).FirstOrDefaultAsync();
+          }
+
+          public async Task<CandidateBriefDto> GetCandidateByAppNo(int appno)
+          {
+               var cv = await _context.Candidates.Where(x => x.ApplicationNo == appno)
+                    .Select(x => new CandidateBriefDto{
+                         Id = x.Id, Gender = x.Gender, ApplicationNo = appno, 
+                         FullName = x.FullName, City = x.City, ReferredById = x.ReferredBy,
+                         AadharNo = x.AadharNo,
+                         CandidateStatusName = Enum.GetName(typeof(EnumCandidateStatus), x.CandidateStatus)})
+                    .FirstOrDefaultAsync();
+               return cv;
+          }
+
+          public async Task<CandidateBriefDto> GetCandidateBriefById(int candidateid)
+          {
+               var cv = await _context.Candidates.Where(x => x.Id == candidateid)
+                    .Select(x => new CandidateBriefDto{
+                         Id = x.Id, Gender = x.Gender, ApplicationNo = x.ApplicationNo, 
+                         FullName = x.FullName, City = x.City, ReferredById = x.ReferredBy,
+                    })
+                    .FirstOrDefaultAsync();
+               return cv;
+          }
+
+          public async Task<CandidateBriefDto> GetCandidateBriefByParams(CandidateSpecParams SpecParams)
+          {
+               var cand = new Candidate();
+
+               if(SpecParams.ApplicationNoFrom != 0) {
+                    var c = await _context.Candidates.Where(x => x.ApplicationNo == SpecParams.ApplicationNoFrom)
+                         .Select(x => new CandidateBriefDto(x.Id, x.Gender, x.ApplicationNo, x.AadharNo, x.FullName,
+                              x.City, x.ReferredBy, ""))
+                         .FirstOrDefaultAsync();
+                    return c;
+               } else if (SpecParams.CandidateId != 0) {
+                    var c = await _context.Candidates.Where(x => x.Id == SpecParams.CandidateId)
+                         .Select(x => new CandidateBriefDto(x.Id, x.Gender, x.ApplicationNo, x.AadharNo, x.FullName,
+                              x.City, x.ReferredBy, ""))
+                         .FirstOrDefaultAsync();
+                    return c;
+               } 
+               return null;
+          }
      }
 }

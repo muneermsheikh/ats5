@@ -52,10 +52,10 @@ namespace infra.Services
                return null;
           }
 
-          public async Task<ReviewItemData> AddReviewItemData(string reviewDescriptionName)
+          public async Task<ReviewItemData> AddReviewItemData(string reviewDescriptionName, bool isBoolean)
           {
                var srno = await _context.ReviewItemDatas.MaxAsync(x => x.SrNo) + 1;
-               var entity = new ReviewItemData(srno, reviewDescriptionName);
+               var entity = new ReviewItemData(srno, reviewDescriptionName, isBoolean);
 
                _unitOfWork.Repository<ReviewItemData>().Add(entity);
                if (await _unitOfWork.Complete() > 0) return entity;
@@ -76,7 +76,6 @@ namespace infra.Services
                _unitOfWork.Repository<SkillData>().Add(entity);
                if (await _unitOfWork.Complete() > 0) return entity;
                return null;
-
           }
 
         
@@ -162,6 +161,12 @@ namespace infra.Services
 
                return new Pagination<Category>(specParams.PageIndex, specParams.PageSize, totalCount, lst);
           }
+          public async Task<ICollection<Qualification>> GetListAsync()
+          {
+               var lst = await _context.Qualifications.OrderBy(x => x.Name).ToListAsync();
+               return lst;
+          }
+
 
           public async Task<Pagination<Industry>> GetIndustryListAsync(IndustrySpecParams specParams)
           {
@@ -172,6 +177,11 @@ namespace infra.Services
                //var data = _mapper.Map<IReadOnlyList<IndustryToReturnDto>>(lst);
  
                return new Pagination<Industry>(specParams.PageIndex, specParams.PageSize, totalCount, lst);
+          }
+
+          public async Task<ICollection<Industry>> GetIndustryListWOPaginationAsync()
+          {
+               return await _context.Industries.OrderBy(x => x.Name).ToListAsync();
           }
 
           public async Task<Pagination<Qualification>> GetQualificationListAsync(QualificationSpecParams specParams)
@@ -197,6 +207,11 @@ namespace infra.Services
           public async Task<IReadOnlyList<SkillData>> GetSkillDataListAsync()
           {
                return await _unitOfWork.Repository<SkillData>().ListAllAsync();
+          }
+
+          public async Task<Industry> GetIndustry(int id)
+          {
+               return await _context.Industries.FindAsync(id);
           }
      }
 }

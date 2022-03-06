@@ -13,7 +13,7 @@ namespace infra.Data.Config
                builder.HasIndex(p => p.OrderItemId);
                builder.HasIndex(p => new{p.CandidateId, p.OrderItemId}).IsUnique();
                
-               builder.HasMany(s => s.ChecklistItemHRs).WithOne().OnDelete(DeleteBehavior.Cascade);
+               builder.HasMany(s => s.ChecklistHRItems).WithOne().OnDelete(DeleteBehavior.Cascade);
           }
      }
 }

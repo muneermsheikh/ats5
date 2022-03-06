@@ -9,22 +9,31 @@ namespace core.Specifications
      {
           public CustomerWithOfficialsSpecs(CustomerSpecParams custParams)
             : base(x => 
+                (string.IsNullOrEmpty(custParams.CustomerCityName) || 
+                  x.City.ToLower().Contains(custParams.CustomerCityName.ToLower())) &&
+                (!custParams.CustomerIndustryId.HasValue || 
+                  x.CustomerIndustries.Select(x => x.IndustryId).Contains(Convert.ToInt32(custParams.CustomerIndustryId))) &&
+                (string.IsNullOrEmpty(custParams.CustomerType) || 
+                  x.CustomerType.ToLower().Contains(custParams.CustomerType.ToLower())) &&
                 (string.IsNullOrEmpty(custParams.Search) || 
                   x.CustomerName.ToLower().Contains(custParams.Search.ToLower())) &&
                 (!custParams.IndustryId.HasValue || 
-                  x.CustomerIndustries.Select(x => x.IndustryId).Contains(Convert.ToInt32(custParams.IndustryId))))
+                  x.CustomerIndustries.Select(x => x.IndustryId).Contains(Convert.ToInt32(custParams.IndustryId)))
+            )
           {
-              AddInclude(x => x.CustomerOfficials);
-              AddInclude(x => x.CustomerIndustries);
-              AddOrderBy(x => x.CustomerName);
+              if (custParams.IncludeOfficials==true ) AddInclude(x => x.CustomerOfficials);
+              if (custParams.IncludeIndustries==true) AddInclude(x => x.CustomerIndustries);
+              if (custParams.Sort=="name") AddOrderBy(x => x.CustomerName);
+              if (custParams.Sort=="city") AddOrderBy(x => x.City);
+
               ApplyPaging(custParams.PageSize * (custParams.PageIndex - 1), custParams.PageSize);
 
               if (!string.IsNullOrEmpty(custParams.Sort)) {
                 switch(custParams.Sort.ToLower()) {
-                  case "nameasc":
+                  case "name":
                     AddOrderBy(x => x.CustomerName);
                     break;
-                  case "namddesc":
+                  case "namedesc":
                     AddOrderByDescending(x => x.CustomerName);
                     break;
                   
@@ -36,7 +45,7 @@ namespace core.Specifications
                     AddOrderByDescending(x => x.CustomerType);
                     break;
                   
-                  case "cityasc":
+                  case "city":
                     AddOrderBy(x => x.City);
                     break;
                   

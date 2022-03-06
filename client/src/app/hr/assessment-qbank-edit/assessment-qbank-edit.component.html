@@ -1,0 +1,71 @@
+<div *ngIf="!qbank">
+     No data available to edit
+</div>
+<div class="mt-2" *ngIf="qbank">
+     <div class="py-0 my-0" style="display: inline-block;" >
+         <div class="alert alert-info" *ngIf="form.dirty">
+             <strong>Information: </strong> You have made changes.  Any unsaved changes will be lost
+         </div>
+     </div>
+     <div class="my-2" style="display: inline-block;">
+         <div>
+               <div>
+                    <strong>Category Name:</strong> {{qbank.categoryName}}
+               </div>
+             <div class="card-footer">
+                    <button [disabled]="!form.dirty" type="submit" class="btn btn-success btn-block fa fa-save" (click)="onSubmit()" >
+                        <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1">Update</span>
+                    </button>
+                    <button type="button" class="btn btn-success btn-block fa fa-save" (click)="TransactionHistory()" >Transaction History</button>
+             </div>
+         </div>
+     </div>
+      
+     <div style="display: inline-block; vertical-align: top; ">
+         <form [formGroup]="form" (ngSubmit)="onSubmit()">
+               <div style="width: 200px; display: inline-block;">
+                    <button type="button" (click)="addAssessmentQBank()" class="px-15 fa fa-plus" style="color: blue; float: right;"></button>
+               </div>
+
+               <div formArrayName="assessmentQBankItems" class="my-1 px-2">
+                    <div *ngFor="let q of assessmentQBankItems.controls; let i=index">
+                         <div [formGroupName]="i">
+                              <div style="display: inline-block; width: 35px;">
+                                   {{i+1}}
+                              </div>
+                              <div class="my-2" style="font-size: small;">
+                                   <div class="stddmx2 b w100">Parameter</div>
+                                        <input class="stdd w200" type="text" formControlName="assessmentParameter" >
+                                   <div class="stddmx2 b w100">Q No</div>
+                                        <input class="stddmx2 w50" type="text" formControlName="qNo" >
+                                   <div class="stddmx2 b w100">Question</div>
+                                   <textarea class="form-control stddmx2" formControlName="question" 
+                                        rows="4" cols="25" style="margin-left: 10px;">
+                                   </textarea>     
+                                   <div class="stddmx2 b w100">Is Standard Q</div>
+                                        <input class="stddmx2 w50" type="checkbox" formControlName="isStandardQ" >
+                                   <div class="stddmx2 b w100">Max Points</div>
+                                        <input class="stddmx2 w100" type="text" formControlName="knownAs">
+                              </div>
+                              <div style="width: 50px; display: inline-block;">
+                                   <button (click)="removeAssessmentQBankItem(i)" class="fa fa-trash" style="color:red; float: right;"></button>
+                               </div>
+                         </div>
+                    </div>
+               </div>
+          </form>            
+
+          <ul class="text-danger list-unstyled" *ngIf="errors">
+             <li *ngFor="let error of errors">
+                  {{error}}
+             </li>
+         </ul>
+     </div>
+
+     <div>
+         {{this.form.value | json}}
+     </div>
+ 
+ 
+</div>
+

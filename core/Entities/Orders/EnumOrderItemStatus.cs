@@ -4,22 +4,20 @@ namespace core.Entities.Orders
 {
     public enum EnumOrderItemStatus
     {
-        [EnumMember(Value="Awaiting Review")]
-        AwaitingReview,
-        [EnumMember(Value="Accepted")]
-        ReviewedAndAccepted,
-        [EnumMember(Value="decline - salary not feasible")]
-        DeclinedSalaryNotFeasible,
-        [EnumMember(Value="Visa availability uncertain")]
-        DeclinedVisaAvailabilityUncertain,
-        [EnumMember(Value="Negative Historical Status")]
-        DeclinedHistoricalStatusNegative,
-        [EnumMember(Value="Background report negative")]
-        DeclinedBackgroundReportNegative,
+        [EnumMember(Value="Not Started")]
+        NotStarted = 0,
+        [EnumMember(Value="UnderProcess")]
+        UnderProcess=100,
+        [EnumMember(Value="Canceled - client not serious")]
+        Canceled_ClientNotSerious=200,
+        [EnumMember(Value="Canceled - Unable to supply")]
+        Canceled_UnableToSupply=300,
+        [EnumMember(Value="Canceled - Inactive Category")]
+        Canceled_InactiveCategory=400,
         [EnumMember(Value="Concluded")]
-        Concluded,
-        [EnumMember(Value="Canceled")]
-        Canceled
+        Concluded=500,
+        [EnumMember(Value="ConcludedPartially")]
+        ConcludedPartially=600
         
     }
 }

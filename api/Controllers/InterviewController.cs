@@ -130,7 +130,7 @@ namespace api.Controllers
           }
           
           [HttpGet("candidatesmatchinginterviewcat")]
-          public async Task<ActionResult<ICollection<CandidateInBriefDto>>> GetCandidatesMatchingInterviewCategory(InterviewSpecParams interviewParams)
+          public async Task<ActionResult<ICollection<CandidateBriefDto>>> GetCandidatesMatchingInterviewCategory(InterviewSpecParams interviewParams)
           {
                var cands = await _interviewService.GetCandidatesMatchingInterviewCategory(interviewParams);
 

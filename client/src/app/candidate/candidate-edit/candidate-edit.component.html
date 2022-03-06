@@ -1,0 +1,366 @@
+<div class="mt-2" *ngIf="member">
+     <div class="col-3 py-0 my-0" style="display: inline-block;">
+         <h3>Your profile</h3>
+     </div>
+     <div class="col-9 py-0 my-0" style="display: inline-block;" >
+         <div class="alert alert-info" *ngIf="form.dirty">
+             <strong>Information: </strong> You have made changes.  Any unsaved changes will be lost
+         </div>
+     </div>
+     <div class="col-3 my-2" style="display: inline-block;">
+         <div class="card">
+             <img src="{{member.photoUrl || './assets/images/user.png'}}" alt="{{member.knownAs}}" 
+                 class="card-img-top img-thumbnail">
+             <div class="card-body">
+                 <div>
+                     <strong>Location:</strong> {{member.city}} {{member.pin}}
+                 </div>
+                 <div>
+                     <strong>Date of Birth:</strong>
+                     {{member.dOB | date}} {{member.dOB}}.  Place of birth: {{member.placeOfBirth}}
+                 </div>
+                 <div>
+                     <strong>Last Active:</strong>
+                     {{member.lastActive}}
+                 </div>
+                 <div>
+                     <strong>Member since:</strong>
+                     {{member.created | date: 'dd MMM yyyy'}}
+                 </div>
+                 <div>
+                      <strong>Current Status</strong>
+                      <span *ngIf="member.candidateStatus!==100" style="color: red;" >{{member.candidateStatus}}</span>
+                      <span *ngIf="member.candidateStatus===100" >{{member.candidateStatus}}</span>
+                  </div>
+             </div>
+             <div class="card-footer">
+                    <button [disabled]="!form.dirty" type="submit" class="btn btn-success btn-block fa fa-save" (click)="onSubmit()" >
+                        <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1">Update</span>
+                    </button>
+                    <button type="button" class="btn btn-success btn-block fa fa-save" (click)="TransactionHistory()" >Transaction History</button>
+             </div>
+         </div>
+     </div>
+ 
+     
+     <div class="col-9" style="display: inline-block; vertical-align: top; ">
+         <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <tabset class="member-tabset">
+                <tab heading='About {{member.knownAs}}' (selectTab)="onTabActivated($event)">
+                    <div class="my-2" style="font-size: small;">
+                        <div class="stdd b w50">Gender</div>
+                            <input class="stdd w30" type="text" formControlName="gender">
+                        <div class="stddL50 b w75">First Name</div>
+                            <input class="stdd w150" type="text" formControlName="firstName" >
+                        <div class="stddmx2 b w100">Second Name</div>
+                            <input class="stddmx2 w150" type="text" formControlName="secondName" >
+                        <div class="stddmx2 b w100">Family Name</div>
+                            <input class="stddmx2 w150" type="text" formControlName="familyName" >
+                        <div class="stddmx2 b w100">Known As</div>
+                            <input class="stddmx2 w100" type="text" formControlName="knownAs">
+                        <br>
+                        <div class="stdd b w100">Date of Birth</div>
+                            <input class="stddmx2 w150"
+                                type="text"
+                                placeholder="Date of birth"
+                                formControlName="dOB"
+                                bsDatepicker
+                                [bsValue]="bsValueDate"
+                                [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                            >   
+                        <div class="stddmx2 b w100">Birth Place</div>
+                            <input class="stddmx2 w150" type="text" formControlName="placeOfBirth">
+                        <div class="stddmx2 b w100">Notification Desired</div>
+                            <input class="stddmx2 w50" type="checkbox" formControlName="notificationDesired" >
+                        <br>
+                        <div class="stdd b w100">Email</div>
+                            <input class="stddmx2 w350" type="text" formControlName="email" >
+                        <div class="stdd b w100">Password</div>
+                            <input class="stddmx2 w150" type="password" formControlName="password" >
+                        <hr>
+                        <div class="col-6" style="display: inline-block;">
+                            <div class="w100 b">Introduction</div>
+                            <textarea class="form-control" formControlName="introduction" rows="2" style="margin-left: 10px;"></textarea>
+                        </div>
+                        <div class="col-6" style="display: inline-block;">
+                            <div style="width: 100px; font-weight: bold;" >Interests</div>
+                            <textarea class="form-control" formControlName="interests" rows="2" style="margin-left: 10px;"></textarea>
+                        </div>
+                         <hr>
+                        <div style="display: inline-block; width: 100px; font-weight: bold; ">Aadhar No</div>
+                        <input type="text" formControlName="aadharNo" style="display: inline-block; width: 150px; line-height: 12px;" class="py-0 my-0">
+                        <hr>
+                        <div style="font-weight: bold;">
+                            <label style="width: 35px;" >Sr#</label>
+                            <label class="mx-2 px-2" style="width: 100px;">PP No</label>
+                            <label class="mx-2 px-2" style="width: 100px;">Nationality</label>
+                            <label class="mx-2 px-2" style="width: 50px;">ECNR</label>
+                            <label class="mx-2 px-1" style="width: 125px;">Issued On</label>
+                            <label class="mx-2 px-1" style="width: 135px;">Valid Upto</label>
+                            <label class="mx-2 px-2" style="width: 75px; ">Is Valid</label>
+                            <div style="width: 200px; display: inline-block;">
+                                <button type="button" (click)="addUserPP()" class="px-15 fa fa-plus" style="color: blue; float: right;"></button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div formArrayName="userPassports" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                        <div *ngFor="let q of userPassports.controls; let i=index">
+                            <div [formGroupName]="i" >
+                                <div style="display: inline-block; width: 35px;">{{i+1}}</div>
+                                <input type="text" formControlName="passportNo" class="mx-2 px-2" style="display: inline-block; width: 100px" >
+                                <input type="text" formControlName="nationality" class="mx-2 px-2" style="display: inline-block; width: 100px" >
+                                <input type="checkbox" formControlName="ecnr" class="mx-2 px-2" style="display: inline-block; width: 50px" >
+                                <!--
+                                <div class="col-2" style="display: inline-block;">
+                                    <app-date-input [formControl]='userPassports.controls["issuedOn"]' [label]='"Issued On"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
+                                </div>
+                                <div class="col-2" style="display: inline-block;">
+                                    <app-date-input [formControl]='userPassports.controls["validity"]' [label]='"Valid Upto"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
+                                </div>
+                                -->
+                                <input type="text" formControlName="issuedOn" class="mx-2 px-2" style="display: inline-block; width: 100px" >
+                                <input type="text" formControlName="validity" class="mx-2 px-2" style="display: inline-block; width: 100px" >
+                                <input type="checkbox" formControlName="isValid" class="mx-2 px-1" style="display: inline-block; width: 50px" >
+                                <div style="width: 50px; display: inline-block;">
+                                    <button (click)="removeUserPP(i)" class="fa fa-trash" style="color:red; float: right;"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+                
+                <tab heading='Professions' (selectTab)="onTabActivated($event)">
+                    <label class="px-5" style="width: 50px;">Sr. No.</label>
+                    <label class="px-5" style="width: 500px;">Profession</label>
+                    <label class="px-5" style="width: 50px;">Is Main</label>
+                    <button type="button" (click)="addUserProfession()" class="px-15 fa fa-plus" style="color: blue;"></button>
+                    <div formArrayName="userProfessions" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                        <div *ngFor="let cat of userProfessions.controls; let i=index">
+                            <div [formGroupName]="i" >
+                                <div style="display: inline-block; width: 50px;" class="px-5">{{i+1}}</div>
+                                <ng-select *ngIf="categories" style="display: inline-block; width: 500px;" class="px-5"
+                                    [items]="categories"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    labelForId="category"
+                                    placeholder="Select categories"
+                                    clearAllText="Clear"
+                                    formControlName="categoryId">
+                                </ng-select>
+                                <input type="checkbox" formControlName="isMain" style="display: inline-block; width: 50px" class="px-5">
+                                <button (click)="removeUserProfession(i)" style="margin-left: 10px;" class="fa fa-trash" style="color:red; display: inline-block;"></button>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+                <tab heading='Qualifications' (selectTab)="onTabActivated($event)">
+                    <label class="px-5" style="width: 50px;">Sr. No.</label>
+                    <label class="px-5" style="width: 300px;">Qualification</label>
+                    <label class="px-5" style="width: 50px;">Is Main</label>
+                    <button type="button" (click)="addQualification()" class="px-15 fa fa-plus" style="color: blue;"></button>
+                    <div formArrayName="userQualifications" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                        <div *ngFor="let q of userQualifications.controls; let i=index">
+                            <div [formGroupName]="i" >
+                                <div style="display: inline-block; width: 50px;" class="px-5">{{i+1}}</div>
+                                <ng-select *ngIf="qualifications" style="display: inline-block; width: 300px;" class="px-5"
+                                    [items]="qualifications"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    labelForId="Qualification"
+                                    placeholder="Select Qualification"
+                                    clearAllText="Clear"
+                                    formControlName="qualificationId">
+                                </ng-select>
+                                <input type="checkbox" formControlName="isMain" style="margin-left: 50px; display: inline-block; width: 50px" >
+                                <button (click)="removeUserQualification(i)" style="margin-left: 10px;" class="fa fa-trash" style="color:red; display: inline-block;"></button>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+
+                <tab heading='Address & Phones' (selectTab)="onTabActivated($event)">
+                     <div class="col-7" style="display: inline-block; vertical-align: top;" >
+                        <button type="button" (click)="addEntityAddress()" class="fa fa-plus" style="text-align: right; color: blue;"></button>
+                        <div formArrayName="entityAddresses" style="height: 10px; font-size: small; " class="my-1 px-0"> 
+                            <div *ngFor="let ph of entityAddresses.controls; let i=index"> 
+                                <div [formGroupName]="i">
+                                   <div style="display: inline-block; width: 40px; text-align: right; font-weight: bold; ">Sr.No.</div>
+                                   <div style="display: inline-block; width: 40px; ">{{i+1}}</div>
+                                   <div style="display: inline-block; width: 40px; text-align: right; font-weight: bold; ">Type</div>
+                                   <input type="text" formControlName="addressType" style="display: inline-block; width: 30px;" class="mx-2">
+                                   <div style="display: inline-block; width: 175px; text-align: right;  font-weight: bold;">Is Main Address</div> 
+                                   <input type="checkbox" formControlName="isMain" style="display: inline-block;" class="mx-20">
+                                   <br><div style="display: inline-block; width: 100px; text-align: right; font-weight: bold; ">Address</div> 
+                                   <input type="text" formControlName="add" style="width: 400px; display: inline-block;" class="mx-2">
+                                   <br><div style="display: inline-block; width: 100px; text-align: right;  font-weight: bold;">Street Address</div> 
+                                   <input type="text" formControlName="streetAdd" style="width: 400px; display: inline-block;" class="mx-2">
+                                   <br><div style="display: inline-block; width: 100px; text-align: right;  font-weight: bold;">City</div> 
+                                   <input type="text" formControlName="city" style="width: 100px; display: inline-block;" class="mx-2">
+                                   <div style="display: inline-block; width: 40px; text-align: right;  font-weight: bold;">PIN</div> 
+                                   <input type="text" formControlName="pin" style="width: 60px; display: inline-block;" class="mx-2">
+                                   <br><div style="display: inline-block; width: 100px; text-align: right;  font-weight: bold;">District</div>
+                                   <input type="text" formControlName="district" style="width: 100px; display: inline-block;" class="mx-2">
+                                   <div style="display: inline-block; width: 40px; text-align: right; font-weight: bold; ">State</div>
+                                   <input type="text" formControlName="state" style="width: 100px; display: inline-block;" class="mx-2">
+                                   <div style="display: inline-block; width: 50px; text-align: right; font-weight: bold; ">Country</div>
+                                   <input type="text" formControlName="country" style="width: 100px; display: inline-block;" class="ml-2">
+                                   <div style="width: 50px; display: inline-block;">
+                                        <button (click)="removeAddress(i)" class="fa fa-trash" style="float: right; color:red; "></button>
+                                    </div>    
+                                </div>
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: inline-block; font-size: small; vertical-align: top;" class="col-5">
+                        <div style="font-weight: bold;">Phones</div>
+                        <label class="mx-1" style="width: 40px;">Sr#</label>
+                        <label class="mx-1" style="width: 100px;">Mobile No</label>
+                        <label class="mx-1" style="width: 50px;">Is Main</label>
+                        <label class="mx-1" style="width: 150px;">Remarks</label>
+                        <div style="width: 50px; display: inline-block;">
+                            <button type="button" (click)="addPhone()" class="px-15 fa fa-plus" style="color: blue; float: right;"></button>
+                        </div>
+                        <div formArrayName="userPhones" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                            <div *ngFor="let q of userPhones.controls; let j=index">
+                                <div [formGroupName]="j" >
+                                    <div style="display: inline-block; width: 40px;" class="mx-1">{{j+1}}</div>
+                                    <input type="text" formControlName="mobileNo" class="mx-1" style="display: inline-block; width: 100px" >
+                                    <input type="checkbox" formControlName="isMain" class="mx-1" style= "display: inline-block; width: 50px" >
+                                    <input type="text" formControlName="remarks" class="mx-1" style="display: inline-block; width: 150px" >
+                                    <div style="width: 40px; display: inline-block;">
+                                        <button (click)="removeUserPhone(j)" class="fa fa-trash" style="color:red; float: right;"></button>
+                                    </div>
+                                </div>
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+                <tab heading='Experiences' (selectTab)="onTabActivated($event)">
+                    <div style="font-weight: bold; font-size: small;">
+                        <label style="width: 35px;" >Sr#</label>
+                        <label class="mx-2 px-0" style="width: 125px;">Date From</label>
+                        <label class="mx-2 px-0" style="width: 125px;">Date Upto</label>
+                        <label class="mx-2 px-2" style="width: 150px;">Company</label>
+                        <label class="mx-2 px-2" style="width: 150px;">Position </label>
+                        <label class="mx-2 px-1" style="width: 150px;">Salary drawn</label>
+                        <div style="width: 40px; display: inline-block;">
+                            <button type="button" (click)="addUserExperience()" class="fa fa-plus" style="color: blue; float: right;"></button>
+                        </div>
+                    </div>
+                    <div formArrayName="userExperiences" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                        <div *ngFor="let q of userExperiences.controls; let i=index">
+                            <div [formGroupName]="i" >
+                                <div style="display: inline-block; width: 35px;">{{i+1}}</div>
+                                <input type="text" formControlName="workedFrom" class="mx-2 px-0" style="display: inline-block; width: 125px" >
+                                <input type="text" formControlName="workedUpto" class="mx-2 px-0" style="display: inline-block; width: 125px" >
+                                <!--`
+                                <div class="col-2" style="display: inline-block;">
+                                    <app-date-input [formControl]='form.userExperiences.controls["workedFrom"]' [label]='"Worked From"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
+                                </div>
+                                <div class="col-2" style="display: inline-block;">
+                                    <app-date-input [formControl]='form.userExperiences.controls["workedUpto"]' [label]='"Worked Upto"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
+                                </div>
+                                -->
+                                <input type="text" formControlName="employer" class="mx-2 px-2" style="display: inline-block; width: 150px" >
+                                <input type="text" formControlName="position" class="mx-2 px-2" style="display: inline-block; width: 150px" >
+                                <input type="text" formControlName="salaryCurrency" class="mx-2 px-1" style="display: inline-block; width: 50px" >
+                                <input type="number" formControlName="monthlySalaryDrawn" class="mx-2 px-0" style="display: inline-block; width: 100px" >
+                                <div style="width: 50px; display: inline-block;">
+                                    <button (click)="removeUserExperience(i)" class="fa fa-trash" style="color:red; float: right;"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+                <tab heading='Documents' (selectTab)="onTabActivated($event)">
+                    <label class="btn btn-secondary" (click)="fileInput.value = null">
+                        Choose Files
+                        <input
+                          #fileInput
+                          type="file"
+                          style="display: none"
+                          (change)="chooseFile(fileInput.files)"
+                          multiple
+                        />
+                      </label>
+
+                      <div *ngIf="selectedFiles && selectedFiles.length">
+                        <div
+                          *ngFor="let item of selectedFiles"
+                          class="d-flex justify-content-between flex-wrap bg-light text-primary"
+                        >
+                          <div>{{ item.name }}</div>
+                          <div>{{ humanFileSize(item.size) }}</div>
+                        </div>
+                        <div *ngIf="uploading" class="mt-2">
+                          <ngb-progressbar
+                            type="success"
+                            showValue="true"
+                            [value]="uploadProgress"
+                          ></ngb-progressbar>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn btn-primary mt-2"
+                          
+                          [disabled]="uploading"
+                        >
+                          <span *ngIf="!uploading">Upload</span>
+                          <span *ngIf="uploading"> Processing <loading-bar></loading-bar></span>
+                        </button>
+                      </div>
+                      
+                      <div *ngIf="errorMsg" class="text-danger">
+                        {{ errorMsg }}
+                      </div>
+                      
+                      <div *ngIf="submissionResults && submissionResults.length" class="text-success">
+                        <p class="font-weight-bold mb-0">File uploaded</p>
+                        <pre>{{ submissionResults | json }}</pre>
+                      </div>
+                    <!--
+                    <div style="font-weight: bold; font-size: small;">
+                        <label style="width: 35px;" >Sr#</label>
+                        <label class="mx-2 px-0" style="width: 200px;">File Name</label>
+                        <div style="width: 200px; display: inline-block;">
+                            <button type="button" (click)="addUserAttachment()" class="px-15 fa fa-plus" style="color: blue; float: right;"></button>
+                        </div>
+                    </div>
+
+                    <div formArrayName="userAttachments" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                        <div *ngFor="let q of userAttachments.controls; let i=index">
+                            <div [formGroupName]="i" >
+                                <div style="display: inline-block; width: 35px;">{{i+1}}</div>
+                                <input type="file" id="file" formControlName="fileName" (change)="handleFileInput($event.target.files)" style="width: 400px; display: inline-block;" class="mx-2">
+                                <div style="width: 50px; display: inline-block;">
+                                    <button (click)="removeAttachment(i)" class="fa fa-trash" style="color:red; float: right;"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                -->
+                </tab>
+                <tab heading='Edit Photos' (selectTab)="onTabActivated($event)">
+                    <app-photo-editor [member]="member"></app-photo-editor>
+                </tab>
+             </tabset>
+         </form>            
+
+          <ul class="text-danger list-unstyled" *ngIf="errors">
+             <li *ngFor="let error of errors">
+                  {{error}}
+             </li>
+         </ul>
+
+   
+     </div>
+     <div>
+         {{this.form.value | json}}
+     </div>
+ 
+ 
+</div>
+

@@ -10,12 +10,15 @@ namespace core.Interfaces
 {
     public interface IContractReviewService
     {
+        Task<Pagination<ContractReview>> GetContractReviews(ContractReviewSpecParams cParams);
+        Task<ContractReview> GetContractReview(int id);
         Task<ContractReview> CreateContractReviewObject(int orderId, int AppUserId);
         //Task<bool> UpdateContractReview(ContractReview cReview);
         Task<ContractReview> GetContractReviewDtoByOrderIdAsync(int orderId);
         //Task<IReadOnlyList<ContractReviewItemDto>> GetContractReviewItemsByOrderIdAsync(int orderid);
         //Task<ContractReview> GetContractReview(int orderId);
         Task<EmailMessageDto> EditContractReview (ContractReview contractReview);
+        Task<bool> EditContractReviewItem(ContractReviewItemDto model);
         Task<bool> DeleteContractReview(int orderid);
         Task<bool> DeleteContractReviewItem(int orderitemid);
         Task<bool> DeleteReviewReviewItem(int id);
@@ -26,6 +29,7 @@ namespace core.Interfaces
         void AddReviewItemStatus (string reviewItemStatusName);
         Task<ICollection<ReviewStatus>> GetReviewStatus();
         Task<IReadOnlyList<ReviewItemStatus>> GetReviewItemStatus();
-        Task<ContractReviewItemDto> GetContractReviewItemWithOrderDetails(int orderItemId);
+        Task<ICollection<ContractReviewItemDto>> GetContractReviewItemsWithOrderDetails(ContractReviewItemSpecParams cParams);
+        Task<ContractReviewItemDto> GetOrAddReviewResults(int orderitemid);
     }
 }

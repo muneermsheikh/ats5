@@ -21,13 +21,15 @@ namespace infra.Services
           private readonly IUnitOfWork _unitOfWork;
           private readonly ATSContext _context;
           private readonly IMapper _mapper;
-          private readonly IComposeMessages _composeMsg;
+          private readonly IComposeMessagesForHR _composeMsg;
           private readonly IOrderService _orderService;
           private readonly int _OperationsManagementId;
           private readonly IEmailService _emailService;
-          public ContractReviewService(IUnitOfWork unitOfWork, ATSContext context, IMapper mapper,
-               IComposeMessages composeMsg, IOrderService orderService, IConfiguration config, IEmailService emailService)
+          private readonly IComposeMessagesForAdmin _msgForAdmin;
+          public ContractReviewService(IUnitOfWork unitOfWork, ATSContext context, IMapper mapper, IComposeMessagesForAdmin msgForAdmin,
+               IComposeMessagesForHR composeMsg, IOrderService orderService, IConfiguration config, IEmailService emailService)
           {
+               _msgForAdmin = msgForAdmin;
                _emailService = emailService;
                _OperationsManagementId = Convert.ToInt32(config.GetSection("OperationsManagementId").Value);
                _orderService = orderService;
@@ -38,10 +40,10 @@ namespace infra.Services
           }
 
           public void AddReviewItemStatus(string reviewItemStatusName)
-     {
-          var status = new ReviewItemStatus(reviewItemStatusName);
-          _unitOfWork.Repository<ReviewItemStatus>().Add(status);
-     }
+          {
+               var status = new ReviewItemStatus(reviewItemStatusName);
+               _unitOfWork.Repository<ReviewItemStatus>().Add(status);
+          }
 
           public void AddReviewStatus(string reviewStatusName)
           {
@@ -51,7 +53,7 @@ namespace infra.Services
 
           public async Task<EmailMessageDto> EditContractReview(ContractReview model)
           {
-               //thanks to @slauma of stackoverflow
+               // thanks to @slauma of stackoverflow
                var existingObj = await _context.ContractReviews
                .Where(p => p.Id == model.Id)
                .Include(x => x.ContractReviewItems).ThenInclude(x => x.ReviewItems)
@@ -152,7 +154,7 @@ namespace infra.Services
                          //FORWARD REQUIREMENT TO HR DEPT
                          var order = await _context.Orders.Where(x => x.Id == existingObj.OrderId)
                               .Include(x => x.OrderItems).FirstOrDefaultAsync();
-                         var emailMsg = await _composeMsg.ForwardEnquiryToHRDept(order);
+                         var emailMsg = await _msgForAdmin.ForwardEnquiryToHRDept(order);
 
                          order.ForwardedToHRDeptOn = DateTime.Now;
                          _unitOfWork.Repository<Order>().Update(order);
@@ -177,6 +179,63 @@ namespace infra.Services
           }
 
 
+          public async Task<bool> EditContractReviewItem(ContractReviewItemDto model)
+          {
+               // thanks to @slauma of stackoverflow
+               var existingObj = await _context.ContractReviewItems
+                    .Where(p => p.Id == model.Id)
+                    .Include(x => x.ReviewItems)
+                    .SingleOrDefaultAsync();
+
+               if (existingObj == null) throw new Exception("The Contract Review Item model does not exist in the database");
+               if (existingObj.ReviewItems == null) throw new Exception("The Contract Review Items collection does not exist in the database");
+
+               _context.Entry(existingObj).CurrentValues.SetValues(model);   //saves only the parent, not children
+
+               //Delete children that exist in existing record, but not in the new model order
+               foreach (var existingItem in existingObj.ReviewItems.ToList())
+               {
+                    if (!model.ReviewItems.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
+                    {
+                         _context.ReviewItems.Remove(existingItem);
+                         _context.Entry(existingItem).State = EntityState.Deleted;
+                    }
+               }
+
+               //children that are not deleted, are either updated or new ones to be added
+               foreach (var itemModel in model.ReviewItems)
+               {
+                    //work on the contractReviewItem
+                    var existingItem = existingObj.ReviewItems.Where(c => c.Id == itemModel.Id && c.Id != default(int)).SingleOrDefault();
+                    if (existingItem != null)       // record exists, update it
+                    {
+                         _context.Entry(existingItem).CurrentValues.SetValues(itemModel);
+                         _context.Entry(existingItem).State = EntityState.Modified;
+                    }
+                    else            //record does not exist, insert a new record
+                    {
+                         int srno = model.ReviewItems.Max(x => x.SrNo)+1;
+                         var newItem = new ReviewItem {
+                              OrderItemId=itemModel.OrderItemId, 
+                              ContractReviewItemId= itemModel.ContractReviewItemId, 
+                              SrNo = srno, ReviewParameter = itemModel.ReviewParameter,
+                              Response = itemModel.Response, ResponseText = itemModel.ResponseText, 
+                              IsResponseBoolean=itemModel.IsResponseBoolean, 
+                              IsMandatoryTrue=itemModel.IsMandatoryTrue, 
+                              Remarks=itemModel.Remarks
+                         };
+                         existingObj.ReviewItems.Add(newItem);
+                         _context.Entry(newItem).State = EntityState.Added;
+                    }
+               }
+
+               _context.Entry(existingObj).State = EntityState.Modified;
+
+               return await _context.SaveChangesAsync() > 0;
+     
+          }
+
+
           public async Task<ContractReview> GetContractReviewDtoByOrderIdAsync(int orderId)
           {
                var crvw = await _context.ContractReviews.Where(x => x.OrderId == orderId)
@@ -194,30 +253,29 @@ namespace infra.Services
           }
           */
 
-          public async Task<ContractReviewItemDto> GetContractReviewItemWithOrderDetails(int orderItemId)
+          public async Task<ICollection<ContractReviewItemDto>> GetContractReviewItemsWithOrderDetails(ContractReviewItemSpecParams cParams)
           {
-               var rvwItem = await _unitOfWork.Repository<ContractReviewItem>()
-                    .GetEntityWithSpec(new ContractReviewSpecs(orderItemId));
-               var orderItem = await _context.OrderItems.FindAsync(orderItemId);
-               var orderNo = await _context.Orders.Where(x => x.Id == orderItem.OrderId).Select(x => x.OrderNo).FirstOrDefaultAsync();
 
-               var dto = new ContractReviewItemDto
+               //var ReviewItemSpecParams = new ContractReviewItemSpecParams{OrderItemIds = (ICollection<int?>)lst };
+               //var ReviewItemSpecParams = new ContractReviewItemSpecParams(cParams);
+               var specs = new ContractReviewItemSpecs(cParams);
+               var countSpecs = new ContractReviewItemForCountSpecs(cParams);
+
+               var rvwItems = await _unitOfWork.Repository<ContractReviewItem>().ListAsync(specs);
+               //var orderNo = await _context.Orders.Where(x => x.Id == orderItem.OrderId).Select(x => x.OrderNo).FirstOrDefaultAsync();
+
+               var listDto = new List<ContractReviewItemDto>();
+               int srno=1;
+               foreach(var item in rvwItems) 
                {
-                    Id = rvwItem.Id,
-                    ContractReviewId = rvwItem.ContractReviewId,
-                    OrderId = orderItem.OrderId,
-                    OrderNo = orderNo,
-                    OrderItemId = orderItem.Id,
-                    SrNo = orderItem.SrNo,
-                    ProfessionName = orderItem.CategoryName,
-                    Quantity = orderItem.Quantity,
-                    Ecnr = orderItem.Ecnr,
-                    RequireAssess = orderItem.RequireAssess,
-                    CompleteBefore = orderItem.CompleteBefore,
-                    ReviewItems = rvwItem.ReviewItems
+                    listDto.Add(new ContractReviewItemDto(
+                         item.Id, item.ContractReviewId, item.OrderId,
+                         item.OrderItemId, srno++, item.CategoryName, item.SourceFrom, item.Quantity,
+                         item.Ecnr, item.RequireAssess, item.ReviewItems, item.ReviewItemStatus
+                    ));
                };
 
-               return dto;
+               return listDto;
           }
 
           public async Task<bool> DeleteContractReview(int orderid)
@@ -342,6 +400,186 @@ namespace infra.Services
                throw new Exception("failed to create the Contract Review object");
           }
 
+          public  ICollection<int> ConvertCSVToAray(string csv) {
+               bool isParsingOk = true;
+               int[] results = Array.ConvertAll<string,int>(csv.Split(','), 
+               new Converter<string,int>(
+               delegate(string num)
+               {
+                    int r;
+                    isParsingOk &= int.TryParse(num, out r);
+                    return r;
+               }));
+               return results;
+
+           }
+          public async Task<Pagination<ContractReview>> GetContractReviews(ContractReviewSpecParams cParams)
+          {
+               if (!string.IsNullOrEmpty(cParams.OrderIds)) {
+                    cParams.OrderIdInts = ConvertCSVToAray(cParams.OrderIds);
+               }
+
+               //check order Ids to ascertain values are valid; 
+               //if not present records in contractReviews and contractReviewItems, then insert
+               var orderIds = await _context.Orders.Where(x => cParams.OrderIdInts.Contains(x.Id)).Include(x => x.OrderItems).ToListAsync();
+               foreach(var order in orderIds) {
+                    var crvw = await _context.ContractReviews.Where(x => x.OrderId == order.Id).FirstOrDefaultAsync();
+                    var rvwItems = new List<ContractReviewItem>();
+                         
+                         foreach(var item in order.OrderItems) {
+                              var rvwItem = await _context.ContractReviewItems.Where(x => x.OrderItemId == item.Id).FirstOrDefaultAsync();
+                              if (rvwItem == null) {
+                                   rvwItem = new ContractReviewItem(item.Id, item.OrderId, item.CategoryName, item.Quantity);
+                                   rvwItems.Add(rvwItem);
+                                   //_unitOfWork.Repository<ContractReviewItem>().Add(rvwItem);
+                              }
+                         }
+                    if (crvw == null) {
+                         crvw = new ContractReview(order.Id, order.OrderNo, order.OrderDate, order.CustomerId, order.CustomerName, rvwItems);
+                         _unitOfWork.Repository<ContractReview>().Add(crvw);
+                    } else if (rvwItems.Count() > 0) {
+                         crvw.ContractReviewItems = rvwItems;
+                         _unitOfWork.Repository<ContractReview>().Update(crvw);
+                    }
+                         
+               }
+               await _unitOfWork.Complete();
+
+               var spec = new ContractReviewSpecs(cParams);
+               var countSpec = new ContractReviewForCountSpecs(cParams);
+               var totalItems = await _unitOfWork.Repository<ContractReview>().CountAsync(countSpec);
+               var data = await _unitOfWork.Repository<ContractReview>().ListAsync(spec);
+
+               return new Pagination<ContractReview>(cParams.PageIndex, cParams.PageSize, totalItems, data);
+
+          }
      
+          public async Task<ContractReview> GetContractReview(int id)
+          {
+          
+               //check order Ids to ascertain values are valid; 
+               //if not present records in contractReviews and contractReviewItems, then insert
+               var order = await _context.Orders.Where(x => x.Id == id).Include(x => x.OrderItems).FirstOrDefaultAsync();
+               
+               var rvwItems = new List<ContractReviewItem>();
+
+               var crvw = await _context.ContractReviews.Where(x => x.OrderId == id).Include(x => x.ContractReviewItems).FirstOrDefaultAsync();
+
+               foreach(var item in order.OrderItems) {
+                    var rvwItem = await _context.ContractReviewItems.Where(x => x.OrderItemId == item.Id).FirstOrDefaultAsync();
+                    if (rvwItem == null) {
+                         rvwItem = new ContractReviewItem(item.Id, item.OrderId, item.CategoryName, item.Quantity);
+                         rvwItems.Add(rvwItem);
+                    }
+               }
+              
+               if (crvw == null) {
+                    if (order.Customer == null) {
+                         var cust = await _context.Customers.FindAsync(order.CustomerId);
+                         order.Customer = cust;
+                         _unitOfWork.Repository<Order>().Update(order);
+                    } 
+
+                    crvw = new ContractReview(order.Id, order.OrderNo, order.OrderDate, order.CustomerId, order.Customer.CustomerName, rvwItems);
+                    _unitOfWork.Repository<ContractReview>().Add(crvw);
+               } else if (rvwItems.Count() > 0) {
+                    crvw.ContractReviewItems = rvwItems;
+                    _unitOfWork.Repository<ContractReview>().Update(crvw);
+               }
+               
+               
+               var ReviewParameters = await _context.ReviewItemDatas.OrderBy(x => x.SrNo).ToListAsync();
+               var ReviewItems = new List<ReviewItem>();
+               int srno=0;
+               foreach(var item in order.OrderItems) {
+                    var reviewsParams =  await _context.ReviewItems.Where(x => x.OrderItemId == item.Id).ToListAsync();
+                    if (reviewsParams == null) {
+                         foreach(var param in ReviewParameters) {
+                              ReviewItems.Add(new ReviewItem{
+                                   ContractReviewItemId = crvw.Id, OrderItemId = item.Id,  SrNo = ++srno,
+                                   ReviewParameter = param.ReviewParameter, IsMandatoryTrue = param.IsMandatoryTrue,
+                                   Response = param.Response
+                              });
+                         }
+                    }
+               }
+               
+               if (ReviewItems.Count > 0 ) {
+                    foreach(var r in ReviewItems)
+                    _unitOfWork.Repository<ReviewItem>().Add(r);
+               }
+               
+               await _unitOfWork.Complete();
+
+               return await _context.ContractReviews.Where(x => x.OrderId == id).Include(x => x.ContractReviewItems).FirstOrDefaultAsync();
+
+          }
+     
+          private async Task<List<ReviewItem>> GetReviewItemData(int orderitemid) 
+          {
+               var results = new List<ReviewItem>();
+               var rvwdata = await _context.ReviewItemDatas.OrderBy(x => x.SrNo).ToListAsync();
+               foreach(var data in rvwdata) {
+                    results.Add (new ReviewItem{
+                         OrderItemId = orderitemid, SrNo = data.SrNo, ReviewParameter = data.ReviewParameter, 
+                         Response = false, IsMandatoryTrue = data.IsMandatoryTrue, IsResponseBoolean = data.IsResponseBoolean});
+               }
+               return results;
+          }
+          public async Task<ContractReviewItemDto> GetOrAddReviewResults(int orderitemid)
+          {
+               var results = new List<ReviewItem>();
+               
+               //check if contractReview exists
+               var contractReviewItem = await _context.ContractReviewItems.Where(x => x.OrderItemId == orderitemid)
+                    .Include(x => x.ReviewItems).FirstOrDefaultAsync();
+               var orderitemObj = await (from i in _context.OrderItems where(i.Id == orderitemid)
+                         join c in _context.Categories on i.CategoryId equals c.Id 
+                         join o in _context.Orders on i.OrderId equals o.Id 
+                         join cust in _context.Customers on o.CustomerId equals cust.Id
+                         select new {CustomerName=cust.CustomerName, CategoryName=c.Name, OrderId=i.OrderId,
+                              OrderNo = o.OrderNo, OrderDate = o.OrderDate, Quantity = i.Quantity, CustomerId = o.CustomerId }
+                         ).FirstOrDefaultAsync();
+
+               if (contractReviewItem == null) {
+                    results = await GetReviewItemData(orderitemid);
+                    var cReviewItem = new ContractReviewItem{
+                         OrderItemId = orderitemid, OrderId = orderitemObj.OrderId, CustomerName=orderitemObj.CustomerName,
+                         CategoryName = orderitemObj.CategoryName, Quantity = orderitemObj.Quantity, ReviewItems=results};
+
+                    var creview = await _context.ContractReviews.Where(x => x.OrderId == orderitemObj.OrderId).FirstOrDefaultAsync();
+                    var cReviewItems =new List<ContractReviewItem>();
+                    cReviewItems.Add(cReviewItem);
+
+                    if (creview == null) {
+                         creview = new ContractReview(orderitemObj.OrderId, orderitemObj.OrderNo, orderitemObj.OrderDate,
+                              orderitemObj.CustomerId, orderitemObj.CustomerName, cReviewItems );
+                         _unitOfWork.Repository<ContractReview>().Add(creview);
+                         await _unitOfWork.Complete();
+                    } else {
+                         cReviewItem.ContractReviewId = creview.Id;
+                         _unitOfWork.Repository<ContractReviewItem>().Add(cReviewItem);
+                         await _unitOfWork.Complete();
+                    }
+               } else if (contractReviewItem.ReviewItems==null || contractReviewItem.ReviewItems.Count ==0) {
+                    contractReviewItem.ReviewItems = await GetReviewItemData(orderitemid);
+                    _unitOfWork.Repository<ContractReviewItem>().Update(contractReviewItem);
+               }
+               
+               var dto = _mapper.Map<ContractReviewItem, ContractReviewItemDto>(contractReviewItem);
+               if(string.IsNullOrEmpty(contractReviewItem.CategoryName) 
+                    || string.IsNullOrEmpty(contractReviewItem.CustomerName)
+                    || contractReviewItem.OrderId == 0
+                    || contractReviewItem.OrderNo == 0
+                    || contractReviewItem.OrderDate.Year < 2000 ) 
+               {
+                    dto.CategoryName=orderitemObj.CategoryName;
+                    dto.CustomerName=orderitemObj.CustomerName;
+                    dto.OrderId=orderitemObj.OrderId;
+                    dto.OrderDate=orderitemObj.OrderDate;
+                    dto.OrderNo=orderitemObj.OrderNo;
+               }
+               return dto;
+          }
      }
 }

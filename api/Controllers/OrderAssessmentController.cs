@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using core.Entities.HR;
 using core.Entities.MasterEntities;
 using core.Entities.Orders;
 using core.Interfaces;
@@ -15,27 +16,6 @@ namespace api.Controllers
           public OrderAssessmentController(IOrderAssessmentService orderAssessmentService)
           {
                _orderAssessmentService = orderAssessmentService;
-          }
-
-          [Authorize(Policy = "AssessmentQBankRole")]
-          [HttpPost("assessmentqbank")]
-          public async Task<bool> AddStddAssessmentQs(ICollection<AssessmentQBank> stddQs)
-          {
-               return await _orderAssessmentService.AddStddQs(stddQs);
-          }
-
-          [Authorize(Policy = "AssessmentQBankRole")]
-          [HttpPut("assessmentqbank")]
-          public async Task<bool> EditStddQs(ICollection<AssessmentQBank> stddQs)
-          {
-               return await _orderAssessmentService.EditStddQs(stddQs);
-          }
-
-          [Authorize(Policy = "AssessmentQBankRole")]
-          [HttpDelete("stddq")]
-          public async Task<bool> DeleteStddQ(AssessmentQBank stddq)
-          {
-               return await _orderAssessmentService.DeleteStddQ(stddq);
           }
 
           [Authorize(Policy = "OrderAssessmentQRole")]

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ats6\\core\\core.csproj": {}
+    "D:\\ats8\\core\\core.csproj": {}
   },
   "projects": {
-    "D:\\ats6\\core\\core.csproj": {
+    "D:\\ats8\\core\\core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ats6\\core\\core.csproj",
+        "projectUniqueName": "D:\\ats8\\core\\core.csproj",
         "projectName": "core",
-        "projectPath": "D:\\ats6\\core\\core.csproj",
+        "projectPath": "D:\\ats8\\core\\core.csproj",
         "packagesPath": "C:\\Users\\hp\\.nuget\\packages\\",
-        "outputPath": "D:\\ats6\\core\\obj\\",
+        "outputPath": "D:\\ats8\\core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\hp\\AppData\\Roaming\\NuGet\\NuGet.Config"

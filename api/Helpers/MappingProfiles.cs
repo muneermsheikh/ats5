@@ -10,6 +10,7 @@ using core.ParamsAndDtos;
 using core.Entities.EmailandSMS;
 using core.Entities.Tasks;
 using core.Entities.Process;
+using core.Entities.Admin;
 
 namespace api.Helpers
 {
@@ -18,6 +19,7 @@ namespace api.Helpers
           public MappingProfiles()
           {
                CreateMap<ApplicationTask, TaskDashboardDto>();
+               CreateMap<ChecklistHR, ChecklistDto>();
                CreateMap<Customer, CustomerTypeNameKnownAsOfficialsToReturnDto>();
                CreateMap<Customer, CustomerDto>();
                CreateMap<CVRef, CVRefDto>();
@@ -26,13 +28,23 @@ namespace api.Helpers
                CreateMap<CVRef, CVRefPostedDto>();
                CreateMap<CVRef, SelectionsPendingDto>();
                CreateMap<EmailMessage, MessageDto>();
+               CreateMap<Employee, EmployeeBriefDto>();
                CreateMap<Employment, EmploymentToReturnDto>();
                CreateMap<EmployeeToAddDto, EmployeeDto>();
                     
                CreateMap<OrderItem, OrderItemDto>();
                CreateMap<OrderItem, OrderItemToReturnDto>();
                CreateMap<Order, OrderToReturnDto>();
+               CreateMap<Order,OrderBriefDto>();
+                    /*
+                    .ForMember(d => d.ReviewStatus, o => o.MapFrom(s => EnumReviewStatus.GetAttribute<s.ContractReviewId>()))
+                    .ForMember(d => d.Status, o => o.MapFrom(s => EnumOrderStatus.GetAttribute<s.Status>()));
+                    */
                CreateMap<Remuneration, RemunerationDto>();
+               CreateMap<RemunerationFullDto,Remuneration>();
+               
+               CreateMap<JDDto, JobDescription>();
+               
                CreateMap<SelectionDecision, SelectionDecisionToReturnDto>();
                
                CreateMap<RegisterDto, Candidate>()
@@ -43,7 +55,8 @@ namespace api.Helpers
                     .ForMember(d => d.DOB, o => o.MapFrom(s => s.Address.DOB))
                     ;
                
-               CreateMap<Candidate, CandidateInBriefDto>();
+               CreateMap<Candidate, CandidateBriefDto>();
+
                
                CreateMap<Address, EntityAddress>();
                CreateMap<SelectionDecision, SelectionDecisionToRegisterDto>();
@@ -60,6 +73,8 @@ namespace api.Helpers
 
                CreateMap<UserProfession, Prof>();
 
+               CreateMap<UserHistory, UserHistoryDto>();
+               CreateMap<UserHistoryItem, UserHistoryItemDto>();
                //itnerviews
 
           }

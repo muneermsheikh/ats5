@@ -33,7 +33,7 @@ namespace api.Controllers
         [HttpGet("servererror")]
         public ActionResult GetServerError()
         {
-            var thing = _context.Categories.Find(42);
+            var thing = _context.Categories.Find(142);
 
             var thingToReturn = thing.ToString();
 

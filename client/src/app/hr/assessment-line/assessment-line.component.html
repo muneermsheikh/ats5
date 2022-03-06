@@ -1,0 +1,14 @@
+<div *ngIf="q===null">
+     No Assessment Questions on record
+</div>
+<div *ngIf="q!==null">
+     <div class="row mb-0" style="padding: 0px; font-size:small; display: inline-block;">
+          <div class="stdd w200" routerLink="/hr/edit/{{q.id}}" title="edit/view Assessment Q for " + {{q.categoryName}}  >{{cv.categoryName}}</div>
+          <div class="stdd w70">{{q.categoryName}}</div>
+          
+          <div style="display: inline-block; width: 200px; vertical-align: top;">
+               <button class="w30 fa fa-trash red" style="display: inline-block;" type="button" routerLink="/hr/delete/{{q.id}}" ></button>
+          </div>
+     </div>
+</div>
+

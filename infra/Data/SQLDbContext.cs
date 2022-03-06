@@ -36,7 +36,7 @@ namespace infra.Data
           public DbSet<ChecklistHR> ChecklistHRs {get; set;}
           public DbSet<CandidateAssessment> CandidateAssessments {get; set;}
           public DbSet<CandidateAssessmentItem> CandidateAssessmentItems {get; set;}
-          public DbSet<ChecklistItemHR> CheckListItemHRs {get; set;}
+          public DbSet<ChecklistHRItem> ChecklistItemHRs {get; set;}
           public DbSet<CVRef> CVRefs {get; set;}
           public DbSet<CVRefRestriction> CVRefRestrictions {get; set;}
           public DbSet<SelectionDecision> SelectionDecisions {get; set;}

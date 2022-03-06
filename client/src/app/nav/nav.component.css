@@ -1,0 +1,16 @@
+a {
+     text-decoration: none;
+     color: #343a40;
+}
+
+a:active {
+     color: blue;
+}
+
+.logo {
+     cursor: pointer;
+}
+
+.logo:focus {
+     outline: none;
+}

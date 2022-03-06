@@ -1,0 +1,83 @@
+<div class="row" style="font-size: smaller;">
+     <div class="col-2" style="font-size: smaller;">
+          <ng-container>
+               <div class="stdd b w50 blue">Sort</div>
+               <select name="" id="" class="custom-select mb-2" style="font-size: small;" (change)="onSortSelected($event.target.value)">
+                    <option *ngFor="let sort of sortOptions"
+                         [value] = "sort.value"
+                    >{{sort.name}}</option>
+               </select>
+               <div class="stdd b w50 blue">City</div>
+               <select name="" id="" class="custom-select mb-2" style="font-size: small;" (change)="onCitySelected($event.target.value)">
+                    <option *ngFor="let city of orderCities"
+                         [value] = "city.id"
+                    >{{city.cityName}}</option>
+               </select>
+<!--
+               <ul class="list-group">
+                    <li class="list-group-item" style="height: 22px; padding-top: 0%; padding-bottom: 0%;"
+                         *ngFor="let city of orderCities"
+                         [class.active] = "city.city === oParams.city"
+                         [value] = "city.city"
+                         (click) = "onCitySelected(city.city)"
+                    >
+                         {{city.city}}
+                    </li>
+               </ul>
+
+               <div class="stdd w75 b blue">Customers</div>
+               <select name="" id="" class="custom-select mb-2" style="font-size: small;" (change)="onCustomerSelected($event.target.value)">
+                    <option *ngFor="let c of customers"
+                         [value] = "c.id"
+                    >{{c.customerName}}</option>
+               </select>
+
+
+               <ul class="list-group">
+                    <li class="list-group-item" style="height: 22px; padding-top: 0%; padding-bottom: 0%;"
+                         *ngFor="let c of customers"
+                         [class.active] = "c.id=== oParams.customerId"
+                         [value] = "c.id"
+                         (click) = "onCustomerSelected(c.id)"
+                    >
+                         {{c.customerName}}
+                    </li>
+               </ul>
+-->
+
+          </ng-container>
+     </div>
+     <div class="col-10">
+          <div class="d-flex justify-contents-between align-items-center">
+               <app-paging-header [totalCount]="totalCount" [pageNumber]="oParams.pageNumber" [pageSize]="oParams.pageSize"></app-paging-header>
+
+               <div class="d-flex justify-contents-between align-items-center">
+                    <div class="form-inline mt-2" *ngIf="orders">
+                         <input (keyup.enter)="onSearch()" type="text" class="stdd form-control w300" #search placeholder="Search">
+                         <button (click)="onSearch()" class="btn btn-outline-primary my-1">Search</button>
+                         <button (click)="onReset()" class="btn btn-outline-success mx-2 my-1">Reset</button>
+                         <button class="btn btn-outline-success ml-2 my-1 fa fa-plus" routerLink="/orders/add"></button>
+                    </div>
+               </div>
+          </div>
+          <div class="form-inline" style="font-weight: bold;">
+               <div class="stdd w70 b" >Order No</div>
+               <div class="stdd w100 b" >Order Date</div>
+               <div class="stdd w200 b">Customer Name</div>
+               <div class="stdd w100 b" >City</div>
+               <div class="stdd w100 b">Reviewed On</div>
+               <div class="stdd w150 b">Review status</div>
+               <div class="stdd w100 b">Forwarded To HR On</div>
+               <div class="stdd w150 b" >Order Status</div>
+          </div>
+          <div class="row" *ngFor="let order of orders" >
+               <app-order-line [order]="order" ></app-order-line>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-2" *ngIf="totalCount > 0">
+               <app-pager 
+                    [pageSize]="oParams.pageSize" [totalCount]="totalCount" [pageNumber]="oParams.pageNumber" (pageChanged)="onPageChanged($event)"  >
+               </app-pager>
+          </div>
+     </div>
+</div>
+

@@ -9,11 +9,12 @@ namespace infra.Data.Config
      {
           public void Configure(EntityTypeBuilder<OrderItem> builder)
           {
+               /*
                builder.Property(s => s.Status).HasConversion(
                o => o.ToString(),
-               o => (EnumOrderItemStatus) Enum.Parse(typeof(EnumOrderItemStatus), o)
+               o => (int)(EnumOrderItemStatus) Enum.Parse(typeof(EnumOrderItemStatus), o)
                );
-      
+               */
                
                builder.HasOne(x => x.JobDescription).WithOne().OnDelete(DeleteBehavior.Cascade);
                builder.HasOne(s => s.Remuneration).WithOne().OnDelete(DeleteBehavior.Cascade);

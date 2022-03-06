@@ -31,6 +31,7 @@ namespace core.Entities.EmailandSMS
         VisaDocumentationAdvisebySMS, 
         TravelBookingAdviseByEmail,
         TravelBookingAdviseBySMS,
-        RequirementForwardToHRDept
+        RequirementForwardToHRDept,
+        DLForwardToAgents
     }
 }

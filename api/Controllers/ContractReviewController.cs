@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Errors;
 using api.Extensions;
@@ -26,7 +27,7 @@ namespace api.Controllers
         }
 
 
-        [Authorize] //(Roles = "ContractReviewRole")]
+        //[Authorize] //(Roles = "ContractReviewRole")]
         [HttpPost("createobject/{orderId}")]
         public async Task<ContractReview> CreateContractReviewObject(int orderId)
         {
@@ -35,7 +36,7 @@ namespace api.Controllers
             return cReview;
         }
 
-        [Authorize] //(Roles = "ContractReviewRole")]
+        //[Authorize] //(Roles = "ContractReviewRole")]
         [HttpPut("update")]
         public async Task<ActionResult<EmailMessage>> UpdateContractReview(ContractReview contractReview)
         {
@@ -47,23 +48,34 @@ namespace api.Controllers
             }
         }
 
-
-        [Authorize] //(Roles = "ContractReviewRole")]
-        [HttpGet("dto/{orderid}")]
-        public async Task<ContractReview> GetContractReviewDtoByOrderId(int orderid)
+       
+        // [Authorize] //(Roles = "ContractReviewRole")]
+        [HttpGet("reviews")]
+        public async Task<Pagination<ContractReview>> GetContractReviews([FromQuery]ContractReviewSpecParams reviewParams)
         {
-            return await _reviewService.GetContractReviewDtoByOrderIdAsync(orderid);
+            var obj = await _reviewService.GetContractReviews(reviewParams);
+            return obj;
         }
 
-        [Authorize] //(Roles = "ContractReviewRole")]
-        [HttpGet("orderitemdto/{orderitemid}")]
-        public async Task<ContractReviewItemDto> GetContractReviewItemDto(int orderitemid)
+        [HttpGet("{id}")]
+        public async Task<ContractReview> GetContractReviews(int id)
         {
-            var rvwitem = await _reviewService.GetContractReviewItemWithOrderDetails(orderitemid);
+            var obj = await _reviewService.GetContractReview(id);
+            return obj;
+        }
+
+
+        //[Authorize] //(Roles = "ContractReviewRole")]
+        [HttpGet("orderitemdto/{orderitemid}")]
+        public async Task<ICollection<ContractReviewItemDto>> GetContractReviewItemsDto(ContractReviewItemSpecParams cParams)
+        {
+            var rvwitem = await _reviewService.GetContractReviewItemsWithOrderDetails(cParams);
             return rvwitem;
         }
 
-        [Authorize] //(Roles = "ContractReviewRole")]
+
+
+        //[Authorize] //(Roles = "ContractReviewRole")]
         [HttpDelete("{orderid}")]           //deletes contractreview and all children
         public async Task<ActionResult<bool>> DeleteContractReview(int orderid)
         {
@@ -71,7 +83,7 @@ namespace api.Controllers
             return Ok(true);
         }
 
-        [Authorize] //(Roles = "ContractReviewRole")]
+        //[Authorize] //(Roles = "ContractReviewRole")]
         [HttpDelete("item/{orderitemid}")]      //deletes contractReviewItem and all reviewitems
         public async Task<ActionResult<bool>> DeleteContractReviewItem(int orderitemid)
         {
@@ -87,7 +99,25 @@ namespace api.Controllers
             return Ok(true);
         }
 
-        
+        [HttpGet("reviewitem/{orderitemid}")]
+        public async Task<ActionResult<ContractReviewItemDto>> GetReviewResults (int orderitemid)
+        {
+            var results = await _reviewService.GetOrAddReviewResults(orderitemid);
+
+            if(results !=null) return Ok(results);
+
+            return NotFound(new ApiResponse(404, "Not found"));
+        }
+
+        [HttpPut("reviewitem")]
+        public async Task<ActionResult<bool>> UpdateContractReviewItem(ContractReviewItemDto model)
+        {
+            var result = await _reviewService.EditContractReviewItem(model);
+
+            if (!result) return BadRequest(new ApiResponse(402, "failed to update the contract review item"));
+
+            return Ok(result);
+        }
         
     }
 }

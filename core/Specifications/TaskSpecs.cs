@@ -38,6 +38,13 @@ namespace core.Specifications
             AddOrderBy(x => x.OrderItemId);
             AddOrderBy(x => x.TaskDate);
         }
-
+        public TaskSpecs(int taskownerid, bool includeTaskItems, int pageIndex, int pageSize) : 
+            base (x => x.TaskStatus.ToLower() != "completed" && x.TaskStatus.ToLower() != "canceled" && x.TaskOwnerId == taskownerid)
+        {
+            ApplyPaging(pageSize * (pageIndex -1), pageSize);
+            if (includeTaskItems) AddInclude(x => x.TaskItems);
+            AddOrderBy(x => x.TaskDate);
+            
+        }
     }
 }

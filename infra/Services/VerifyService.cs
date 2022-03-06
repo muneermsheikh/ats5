@@ -62,12 +62,12 @@ namespace infra.Services
                          {
                               var checklisthr = await _context.ChecklistHRs
                                    .Where(x => x.CandidateId == id.CandidateId && x.OrderItemId == id.OrderItemId)
-                                   .Include(x => x.ChecklistItemHRs)
-                                   .Select(x => new {x.Id, x.ChecklistItemHRs})
+                                   .Include(x => x.ChecklistHRItems)
+                                   .Select(x => new {x.Id, x.ChecklistHRItems})
                                    .FirstOrDefaultAsync();
                               if (checklisthr == null) errors.Add("No checklist record present for candidateId " + 
                                    id.CandidateId + " and orderitemid " + id.OrderItemId);
-                              var allAccepted = checklisthr.ChecklistItemHRs.Where(x => !x.Accepts).Select(x => x.Accepts).ToList();
+                              var allAccepted = checklisthr.ChecklistHRItems.Where(x => !x.Accepts).Select(x => x.Accepts).ToList();
                               if (allAccepted.Count > 0) errors.Add("not all checklist items are accepted for " +
                                    "candidateId " + id.CandidateId + " and orderitemid " + id.OrderItemId);
                          }

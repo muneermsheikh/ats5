@@ -13,12 +13,12 @@ namespace api.Extensions
             return user.FindFirst(ClaimTypes.Name)?.Value;
         }
 
-    /*
+    
         public static int GetUserId(this ClaimsPrincipal user)
         {
             return int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
         }
-    */
+    
         public static int GetIdentityUserId(this ClaimsPrincipal user)
         {
             //var id = user.FindFirst("Id").Value;
@@ -32,6 +32,12 @@ namespace api.Extensions
         {
             return user?.FindFirst(ClaimTypes.Email)?.Value;
         }
+ 
+        public static int GetIdentityUserEmployeeId(this ClaimsPrincipal user)
+        {
+            return user.GetIdentityUserEmployeeId();
+        }
+ 
         public static bool IsUserAuthenticated(this ClaimsPrincipal user)
         {
             return user.Identity.IsAuthenticated;

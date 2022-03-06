@@ -1,25 +1,15 @@
 namespace core.Specifications
 {
-    public class CustomerSpecParams
+    public class CustomerSpecParams: CommonSpecParams
     {
-        private const int MaxPageSize = 15;
-        public int PageIndex { get; set; } = 1;
-
-        private int _pageSize = 5;
-        public int PageSize
-        {
-            get => _pageSize;
-            set => _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
-        }
-
+        public string CustomerType {get; set;}
+        public string CustomerCityName { get; set; }
+        public int? CustomerIndustryId {get; set;}
+        public bool IncludeOfficials {get; set;}=false;
+        public bool IncludeIndustries {get; set;}=true;
+        
         public int? CustomerOfficialId { get; set; }
         public int? IndustryId { get; set; }
-        public string Sort { get; set; }
         private string _search;
-        public string Search
-        {
-            get => _search;
-            set => _search = value.ToLower();
-        }
     }
 }

@@ -4,31 +4,20 @@ using core.Params;
 
 namespace core.Specifications
 {
-     public class UserContactForCountSpecs : BaseSpecification<UserContact>
+     public class UserContactForCountSpecs : BaseSpecification<UserHistory>
      {
-          public UserContactForCountSpecs(UserContactSpecParams specParams)
+          public UserContactForCountSpecs(UserHistorySpecParams specParams)
             : base(x => 
-                (!specParams.CandidateId.HasValue || x.CandidateId == specParams.CandidateId) 
-                && (!specParams.OrderItemId.HasValue || x.OrderItemId == specParams.OrderItemId) 
-                && (!specParams.OrderId.HasValue || x.OrderId == specParams.OrderId) 
-                && (string.IsNullOrEmpty(specParams.Subject) || 
-                    x.Subject.ToLower().Contains(specParams.Subject.ToLower())) 
-                && (string.IsNullOrEmpty(specParams.UserPhoneNoContacted) || 
-                    x.UserPhoneNoContacted.Contains(specParams.UserPhoneNoContacted)) 
-                && (!specParams.DateOfContactFrom.HasValue && !specParams.DateOfContactUpto.HasValue || 
-                    (DateTime.Compare(x.DateOfContact.Date, ((DateTime)specParams.DateOfContactFrom).Date) >= 0 && 
-                    DateTime.Compare(x.DateOfContact.Date, ((DateTime)specParams.DateOfContactUpto).Date) <= 0)) 
-                && (!specParams.DateOfContactFrom.HasValue || 
-                    x.DateOfContact.Date == ((DateTime)specParams.DateOfContactFrom).Date) 
-                && (!specParams.enumContactResult.HasValue || x.enumContactResult == specParams.enumContactResult) 
-                && (!specParams.loggedInUserId.HasValue || x.LoggedInUserId == specParams.loggedInUserId) 
-            
+                (string.IsNullOrEmpty(specParams.PartyName) || (x.PartyName.ToLower().Contains(specParams.PartyName.ToLower())) &&
+                (string.IsNullOrEmpty(specParams.AadharNo) || x.AadharNo == specParams.AadharNo) &&
+                (string.IsNullOrEmpty(specParams.EmailId) || x.EmailId == specParams.EmailId) &&
+                (string.IsNullOrEmpty(specParams.PhoneNo) || x .AadharNo == specParams.PhoneNo) &&
+                (!specParams.Id.HasValue || x.Id == (int)specParams.Id) &&
+                (!specParams.CandidateId.HasValue || x.CandidateId == (int)specParams.CandidateId) &&
+                (!specParams.CustomerOfficialId.HasValue || x.CustomerOfficialId == (int)specParams.CustomerOfficialId) &&
+                (!specParams.ApplicationNo.HasValue || x.ApplicationNo == (int)specParams.ApplicationNo))
             )
           {
           }
-
-          public UserContactForCountSpecs(int id)  : base(x => x.Id == id)
-        {
-        }
      }
 }

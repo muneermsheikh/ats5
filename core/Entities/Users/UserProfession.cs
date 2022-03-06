@@ -15,16 +15,18 @@ namespace core.Entities.Users
             IndustryId = industryId;
             IsMain = isMain;
         }
-        public UserProfession(int categoryId, int industryId, bool isMain)
+        public UserProfession(int categoryId, string profession, int industryId, bool isMain)
         {
             CategoryId = categoryId;
             IndustryId = industryId;
+            Profession = profession;
             IsMain = isMain;
         }
 
 
         public int CandidateId { get; set; }
         public int CategoryId { get; set; }
+        public string Profession   { get; set; }
         public int IndustryId { get; set; }
         public bool IsMain { get; set; }
         //public Candidate Candidate {get; set;}

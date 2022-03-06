@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using core.Entities.EmailandSMS;
 using core.Entities.HR;
 using core.Entities.Orders;
@@ -24,15 +25,19 @@ namespace infra.Services
           private readonly int TargetDays_HRSupToReviewCV;
           private readonly int TargetDays_DocControllerToFwdCV;
           public IConfiguration Config { get; set; }
-          private readonly IComposeMessages _composeMessages;
+          private readonly IComposeMessagesForHR _composeMsgHR;
           private readonly IUnitOfWork _unitOfWork;
           private readonly IEmailService _emailService;
-          public TaskServices(ICommonServices commonServices, ATSContext context, IConfiguration config,
-                    IComposeMessages composeMessages, IUnitOfWork unitOfWork, IEmailService emailService)
+          private readonly IEmployeeService _empService;
+          private readonly IMapper _mapper;
+          public TaskServices(ICommonServices commonServices, ATSContext context, IConfiguration config, IMapper mapper,
+               IComposeMessagesForHR composeMsgHR, IUnitOfWork unitOfWork, IEmailService emailService, IEmployeeService empService)
           {
+               _empService = empService;
+               _mapper = mapper;
                _emailService = emailService;
                _unitOfWork = unitOfWork;
-               _composeMessages = composeMessages;
+               _composeMsgHR = composeMsgHR;
                _context = context;
                _commonServices = commonServices;
                EmployeeIdDocController = Convert.ToInt32(config.GetSection("EmpDocControllerAdminId").Value);
@@ -40,140 +45,7 @@ namespace infra.Services
                TargetDays_DocControllerToFwdCV = Convert.ToInt32(config.GetSection("TargetDays_DocControllerToFwdCV").Value);
 
           }
-
-     /*
-     public async Task<ICollection<CVSubmitToHRSupDto>> CreateAndSaveTaskForCVRvwByHRSup(LoggedInUserDto loggedInDto, ICollection<CVSubmitToHRSupDto> cvsSubmitted)
-     {
-          ApplicationTask nextTask = null;
-          var lstMsg = new List<EmailMessageAndTaskIdDto>();
-          foreach (var item in cvsSubmitted)
-          {
-               if (item.AssignedToId == 0) throw new Exception("Task not assigned to anyone");
-               var commonData = item.CommonDataDto;
-               var candidateDesc = commonData.CandidateDesc;
-               var parentTask = item.ParentTask;
-
-               if(parentTask == null) {
-                    parentTask = await GetHRExecTaskForCVCompiling(item.OrderItemId, commonData.HRExecId);
-
-                    if (parentTask == null) throw new Exception("cannot retrieve task for " + loggedInDto.LoggedIAppUsername +
-                         " for category " + commonData.OrderNo + "-" + commonData.OrderItemSrNo);
-               }
-
-               var newTask = new ApplicationTask();
-               var hrcvreview = new CVReview();
-
-               if (commonData.HRSupId == 0)   //save for use later for cv fwd
-               {
-                    // create task for Doc Controller
-                    newTask = new ApplicationTask((int)EnumTaskType.CVForwardToDocControllerAdmin, DateTime.Now,
-                         item.TaskOwnerId, EmployeeIdDocController, commonData.OrderId,  commonData.OrderNo, 
-                         item.OrderItemId, "Please forward following application to client: " + candidateDesc,
-                         DateTime.Today.AddDays(TargetDays_DocControllerToFwdCV), "Open", item.CandidateId, null);
-
-                    _context.Tasks.Add(newTask);
-                    await _context.SaveChangesAsync();
-
-                    // insert CVReview
-                    hrcvreview = new CVReview
-                    {
-                         CandidateId = item.CandidateId,
-                         OrderId = commonData.OrderId,
-                         OrderItemId = item.OrderItemId,
-                         HRExecutiveId = commonData.HRExecId,
-                         HRSupId = commonData.HRSupId,
-                         SubmittedByHRExecOn = DateTime.Now,
-                         DocControllerAdminTaskId = newTask.Id,
-                         HRExecRemarks = "No review by HR Sup, tasked to Doc Controller to froward CV"
-                    };
-
-                    _context.CVReviews.Add(hrcvreview);
-               }
-               else
-               {
-                    nextTask = new ApplicationTask((int)EnumTaskType.SubmitCVToHRSupForReview, DateTime.Now, 
-                         item.TaskOwnerId, item.AssignedToId, commonData.OrderId, commonData.OrderNo, 
-                         item.OrderItemId, "Please review following CV: " + candidateDesc, 
-                         DateTime.Today.AddDays(TargetDays_HRSupToReviewCV), "Open", item.CandidateId, null);
-
-                    _context.Tasks.Add(nextTask);
-                    await _context.SaveChangesAsync();
-
-                    // update HRCV Processing
-                    hrcvreview = await _context.CVReviews.Where(x => x.OrderItemId == item.OrderItemId
-                         && x.CandidateId == item.CandidateId).FirstOrDefaultAsync();
-                    hrcvreview.HRSupId = commonData.HRMId == 0 ? 0 : nextTask.Id;
-                    hrcvreview.DocControllerAdminTaskId = commonData.HRMId == 0 ? nextTask.Id : 0;
-
-                    _context.CVReviews.Update(hrcvreview);
-
-                    //update CVReviewBySup record
-                    var supreview = await _context.CVReviews.FindAsync(hrcvreview.CVReviewBySupId);
-                    if (supreview == null) throw new Exception("cannot retrieve Supervisor Review record for reviewBySupId " + hrcvreview.CVReviewBySupId);
-                    
-
-                    //add taskitems to hr exec assignment task
-                    var parentTaskItem = new TaskItem((int)EnumTaskType.AssignTaskToHRExec, parentTask.Id, DateTime.Now, "Open",
-                         "CV submitted for review " + candidateDesc, loggedInDto.LoggedInEmployeeId, commonData.OrderId, item.OrderItemId,
-                         commonData.OrderNo, loggedInDto.LoggedInAppUserId, null, item.CandidateId, 0, parentTask);
-                    _unitOfWork.Repository<TaskItem>().Add(parentTaskItem);
-               }
-
-               parentTask.CompletedOn = DateTime.Now;
-               _context.Tasks.Update(parentTask);
-
-               await _context.SaveChangesAsync();
-          }
-
-          return cvsSubmitted;
-     }
-
-     public async Task<ICollection<CVSubmitToHRMDto>> CreateAndSaveTaskForCVRvwByHRM(LoggedInUserDto loggedInDto, ICollection<CVSubmitToHRMDto> cvsSubmitted)
-     {
-          ApplicationTask nextTask = null;
-          var lstMsg = new List<EmailMessage>();
-          foreach (var item in cvsSubmitted)
-          {
-               var commonData = item.CommonDataDto;
-               var candidateDesc = commonData.CandidateDesc;
-
-               var parentTask = await GetHRSupTaskForCVCompiling(item.OrderItemId, item.CandidateId);
-
-               if (parentTask == null) throw new Exception("cannot retrieve task for " + loggedInDto.LoggedIAppUsername +
-                    " for category " + commonData.OrderNo + "-" + commonData.OrderItemSrNo);
-
-               if (item.ReviewResultId == 1)       //approved by HR Sup
-               {
-                    nextTask = new ApplicationTask((int)EnumTaskType.CVForwardToDocControllerAdmin, DateTime.Now, 
-                         item.TaskOwnerId, EmployeeIdDocController, commonData.OrderId, commonData.OrderNo,
-                         item.OrderItemId, "Following CV ready to forward to Client: " + candidateDesc,
-                         DateTime.Today.AddDays(TargetDays_DocControllerToFwdCV), "Open", item.CandidateId, null);
-                    _context.Tasks.Add(nextTask);
-                    await _context.SaveChangesAsync();
-               }
-
-               //update existing HRSup processing record
-               var CVReviewBySupId = await _context.CVReviews.Where(x => x.CandidateId == item.CandidateId && 
-                    x.OrderItemId == item.OrderItemId).Select(x => x.CVReviewBySup.Id).FirstOrDefaultAsync();
-               var cvreviewSup = await _context.CVReviewBySups.FindAsync(CVReviewBySupId);
-
-               if (cvreviewSup != null)
-               {
-                    cvreviewSup.HRMId = item.ReviewResultId == 1 ? nextTask.AssignedToId : 0;
-                    cvreviewSup.ReviewedByHRSupOn = DateTime.Now;
-                    _context.CVReviewBySups.Update(cvreviewSup);
-               }
-
-               parentTask.CompletedOn = DateTime.Now;
-               _context.Tasks.Update(parentTask);
-          }
-
-          await _context.SaveChangesAsync();
-
-          return cvsSubmitted;
-
-     }
-     */
+     
      private async Task<ICollection<OrderAssignmentDto>> GetAssignmentDtoFromItemIds(ICollection<int> orderItemIds)
      {
           var orderassignmentdto = await (from i in _context.OrderItems where orderItemIds.Contains(i.Id)
@@ -184,34 +56,120 @@ namespace infra.Services
                orderby i.SrNo
                select new OrderAssignmentDto{
                     OrderId = o.Id, OrderNo = o.OrderNo, CategoryRef = o.OrderNo + "-" + i.SrNo, OrderItemId = i.Id, CategoryName = c.Name, 
-                    OrderDate = o.OrderDate.Date, Quantity = i.Quantity, HRExecId = (int)i.HrExecId, 
+                    OrderDate = o.OrderDate.Date, Quantity = i.Quantity, HrExecId = (int)i.HrExecId, 
                     CompleteBy = i.CompleteBefore.Year < 2000 ? o.CompleteBy.Date : i.CompleteBefore.Date, CustomerName = cust.CustomerName, CustomerId = o.CustomerId, 
                     ProjectManagerId = o.ProjectManagerId, CityOfWorking = o.CityOfWorking,
                }).ToListAsync();
           return orderassignmentdto;
      }
-     public async Task<ICollection<EmailMessage>> CreateTaskForHRExecAssignment(ICollection<int> OrderItemIds, LoggedInUserDto loggedInDto)
+
+     public async Task<ICollection<EmailMessage>> CreateTaskForHRExecOnOrderItemIds(ICollection<OrderAssignmentDto> assignments, int loggedInEmployeeId)
      {
-          var orderassignmentdto = await GetAssignmentDtoFromItemIds(OrderItemIds);
 
           var tasks = new List<ApplicationTask>();
-          foreach(var item in orderassignmentdto)
-          {
-               var task = new ApplicationTask((int)EnumTaskType.AssignTaskToHRExec, DateTime.Now,
-                    loggedInDto.LoggedInEmployeeId, (int)item.HRExecId, item.OrderId, item.OrderNo,
-                    item.OrderItemId, "Category Ref " + item.CategoryRef + " " + item.CategoryName +
-                    " total " + item.Quantity + " for " + item.CustomerName + " assigned to you", 
-                    item.CompleteBy.Date, "Open", 0, null);
-               //task.PostTaskAction = EnumPostTaskAction.ComposeAndSendEmail;
-               
-               _unitOfWork.Repository<ApplicationTask>().Add(task);
-          }
+          var task = new ApplicationTask();
 
+          foreach(var t in assignments)
+          {
+               if (string.IsNullOrEmpty(t.CustomerName)) t.CustomerName=await _commonServices.CustomerNameFromCustomerId(t.CustomerId);
+               if (string.IsNullOrEmpty(t.CategoryName)) t.CategoryName=await _commonServices.CategoryNameFromCategoryId(t.CategoryId);
+               if (string.IsNullOrEmpty(t.ProjectManagerPosition)) t.ProjectManagerPosition=await _commonServices.GetEmployeePositionFromEmployeeId(t.CustomerId);
+               var taskitems = new List<TaskItem>();
+               
+               taskitems.Add(new TaskItem((int)EnumTaskType.AssignTaskToHRExec, DateTime.Now, "not started", "task initiated",  loggedInEmployeeId,
+                    t.OrderId, t.OrderItemId, t.OrderNo, loggedInEmployeeId, DateTime.Now.AddDays(7), t.HrExecId,t.Quantity));
+
+               task = new ApplicationTask((int)EnumTaskType.AssignTaskToHRExec, DateTime.Now, t.ProjectManagerId, t.HrExecId, (int)t.OrderId, (int)t.OrderNo,
+                    (int)t.OrderItemId, "Task assigned for " + t.Quantity + " CVs of " + t.CategoryName + ", Category Reference " + t.CategoryRef + " for " + t.CustomerName, 
+                    t.CompleteBy, "Not Started", 0, taskitems);
+               string ErrString = ValidateTaskObject(task);
+               if (string.IsNullOrEmpty(ErrString)) tasks.Add(task);
+
+          }
+          
+          if(tasks==null || tasks.Count==0) return null;
+
+          foreach(var tsk in tasks) {
+               _unitOfWork.Repository<ApplicationTask>().Add(tsk);
+          }
+          
           var recordsAffected = await _unitOfWork.Complete();
 
           if (recordsAffected == 0) throw new Exception("Failed to create the task");
 
-          var msgs = (List<EmailMessage>) await _composeMessages.ComposeMessagesToHRExecToSourceCVs(orderassignmentdto, loggedInDto);
+          var emailMsgs = (List<EmailMessage>) await _composeMsgHR.ComposeMessagesToHRExecToSourceCVs(assignments);
+          if (emailMsgs != null && emailMsgs.Count ==0) return null;
+
+          foreach(var msg in emailMsgs)
+          {
+               if ((msg.PostAction == (int)EnumPostTaskAction.ComposeAndSendEmail || 
+                    msg.PostAction == (int)EnumPostTaskAction.ComposeAndSendEmailComposeAndSendSMS ))
+               {
+                    var attachments = new List<string>();
+                    _emailService.SendEmail(msg, attachments);
+               }
+          }
+          /*   //TODO - test for recipient particulars before allowing direct send
+          if (msg != null) {
+               var attachments = new List<string>();        // TODO - should this be auto-sent?
+               msg = await _emailService.SendEmail(msg, attachments);
+          }
+          */
+          return emailMsgs;
+
+     }
+     public async Task<bool> CreateTaskForHRExecOnOrderItemId_s(Order modelOrder, int loggedInEmployeeId)
+     {
+          //var orderassignmentdto = await GetAssignmentDtoFromItemIds(OrderItemIds);
+          var ids = modelOrder.OrderItems.Select(x => x.Id).ToList();
+          var existingOrderItems = await _context.OrderItems.Where(x => ids.Contains(x.Id)).ToListAsync();
+          var tasks = new List<ApplicationTask>();
+          int added=0;
+          var orderitemid = modelOrder.OrderItems.Select(x => x.Id).FirstOrDefault();
+          var CustomerName = await _context.Customers.Where(x => x.Id == modelOrder.CustomerId).Select(x => x.CustomerName).FirstOrDefaultAsync();
+
+          var cats = await _context.Categories.Where(x => modelOrder.OrderItems.Select(x => x.CategoryId).ToList().Contains(x.Id)).Select(x => new {x.Id, x.Name}).ToListAsync();
+
+          foreach(var model in modelOrder.OrderItems)
+          {
+               var existingOrderItem = existingOrderItems.Where(x => x.Id == model.Id).FirstOrDefault();
+               if (existingOrderItem.HrExecId != model.HrExecId) {
+                    existingOrderItem.HrExecId = model.HrExecId;
+                    _unitOfWork.Repository<OrderItem>().Update(existingOrderItem);
+
+                    var task = new ApplicationTask((int)EnumTaskType.AssignTaskToHRExec, DateTime.Now,
+                         loggedInEmployeeId, (int)model.HrExecId, model.OrderId, model.OrderNo,
+                         model.Id, "Category Ref " + modelOrder.OrderNo + "-" + model.SrNo + " " + 
+                         cats.Where(x => x.Id == model.CategoryId).Select(x => x.Name).FirstOrDefault() +
+                         " total " + model.Quantity + " for " + CustomerName + " assigned to you", 
+                         model.CompleteBefore.Date, "Open", 0, null);
+                    //task.PostTaskAction = EnumPostTaskAction.ComposeAndSendEmail;
+               
+                    _unitOfWork.Repository<ApplicationTask>().Add(task);
+                    added++;
+               }
+          }
+
+          if(added == 0) throw new Exception("no valid records found to generate order assignments");
+          var recordsAffected = await _unitOfWork.Complete();
+
+          if (recordsAffected == 0) throw new Exception("Failed to create the task");
+
+          var dtos = new List<OrderAssignmentDto>();
+          foreach(var model in modelOrder.OrderItems)
+          {
+               dtos.Add(new OrderAssignmentDto{
+                    OrderId = model.OrderId, OrderNo = modelOrder.OrderNo, OrderDate = modelOrder.OrderDate, 
+                    CityOfWorking = modelOrder.CityOfWorking, ProjectManagerId = modelOrder.ProjectManagerId, 
+                    ProjectManagerPosition="not retrieved from DB", OrderItemId = model.Id,
+                    HrExecId = (int)model.HrExecId, CategoryRef=modelOrder.OrderNo + "-" + model.SrNo,
+                    CategoryName = cats.Where(x => x.Id == model.CategoryId).Select(x => x.Name).FirstOrDefault(),
+                    CustomerId = modelOrder.CustomerId, CustomerName  = CustomerName, CompleteBy = model.CompleteBefore});
+          }
+          
+
+          //var orderassignmentdto = _mapper.Map<ICollection<OrderItem>, ICollection<OrderAssignmentDto>>(orderitems);
+          var msgs = (List<EmailMessage>) await _composeMsgHR.ComposeMessagesToHRExecToSourceCVs(dtos);
           
           //for this function, the post action is: composeandsendemail
           if(msgs!=null && msgs.Count > 0)
@@ -223,14 +181,14 @@ namespace infra.Services
                }
           }
           
-          /*   //TODO - test for recipient particulars before allowing direct send
+          /*   ** TODO ** - test for recipient particulars before allowing direct send
           if (msg != null) {
                var attachments = new List<string>();        // TODO - should this be auto-sent?
                msg = await _emailService.SendEmail(msg, attachments);
           }
           */               
 
-          return msgs;
+          return recordsAffected > 0 ;
      }
 
      public async Task<ICollection<EmailMessage>> CreateNewApplicationTask(ApplicationTask task, LoggedInUserDto loggedInDto)
@@ -250,7 +208,7 @@ namespace infra.Services
           {
                case (int)EnumTaskType.DesignOrderAssessmentQ:
                     emailMsgs = (List<EmailMessage>)
-                         await _composeMessages.ComposeMessagesToDesignOrderAssessmentQs((int)task.OrderId, loggedInDto);
+                         await _composeMsgHR.ComposeMessagesToDesignOrderAssessmentQs((int)task.OrderId, loggedInDto);
                     break;
 
                case (int)EnumTaskType.AssignTaskToHRExec:
@@ -258,7 +216,7 @@ namespace infra.Services
 
                     var assignmentdtos = await GetAssignmentDtoFromItemIds(orderitemids);
                     emailMsgs = (List<EmailMessage>)
-                         await _composeMessages.ComposeMessagesToHRExecToSourceCVs((ICollection<OrderAssignmentDto>)orderitemids, loggedInDto);
+                         await _composeMsgHR.ComposeMessagesToHRExecToSourceCVs((ICollection<OrderAssignmentDto>)orderitemids);
                     break;
 
                default:
@@ -397,6 +355,16 @@ namespace infra.Services
           return new Pagination<ApplicationTask>(pageIndex, pageSize, totalCount, tasks);
      }
 
+     public async Task<Pagination<ApplicationTask>> GetApplicationPendingTasksOfAUserPaginated(int userid, int pageIndex, int pageSize)
+     {
+          var specs = new TaskSpecs(userid, false, pageIndex, pageSize);
+          var countSpec = new TaskForCountSpecs(userid, false);
+          var tasks = await _unitOfWork.Repository<ApplicationTask>().ListAsync(specs);
+          var totalCount = await _unitOfWork.Repository<ApplicationTask>().CountAsync(countSpec);
+
+          return new Pagination<ApplicationTask>(pageIndex, pageSize, totalCount, tasks);
+     }
+
      public async Task<ICollection<TaskDashboardDto>> GetDashboardTasks(int loggedInEmployeeId)
      {
           var tasks = await _context.Tasks
@@ -461,7 +429,8 @@ namespace infra.Services
 
           var tItem = new TaskItem((int)t.TaskTypeId, t.Id, dateOfStatus, taskStatus,
                "set as " + taskStatus + " on " + dateOfStatus + " by " + UserName, employeeId, (int)t.OrderId,
-               (int)t.OrderItemId, (int)t.OrderNo, employeeId, DateTime.Now.AddDays(2), (int)t.CandidateId, 0,0, t);
+               (int)t.OrderItemId, (int)t.OrderNo, employeeId, DateTime.Now.AddDays(2), (int)t.CandidateId, 0,0//, t
+          );
           //_context.Entry(tItem).State = EntityState.Added;
           t.TaskItems.Add(tItem);
 
@@ -489,6 +458,10 @@ namespace infra.Services
                     break;
                case (int)EnumTaskType.AssignTaskToHRExec:
                     if (task.OrderItemId == 0) ErrorString = "Order Item Id and Order No not provided";
+                    //check for index integrity
+                    //check for duplicate key row in object 'dbo.Tasks' for unique index 'IX_Tasks_AssignedToId_OrderItemId_CandidateId_TaskTypeId'. 
+                    //The duplicate key value is (1023, 18, 0, 4).
+
                     break;
                case (int)EnumTaskType.SubmitCVToHRSupForReview:
                     if (task.OrderId == 0 || task.OrderNo == 0) ErrorString = "Order Id and Order No not provided";

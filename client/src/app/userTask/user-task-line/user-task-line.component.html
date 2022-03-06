@@ -1,0 +1,22 @@
+<div *ngIf="task===null">
+     No Tasks available
+</div>
+<div *ngIf="task!==null">
+     <div style="display: inline-block; width: max-content;" >
+          <div class="stdd w150" >{{task.assignedToName}}</div>
+          <div class="stdd w100" >{{task.taskDate | date}}</div>
+          <div class="stdd w100">{{task.taskTypeName}}</div>
+          <div class="stdd w300">{{task.taskDescription}}</div>
+          <div class="stdd w100">{{task.completeBy | date}}</div>
+          <div class="stdd w100">{{task.taskStatus}}</div>
+          <div class="stdd w150">{{order.postTaskActionName}}</div>
+          
+          <div style="display: inline-block; width: 250px; line-height: 1em;">
+               <button class="btn btn-outline-success fa fa-pencil blue" type="button" routerLink="/userTask/edit/{{task.id}}" ></button>
+               <button class="mx-1 btn btn-outline-secondary fa fa-eye blue" type="button" routerLink="/userTask/view/{{task.id}}"  ></button>
+               <button class="btn btn-outline-secondary fa fa-trash red" type="button" (click)="markAsDeleted(task.id)" ></button>
+               <button class="mx-1 btn btn-outline-secondary  green fa fa-balance-check" type="button" (click)="markAsCompleted(task.id)" ></button>
+          </div>
+     </div>
+</div>
+

@@ -17,5 +17,6 @@ namespace core.ParamsAndDtos
         public int CustomerId { get; set; }
         public string CustomerName {get; set;}
         public string OfficialName { get; set; }
+
     }
 }

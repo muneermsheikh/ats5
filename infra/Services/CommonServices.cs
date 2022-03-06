@@ -24,6 +24,34 @@ namespace infra.Services
           {
                return await _context.Categories.Where(x => x.Id == categoryId).Select(x => x.Name).FirstOrDefaultAsync();
           }
+          public async Task<string> CategoryRefFromOrderItemId(int OrderItemId)
+          {
+               var CatRef = await (from i in _context.OrderItems where i.Id == OrderItemId
+                    join o in _context.Orders on i.OrderId equals o.Id
+                    join cat in _context.Categories on i.CategoryId equals cat.Id
+                    join c in _context.Customers on o.CustomerId equals c.Id
+                    select new {CategoryRef = o.OrderNo + "-" + i.SrNo + "-" + cat.Name + " for " + c.CustomerName })
+                    .FirstOrDefaultAsync();
+
+               return CatRef.CategoryRef;
+          }
+          
+          public async Task<string> CustomerNameFromCustomerId(int customerId)
+          {
+               var qry = await (from c in _context.Customers where c.Id == customerId
+                    select c.CustomerName)
+                    .FirstOrDefaultAsync();
+               return qry;
+          }
+
+          public async Task<string> GetEmployeeNameFromEmployeeId(int id)
+          {
+               return await _context.Employees.Where(x => x.Id == id).Select(x => x.FirstName + " " + x.FamilyName).FirstOrDefaultAsync();
+          }
+          public async Task<string> GetEmployeePositionFromEmployeeId(int employeeId)
+          {
+                return await _context.Employees.Where(x => x.Id == employeeId).Select(x => x.Position).FirstOrDefaultAsync();
+          }
 
           public async Task<string> CustomerNameFromOrderDetailId(int orderDetailId)
           {
@@ -347,5 +375,10 @@ namespace infra.Services
                
           }
 
+          public async Task<string> CandidateNameFromCandidateId(int CandidateId)
+          {
+               var candidatename = await _context.Candidates.Where(x => x.Id == CandidateId).Select(x => x.FullName).FirstOrDefaultAsync();
+               return candidatename;
+          }
      }
 }

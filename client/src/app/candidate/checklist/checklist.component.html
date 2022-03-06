@@ -1,0 +1,30 @@
+<div class="mx-2">
+     <div class="b blue">HR Checklist</div>
+      <div> <span class="b blue">Candidate:</span> {{chklst.applicationNo}} - {{chklst.candidateName}}</div>
+      <div><span class="b blue">Order Ref</span> {{chklst.orderRef}} </div>
+      <button type="button" class="stdd close pull-right" aria-label="Close" routerLink="/candidate/checklist" >
+        <span aria-hidden="true">&times;</span>
+      </button>
+   </div>
+   <div>
+     <form #checklistForm="ngForm" id="checklistForm" class="ml-2">
+          <label class="stdd w25">Sr#</label>
+          <label class="stdd w200">Parameter</label>
+          <label class="stdd w200">Candidate<br>Response</label>
+          <label class="stdd w50">Candidate<br>accepts</label>
+          <label class="stdd w50">Must<br>accept</label>
+          <label class="stdd w150">Exception</label>
+          <div class="form-check" *ngFor="let item of items; let i=index" style="font-size: small;">
+              <input class="form-control stdd w25" type="text" [(ngModel)]="item[i].srNo" >
+              <input class="form-control stdd w200" type="text" [(ngModel)]="item[i].parameter" >
+              <input class="form-control stdd w200" type="text" [(ngModel)]="item[i].response" >
+              <input class="form-control stdd w50" type="checkbox" [(ngModel)]="item[i].accepts"  >
+              <input class="form-control stdd w50" type="checkbox" [(ngModel)]="item[i].isMandatoryTrue" >
+              <input type="text" [(ngModel)]="item[i].exceptions" >
+          </div>
+     </form>
+   </div>
+   <div class="modal-footer">
+     
+     <button type="button" class="btn btn-success" (click)="updatechecklist()">Submit</button>
+   </div>

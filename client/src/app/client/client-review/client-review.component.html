@@ -1,0 +1,57 @@
+<div *ngIf="customerReview">
+    <div class="mx-5">
+        <button [disabled]="!form.dirty" class="btn btn-success btn-block fa fa-save w50 pull-right" (click)="onSubmit()" >
+            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+        </button>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="stdd w300 b">Customer Review of: {{customerReview.customerName}}</div>
+            <!-- <div>City: <input class="stdd b" type="text" formControlName="city" readonly="true"> </div> -->
+            <p> Current status: 
+                <input class="stdd" type="radio" value="active" formControlName="currentStatus"> Active
+                <input class="stdd" type="radio" value="inactive" formControlName="currentStatus"> Inactive
+                <input class="stdd" type="radio" value="blacklisted" formControlName="currentStatus"> Blacklisted
+            </p>
+            <div formArrayName="customerReviewItems" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                <div class="stdd w100 b vertMiddle">Date</div>
+                <div class="stdd w500 b vertMiddle">Review status</div>
+                <div class="stdd w300 b vertMiddle">Remarks</div>
+                <div class="stdd w100 b vertMiddle">Approved</div>
+                <div class="stdd w40 vertMiddle">
+                    <button type="button" (click)="addCustomerReviewItem()" class="stdd b fa fa-plus" style="color: blue; float: right;"></button>
+                </div>
+                
+                <div *ngFor="let q of customerReviewItems.controls; let i=index">
+                    <div [formGroupName]="i" >
+                            <input class="stdd w100"
+                                type="text"
+                                placeholder="Date"
+                                formControlName="reviewTransactionDate"
+                                bsDatepicker
+                                [bsValue]="bsValueDate"
+                                [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                            >
+                            <ng-select *ngIf="customerReviewStatusData" style="display: inline-block; width: 500px;" 
+                                [items]="customerReviewStatusData"
+                                bindLabel="customerReviewStatusName"
+                                bindValue="id"
+                                labelForId="customerReviewDataId"
+                                placeholder="Select status"
+                                clearAllText="Clear"
+                                formControlName="customerReviewDataId">
+                        </ng-select>
+                    
+                        <input type="text" formControlName="remarks" class="mx-2 px-2" style="display: inline-block; width: 300px" >
+                        <input type="checkbox" disabled="!hasUserManagerRole" formControlName="approvedBySup" class="mx-27 px-2" style="display: inline-block; width: 50px" >
+                        <div style="width: 50px; display: inline-block;">
+                                <button (click)="removeCustomerReviewItem(i)" class="fa fa-trash" style="color:red; float: right;"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<br>          
+<div style="font-size: small; margin-top: 125px;">
+     {{this.form.value | json}}
+ </div>
