@@ -28,6 +28,11 @@ namespace core.Entities.HR
         public int UserId { get; set; }
         public DateTime CheckedOn {get; set;}
         public String HrExecComments {get; set;}
+        public int Charges {get; set;}
+        public int ChargesAgreed {get; set;}
+        public bool ExceptionApproved {get; set;}
+        public string ExceptionApprovedBy {get; set;}
+        public DateTime ExceptionApprovedOn {get; set;}
         public ICollection<ChecklistHRItem> ChecklistHRItems {get; set;}
         public Candidate Candidate {get; set;}
         public OrderItem OrderItem {get; set;}

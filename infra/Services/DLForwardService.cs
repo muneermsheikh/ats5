@@ -30,16 +30,10 @@ namespace infra.Services
             foreach(var itemid in itemsAndAgents.Items) {
                 var CatRef = await _commonService.CategoryRefFromOrderItemId(itemid.OrderItemId);
                 foreach(var id in itemsAndAgents.Agents) {
-                    string emailid = "";
-                    string phoneno = "";
-                    string mobile = "";
-                    if(id.Checked==true) emailid = id.OfficialEmailId;
-                    if (id.CheckedPhone==true) phoneno = id.Phoneno;
-                    if (id.CheckedMobile==true) mobile = id.Mobile;
-                    if (string.IsNullOrEmpty(emailid) && string.IsNullOrEmpty(phoneno) && string.IsNullOrEmpty(mobile)) break;
+                    if (string.IsNullOrEmpty(id.OfficialEmailId) && string.IsNullOrEmpty(id.Mobile) && string.IsNullOrEmpty(id.Phoneno)) break;
                     
-                    var dlForward = new DLForward(itemid.OrderItemId, itemid.CategoryId, CatRef, id.CustomerOfficialId, 
-                        itemsAndAgents.DateForwarded, emailid, phoneno, mobile, LoggedInUserId);
+                    var dlForward = new DLForward(itemid.OrderItemId, itemid.CategoryId, CatRef, id.OfficialId, 
+                        itemsAndAgents.DateForwarded, id.OfficialEmailId, id.Phoneno, id.Mobile, LoggedInUserId);
                     dlForwards.Add(dlForward);
                     _unitOfWork.Repository<DLForward>().Add(dlForward);
                 }

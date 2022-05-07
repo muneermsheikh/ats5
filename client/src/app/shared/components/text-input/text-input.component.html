@@ -5,6 +5,7 @@
     <input 
          [ngClass]="(controlDir?.control?.touched) 
              ? !controlDir.control.valid ? 'is-invalid' : 'is-valid' : null"
+        [class]="'class'"
          [type]="type"
          (input)="onChange($event.target.value)"
          (blur)="onTouched()"

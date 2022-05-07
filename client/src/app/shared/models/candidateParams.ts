@@ -1,25 +1,26 @@
 export class candidateParams {
-     candidateId?: number;
-     applicationNoFrom?: number;
-     applicationNoUpto?: number;
-     registeredFrom?: Date;
-     registeredUpto?: number;
+     candidateId?= 0;
+     applicationNoFrom? = 0;
+     applicationNoUpto? = 0;
+     registeredFrom? = '';
+     registeredUpto? = 0;
      professionId? = 0;
-     agentId?: number;
-     industryId?: number;
-     associateId?: number;
-     appUserId?: number;
+     agentId? = 0;
+     industryId? = 0;
+     associateId? = 0;
+     appUserId? = 0;
      city ='';
-     disrict: string;
-     state: string;
-     email: '';
-     mobile: '';
+     disrict ='';
+     state = '';
+     email= '';
+     mobile= '';
+     fullName='';
 
-     passportNo?: string;
+     passportNo?='';
 
      sort = "name";
      pageNumber = 1;
      pageSize = 10;
-     search: string;
+     search: '';
 }
 

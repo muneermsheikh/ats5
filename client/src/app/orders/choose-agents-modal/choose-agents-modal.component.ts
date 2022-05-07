@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
-import { IChooseAgentDto } from 'src/app/shared/models/chooseAgentDto';
+import { ICustomerOfficialDto } from 'src/app/shared/models/customerOfficialDto';
 import { IOrderBriefDto } from 'src/app/shared/models/orderBriefDto';
-import { IUser } from 'src/app/shared/models/user';
 
 @Component({
   selector: 'app-choose-agents-modal',
@@ -14,8 +13,8 @@ import { IUser } from 'src/app/shared/models/user';
 export class ChooseAgentsModalComponent implements OnInit {
 
   @Input() updateSelectedOfficialIds = new EventEmitter();
-  order: IOrderBriefDto;
-  agents: IChooseAgentDto[]; 
+  //order: IOrderBriefDto;
+  agents: ICustomerOfficialDto[]; // IChooseAgentDto[]; 
 
   constructor(public bsModalRef: BsModalRef) { }
 

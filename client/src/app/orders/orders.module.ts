@@ -14,6 +14,7 @@ import { RemunerationModalComponent } from './remuneration-modal/remuneration-mo
 import { ReviewModalComponent } from './review-modal/review-modal.component';
 import { ChooseAgentsModalComponent } from './choose-agents-modal/choose-agents-modal.component';
 import { IdsModalComponent } from './ids-modal/ids-modal.component';
+import { OrderItemModalComponent } from './order-item-modal/order-item-modal.component';
 
 
 @NgModule({
@@ -28,6 +29,7 @@ import { IdsModalComponent } from './ids-modal/ids-modal.component';
     ReviewModalComponent,
     ChooseAgentsModalComponent,
     IdsModalComponent,
+    OrderItemModalComponent,
   ],
   imports: [
     CommonModule, 

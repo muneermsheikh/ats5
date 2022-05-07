@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
-     //[Authorize(Policy = "Admin")]
+     
      public class EmployeesController : BaseApiController
      {
           private readonly IGenericRepository<Employee> _empRepo;
@@ -46,10 +46,11 @@ namespace api.Controllers
                return Ok(emps);
           }
 
-     
+          [Authorize(Policy = "AdminRole")]
           [HttpGet("byId/{id}")]
           public async Task<ActionResult<Employee>> GetEmployeeById(int id)
           {
+               var claim = this.HttpContext.User.Claims;
                var emp = await _empService.GetEmployeeById(id);
                if (emp == null) return NotFound();
                return Ok(emp);
@@ -114,6 +115,7 @@ namespace api.Controllers
                {
                     var appuser = await _userManager.FindByIdAsync(emp.AppUserId.ToString());
                     users.Add(new UserDto {
+                         loggedInEmployeeId = emp.Id,
                          DisplayName = emp.KnownAs,
                          Token = await _tokenService.CreateToken(appuser),
                          Email = emp.Email

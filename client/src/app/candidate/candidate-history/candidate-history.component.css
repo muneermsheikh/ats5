@@ -6,6 +6,14 @@
      font-size:medium;
 }
 
+.stddmx2smaller {
+     display: inline-block;
+     vertical-align: top;
+     margin-left: 2px;
+     margin-right: 1px;
+     font-size:smaller;
+}
+
 .borderBlue {
      border-style: solid;
      border-color: blue;

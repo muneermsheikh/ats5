@@ -10,6 +10,6 @@ namespace core.ParamsAndDtos
         public DateTime TransactionDate { get; set; }
         public EnumDeployStatus StageId { get; set; }
         public EnumDeployStatus NextStageId { get; set; }
-        public DateTime NextEstimatedStageDate { get; set; }
+        public DateTime NextStageDate { get; set; }
     }
 }

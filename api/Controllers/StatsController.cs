@@ -28,6 +28,7 @@ namespace api.Controllers
 
           }
 
+     /*
           [HttpGet("ordertrans/{orderid}")]
           public async Task<ActionResult<OrderItemTransDto>> GetOrderItemTransactions(int orderid)
           {
@@ -42,7 +43,8 @@ namespace api.Controllers
                //Response.AddPaginationHeader(op.CurrentPage, op.PageSize, op.TotalCount, op.TotalPages);
                return Ok(op);
           }
-
+     */
+     /*
           [HttpGet("itemtrans/{orderitemid}")]
           public async Task<ActionResult<OrderItemTransDto>> GetOrderItemsTransactions(int orderitemid)
           {
@@ -57,7 +59,8 @@ namespace api.Controllers
                //Response.AddPaginationHeader(op.CurrentPage, op.PageSize, op.TotalCount, op.TotalPages);
                return Ok(op);
           }
-
+     */
+     /*
           [HttpGet("aitemstrans")]
           public async Task<ActionResult<OrderItemTransDto>> GetOrderItemTransactions(StatsTransParams param)
           {
@@ -67,7 +70,8 @@ namespace api.Controllers
                //Response.AddPaginationHeader(op.CurrentPage, op.PageSize, op.TotalCount, op.TotalPages);
                return Ok(op);
           }
-
+     */
+     /*
           [HttpGet("itemstrans")]
           public async Task<ActionResult<ICollection<OrderItemTransDto>>> GetOrderItemsTransactions([FromQuery] StatsTransParams param)
           {
@@ -77,5 +81,6 @@ namespace api.Controllers
                //Response.AddPaginationHeader(op.CurrentPage, op.PageSize, op.TotalCount, op.TotalPages);
                return Ok(op);
           }
+     */
      }
 }

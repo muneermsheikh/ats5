@@ -42,11 +42,11 @@ export class AccountService {
   }
 
   setCurrentUser(user: IUser) {
-    console.log('in setcurrentuser, user is: ', user);
+    //console.log('in setcurrentuser, user is: ', user);
     user.roles = [];
     const roles = this.getDecodedToken(user.token).role;
     Array.isArray(roles) ? user.roles = roles : user.roles.push(roles);
-    console.log('user roles in setCurrentUser : ',user.roles);
+    //console.log('user roles in setCurrentUser : ',user.roles);
     localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('token', user.token);
     this.currentUserSource.next(user);
@@ -87,9 +87,7 @@ export class AccountService {
       return of(null);
     }
 
-    let headers = new HttpHeaders();
-    headers = headers.set('Authorization', `Bearer ${token}`);
-    return this.http.get(this.baseUrl + 'account', {headers}).pipe(
+    return this.http.get(this.baseUrl + 'account').pipe(
       map((user: IUser) => {
         console.log('returned from api');
         if (user) {

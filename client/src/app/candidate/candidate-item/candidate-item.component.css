@@ -1,9 +1,6 @@
 .stdd {
      display: inline-block;
-     margin-left: 2px;
-     margin-right: 2px;
-     padding: 1px;
-     vertical-align: top;
+    vertical-align: top;
 }
 
 .b {font-weight: bold;}

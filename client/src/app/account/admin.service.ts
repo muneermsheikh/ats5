@@ -6,6 +6,7 @@ import { IChooseAgentDto } from '../shared/models/chooseAgentDto';
 import { IOrderItemToFwdDto } from '../shared/models/orderItemToFwdDto';
 import { IUser } from '../shared/models/user';
 import { IOrderItemsAndAgentsToFwdDto } from '../shared/models/orderItemsAndAgentsToFwdDto';
+import { ICustomerOfficialDto } from '../shared/models/customerOfficialDto';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +32,8 @@ export class AdminService {
   }
 
   getOfficialDto() {
-    return this.http.get<IChooseAgentDto[]>(this.baseUrl + 'customers/getagentdetails');
+    //return this.http.get<IChooseAgentDto[]>(this.baseUrl + 'customers/agentdetails');
+    return this.http.get<ICustomerOfficialDto[]>(this.baseUrl + 'customers/agentdetails');
   }
 
   //forward DL to agents

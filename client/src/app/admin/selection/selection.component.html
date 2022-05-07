@@ -1,0 +1,86 @@
+<div class="mx-3">
+     <div *ngIf="selectionsPending.length==0">
+          no selections pending
+     </div>     
+     <div *ngIf="selectionsPending.length > 0" > 
+     
+          <div class="d-flex justify-contents-between align-items-center">
+               <app-paging-header [totalCount]="totalCount" [pageNumber]="sParams.pageIndex" [pageSize]="sParams.pageSize"></app-paging-header>
+
+               <div class="d-flex justify-contents-between align-items-center">
+                    <div class="form-inline mt-2">
+                         <input (keyup.enter)="onSearch()" type="text" class="form-control ml-5 w300" #search placeholder="Search">
+                         <button type="button" (click)="onSearch()" class="btn btn-outline-primary mx-1 my-1" style="font-size: small;">Search</button>
+                         <button type="button" (click)="onReset()" class="btn btn-outline-success mx-1 my-1" style="font-size: small;">Reset</button>
+                         <button type="button" (click)="onCategoryRef()" class="btn btn-outline-success mx-1 my-1" style="font-size: small;">Category Ref</button>
+                         <button type="button" class="btn btn-outline-success ml-2 my-1 fa fa-plus" routerLink="/cv/add"></button>
+                         <label class="lbl" style="margin-left: 15px;">Transactions will be dated: </label> 
+                         <input class="stdd w150"
+                              type="text"
+                              placeholder="Date of birth"
+                              bsDatepicker
+                              [bsValue]="todayDate"
+                              [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                         >   
+                    </div>
+               </div>
+          </div>
+     
+          <form #form="ngForm" id="form">
+               <label class="lbl" style="margin-left:2px; width: 50px;">Check</label>
+               <label class="lbl mx-2 w75">App No</label>
+               <label class="lbl mx-2 w75">PP No</label>
+               <label class="lbl mx-2 w150">Candidate Name</label>
+               <label class="lbl mx-2 w150">Referred to Company</label>
+               <label class="lbl mx-2 w150">Referred for category</label>
+               <label class="lbl mx-2 w75">Referred On</label>
+               <label class="lbl mx-2 w300">Selection decision</label>
+               <label class="lbl mx-2 w200">Remarks</label>
+               <button type="button" class="btn btn-success ml-10 fa fa-check" title="register selection decisions on checked candidates" (click)="registerSelections()" ></button>  
+               <button class="stdd btn btn-default fa fa-2x fa-window-close" title="Close this form "  (click)="routeChange()" ></button>
+               
+               <div *ngFor="let item of selectionsPending">
+                    <div class="stdd mx-10 form-check" style="text-align: center; margin-left: 10px;">
+                         <input type="checkbox" 
+                              class="form-check-input mx-10" 
+                              name="checked"
+                              class="form-check-input" 
+                              [checked]="item.checked"
+                              [value]="item.checked"
+                              (change)="item.checked = !item.checked"
+                         >
+                    </div>
+                    <label class="stdd mx-3 w75" style="margin-left: 15px;" >{{item.applicationNo}}</label>
+                    <label class="stdd mx-2 w75">{{item.ppno}}</label>
+                    <label class="stdd mx-2 w150">{{item.candidateName}}</label>
+                    <label class="stdd mx-2 w150">{{item.companyName}}</label>
+                    <label class="stdd mx-2 w150">{{item.categoryRef}}</label>
+                    <label class="stdd mx-2 w75">{{item.referredOn | date : 'd-MMM-yy'}}</label>
+                    <ng-select *ngIf="selectionStatus" class="stdd ml5 w300"
+                         name="selectionStatusId"
+                         [items]="selectionStatus"
+                         bindLabel="status"
+                         bindValue="id"
+                         labelForId="status"
+                         placeholder="Selection status"
+                         clearAllText="Clear"
+                         [(ngModel)]="item.selectionStatusId"
+                    >
+                    </ng-select>
+                    <input type="text" class="stdd w300 ml2" name="remarks" [(ngModel)]="item.remarks" >
+                    <!-- 
+                         <button class="stdd mx-2 btn btn-outline-primary fa fa-usd" [disabled]="item.selectionStatusId !== statusSelected" 
+                         (click)="showEmploymentModal(item)" ></button>
+                    -->
+               </div>
+          </form>
+
+          <div class="d-flex justify-content-between align-items-center mt-2" *ngIf="totalCount > 0">
+               <app-pager 
+                    [pageSize]="sParams.pageSize" [totalCount]="totalCount" [pageNumber]="sParams.pageIndex" (pageChanged)="onPageChanged($event)"  >
+               </app-pager>
+          </div>
+     </div>
+</div>
+
+

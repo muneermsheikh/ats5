@@ -6,7 +6,17 @@ namespace core.Entities.Orders
         {
         }
 
-        public int OrderItemId { get; set; }
+          public ReviewItem(int orderItemId, int srNo, string reviewParameter, bool response, bool isResponseBoolean, bool isMandatoryTrue)
+          {
+               OrderItemId = orderItemId;
+               SrNo = srNo;
+               ReviewParameter = reviewParameter;
+               Response = response;
+               IsResponseBoolean = isResponseBoolean;
+               IsMandatoryTrue = isMandatoryTrue;
+          }
+
+          public int OrderItemId { get; set; }
         public int ContractReviewItemId { get; set; }
         public int SrNo { get; set; }
         public string ReviewParameter { get; set; }

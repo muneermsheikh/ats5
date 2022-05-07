@@ -8,6 +8,7 @@ namespace core.ParamsAndDtos
     {
         public int CandidateId {get; set;}
         public int OrderDetailId {get; set;}
+        public bool requireInternalReview {get; set;}
         public EnumCandidateAssessmentResult AssessmentResult {get; set;}
         public int AssessedById {get; set;}
         public DateTime DateAssessed {get; set;}

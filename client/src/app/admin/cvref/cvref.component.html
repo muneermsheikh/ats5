@@ -1,0 +1,54 @@
+<div class="mx-3">
+     <div *ngIf="cvAssessed.length===0">
+          No Candidates pending for CV Referrals
+     </div>
+
+     <div *ngIf="cvAssessed.length > 0">
+   
+          <form #form="ngForm" id="form">
+               <label class="lbl mx-2 w75">Check</label>
+               <label class="lbl mx-2 w200">Customer</label>
+               <label class="lbl mx-2 w150">Order Category Ref</label>
+               <label class="lbl mx-2 w50">Appl #</label>
+               <label class="lbl mx-2 w150">Candidate Name</label>
+               <label class="lbl mx-2 w100">Assessed On</label>
+               <label class="lbl mx-2 w150">Assessed By</label>
+               <label class="lbl mx-2 w100">Assessment Result</label>
+               <label class="lbl mx-2 w75" style="font-size: small;">Service<br>Charges</label>
+               <label class="lbl mx-2 w50" style="font-size: small;">Requires<br>Internal<br>Review</label>
+               
+               <label class="lbl mx-2 w75">Remarks</label>
+               <button type="button" class="btn btn-success fa fa-check" title="forward selected CVs to respective clients" (click)="forwardSelected()" ></button>  
+               <button class="stdd btn btn-default fa fa-2x fa-window-close" title="Close this form "  (click)="routeChange()" ></button>
+
+               <div *ngFor="let item of cvAssessed">
+                    <div class="stdd mx-10 form-check" style="text-align: center;">
+                         <input type="checkbox"
+                         class="form-check-input mx-10"
+                         [checked]="item.checked"
+                         [value]="item.checked"
+                         (change)="item.checked = !item.checked"
+                         [disabled]="item.charges!=='Agreed' && item.charges !== 'Approved' "
+                         >
+                         <!-- (click)="onCheckedChange($event.target)" -->
+                    </div>
+                    <label class="stdd mx-2 w270" style="margin-left: 15px;" >{{item.customerName}}</label>
+                    <label class="stdd mx-2 w150">{{item.orderItemRef}}</label>
+                    <label class="stdd mx-2 w50">{{item.applicationNo}}</label>
+                    <label class="stdd mx-2 w150">{{item.candidateName}}</label>
+                    <label class="stdd mx-2 w100">{{item.assessedOn | date}}</label>
+                    <label class="stdd mx-2 w150">{{item.assessedByName}}</label>
+                    <label class="stdd mx-2 w100">{{item.assessedResult}}</label>
+                    <label class="stdd mx-2 w75" title="click to display HR Checklist" (click)="showChecklistModal(item.candidateId, item.orderItemId)" style="padding-right: 10px;">{{item.charges}}</label>
+                    <input type="checkbox" readonly
+                         class="form-check-input stdd mx-2"
+                         style="margin-left: 2  0px;"
+                         [checked]="item.requireInternalReview"
+                    >
+                    
+                    <label class="stdd mx-2 w150">{{item.remarks}}</label>
+               </div>
+
+          </form>
+     </div>
+</div>

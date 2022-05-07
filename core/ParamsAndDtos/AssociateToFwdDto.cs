@@ -7,7 +7,7 @@ namespace core.ParamsAndDtos
 {
     public class AssociateToFwdDto
     {
-        public int CustomerOfficialId { get; set; }
+        public int OfficialId { get; set; }
         public int CustomerId { get; set; }
         public string CustomerName {get; set;}
         public string CustomerCity { get; set; }

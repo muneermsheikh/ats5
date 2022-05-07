@@ -1,10 +1,11 @@
 export interface IUserHistoryDto
 {
      id: number;
-     partyName: string;
-     customerOfficialId: number;
-     candidateId: number;
-     aadharNo: string;
-     emailId: string;
+     personType: string;
+     personName: string;
+     personId: number;
      applicationNo: number;
+     emailId: string;
+     mobileNo: string;
+     createNewIfNull: boolean;
 }

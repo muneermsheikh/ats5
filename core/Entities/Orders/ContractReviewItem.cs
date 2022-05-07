@@ -17,6 +17,14 @@ namespace core.Entities.Orders
             CategoryName = categoryName;
             Quantity = quantity;
         }
+        public ContractReviewItem(int orderItemId, int orderId, string categoryName, int quantity, ICollection<ReviewItem> reviewitems)
+        {
+            OrderId = orderId;
+            OrderItemId = orderItemId;
+            CategoryName = categoryName;
+            Quantity = quantity;
+            ReviewItems = reviewitems;
+        }
         public int ContractReviewId { get; set; }
         public int OrderId {get; set;}
         public int OrderNo {get; set;}

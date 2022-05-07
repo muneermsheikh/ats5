@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Entities.HR;
@@ -8,10 +7,13 @@ namespace core.Interfaces
 {
     public interface ICandidateAssessmentService
     {
-        Task<CandidateAssessment> AssessNewCandidate(CandidateAssessmentParams candidateAssessParams);
-        Task<bool> EditCandidateAssessment(CandidateAssessment candidateAssessment);
-        Task<bool> DeleteCandidateAssessment(CandidateAssessment candidateAssessment);
+        Task<CandidateAssessmentWithErrorStringDto> AssessNewCandidate(bool requireInternalReview, int candidateId, int orderItemId, int loggedInIdentityUserId);
+        Task<CandidateAssessment> GetNewAssessmentObject(bool requireInternalReview, int candidateId, int orderItemId, int loggedInIdentityUserId);
+        Task<ICollection<CandidateAssessedDto>> GetAssessedCandidatesApproved ();
+        Task<MessagesDto> EditCandidateAssessment(CandidateAssessment candidateAssessment, int loggedinEmployeeId);
+        Task<bool> DeleteCandidateAssessment(int CandidateAssessmentId);
         Task<bool> DeleteCandidateAssessmentItem(CandidateAssessmentItem assessmentItem);
         Task<CandidateAssessment> GetCandidateAssessment(int candidateId, int orderItemId);   
+        Task<CandidateAssessmentAndChecklistDto> GetCandidateAssessmentAndChecklist(int candidateId, int orderItemId, int loggedInEmployeeId);
     }
 }

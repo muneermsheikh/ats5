@@ -1,0 +1,18 @@
+<div class="fontSmall" *ngIf="q" >
+     <form [formGroup]="form">
+          <div class="stdd mx-2">Order No.: <strong>{{q.orderNo}}</strong></div>
+          <div class="stdd ml-2">Category Name <strong>{{q.categoryName}}</strong></div>
+          
+          <button class="fa fa-plus blue" type="button" (click)="addOrderItemAssessmentQ()" ></button>
+          <div class="px-2 smallFont" *ngFor="let item of orderItemAssessmentQs.controls; let i=index" >
+               <div [formGroupName]="i">
+                    <div class="stdd w40">{{item.id}}</div>
+                    <input type="text" class="stdd mx-2 w150" formControlName="subject" >
+                    <input type="text" class="stdd b mx-2 w40" formControlName="questionNo" >
+                    <input type="number" class="stdd mx-2 w75" formControlName="maxMarks">
+                    <input type="checkbox" class="stdd w40 mx-2" formControlName="isMandatory" >
+                    <button class="stdd red fa fa-trash mx-2" (click)="removeOrderAssessmentItemQ(i)" ></button>
+               </div>
+          </div>
+     </form>
+</div>

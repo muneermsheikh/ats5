@@ -27,10 +27,12 @@ namespace core.Entities.HR
         public bool Checked {get; set;}
         public int Id { get; set; }
         public string Gender { get; set; }
+        public string FullName { get; set; }
+        public string MobileNo {get; set;}
+        public string PassportNo { get; set;}
         public int ApplicationNo { get; set; }
         public string AadharNo {get; set;}
-        public string FullName { get; set; }
-        //public string PassportNo { get; set; }
+
         public string City { get; set; }
         public int ReferredById { get; set; }
         public string ReferredByName { get; set; }

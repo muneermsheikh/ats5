@@ -1,0 +1,64 @@
+<h1>{{title}}</h1>
+ 
+<form [formGroup]="ordersForm" (ngSubmit)="onSubmit()">
+    <div formArrayName="orders">
+  
+        <div *ngFor="let order of orders().controls; let ti=index">
+            <div [formGroupName]="ti"
+                style="border: 1px solid blue; padding: 10px; width: 100%; display: inline-block; margin: 5px;">
+                Order No : <input type="text" formControlName="orderNo">
+                Dated : <input type="text" formControlName="orderDate">
+                Customer : <input type="text" formControlName="customerName">
+                <button class="btn btn-primary fa fa-trash" (click)="removeOrder(ti)"></button>
+                <button class="btn btn-primary fa fa-plus" type="button" (click)="addOrder(ti)" title="Add Order" ></button>
+        
+                <div formArrayName="orderItems">
+                    <div *ngFor="let item of orderItems(ti).controls; let bi=index">
+                        <div [formGroupName]="bi" style="border: 1px solid red; padding: 10px; margin: 5px; float:left">
+                            <div class="stdd mx-10 form-check" style="text-align: center;">
+                              <input type="checkbox"
+                              class="form-check-input mx-10"
+                              [checked]="item.checked"
+                              [value]="item.checked"
+                              (change)="item.checked = !item.checked"
+                              formControlName="item.checked"
+                              >
+                              <!-- (click)="onCheckedChange($event.target)" -->
+                         </div>
+                         <input [disabled]="true" type="text" formControlName="categoryRef" >
+                         <input [disabled]="true" type="text" formControlName="categoryName">
+                         <input [disabled]="true" type="text" formControlName="quantity" >
+                         <button (click)="removeBatch(ti,bi)" class="btn btn-primary fa fa-trash" ></button>
+                         <!-- 
+                              <button (click)="addStudent(ti,bi)">Add Student</button>
+              
+                            <div formArrayName="students">
+                                <div *ngFor="let batch of students(ti,bi).controls; let si=index">
+                                  <div [formGroupName]="si" style="border: 1px solid blue; padding: 2px; ">
+                                    Student Name :
+                                    <input type="text" formControlName="name">
+                                    <button (click)="removeStudent(ti,bi,si)">Remove student</button>
+                                  </div>
+                                </div>
+                            </div>
+                         -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+  
+    <p>
+      <button type="button" (click)="addOrder()" >Add Order</button>
+    </p>
+    <p>
+      <button type="submit">Submit</button>
+    </p>
+ 
+</form>
+ 
+{{this.ordersForm.value | json}}
+ 

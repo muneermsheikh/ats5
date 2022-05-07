@@ -6,11 +6,11 @@
           <div class="stdd w70" title="View order No.  {{order.orderNo}}"  routerLink="/orders/view/{{order.id}}">{{order.orderNo}}</div>
           <div class="stdd w100" title="assess client {{order.customerName}}" routerLink="/orders/history/{{order.id}}" >{{order.orderDate | date}}</div>
           <div class="stdd w200" title="edit order No.  {{order.orderNo}}"  routerLink="/orders/edit/{{order.id}}" >{{order.customerName}}</div>
-          <div class="stdd w100" >{{order.cityOfWorking}}</div>
+          <div class="stdd w100" routerLink="./hr/" >{{order.cityOfWorking}}</div>
           <div class="stdd w100" title="technical & commercial review" routerLink="/orders/review/{{order.id}}" >{{order.reviewedOn | date}}</div>
           <div class="stdd w150">{{order.reviewStatus}}</div>
           <div class="stdd w100" routerLink="/orders/" >{{order.forwardedToHRDeptOn.getFullYear < 2000 ? 'Not Forwarded' : order.forwardedToHRDeptOn | date}}</div>
-          <div class="stdd w150">{{order.status}}</div>
+          <div class="stdd w150" routerLink="/hr/hrforward/{{order.id}}" title="click to forward this order to associates (to be selected)" >{{order.status}}</div>
           
           <div style="display: inline-block; width: 250px;"> 
                <!-- <button class="stdd fa fa-pencil blue" title="edit the DL" type="button" routerLink="/orders/edit/{{order.id}}" ></button> -->

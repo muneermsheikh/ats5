@@ -27,14 +27,13 @@ import { OrderService } from '../order.service';
 import { RemunerationModalComponent } from '../remuneration-modal/remuneration-modal.component';
 import { ReviewModalComponent } from '../review-modal/review-modal.component';
 import { ReviewService } from '../review.service';
-import { chooseAgentDto, IChooseAgentDto } from 'src/app/shared/models/chooseAgentDto';
+
 import { AdminService } from 'src/app/account/admin.service';
 import { ChooseAgentsModalComponent } from '../choose-agents-modal/choose-agents-modal.component';
 import { OrderItemsAndAgentsToFwdDto } from 'src/app/shared/models/orderItemsAndAgentsToFwdDto';
 import { IOrderItemToFwdDto, OrderItemToFwdDto } from 'src/app/shared/models/orderItemToFwdDto';
-import { AssociateToFwdDto, IAssociateToFwdDto } from 'src/app/shared/models/associateToFwdDto';
-import { ItemsList } from '@ng-select/ng-select/lib/items-list';
-import { IOrderBriefDto, OrderBriefDto } from 'src/app/shared/models/orderBriefDto';
+import { OrderBriefDto } from 'src/app/shared/models/orderBriefDto';
+import { ICustomerOfficialDto } from 'src/app/shared/models/customerOfficialDto';
 
 @Component({
   selector: 'app-order-edit',
@@ -57,6 +56,7 @@ export class OrderEditComponent implements OnInit {
   categories: IProfession[];
   employees: IEmployeeIdAndKnownAs[];
   customers: ICustomerNameAndCity[];
+  associates: ICustomerOfficialDto[];
   
   fileToUpload: File | null = null;
 
@@ -100,7 +100,7 @@ export class OrderEditComponent implements OnInit {
   ]
 
   //modal choose agents
-    existingOfficialIds: IChooseAgentDto[]=[];
+    existingOfficialIds: ICustomerOfficialDto[]=[]; // IChooseAgentDto[]=[];
 
   constructor(private service: OrderService, private bcService: BreadcrumbService, private adminService: AdminService,
       private modalService: BsModalService,
@@ -124,55 +124,23 @@ export class OrderEditComponent implements OnInit {
    }
 
   ngOnInit(): void {
+    this.activatedRoute.data.subscribe(data => { 
+      this.member = data.order;
+      this.associates = data.associates;
+      this.customers = data.customers;
+      this.employees = data.employees;
+      this.categories = data.professions;
+    })
 
       //this.routeId = this.activatedRoute.snapshot.params['id'];
       this.isAddMode = !this.routeId;
-      this.getProfessions();
-      this.getCategories();
-      this.getEmployeeIdAndKnownAs();
-      this.getCustomers();
       this.createForm();
 
       if (!this.isAddMode) {
-        this.getMember(+this.routeId);
-      } 
-      /*
-      this.activatedRoute.data.subscribe(data => {
-        this.member = data;
-      }, error => {
-        console.log(error);
-      })
-  */
-  }
-
-  getCustomers() {
-    return this.sharedService.getCustomers().subscribe(response => {
-      this.customers = response;
-    }, error => {
-      this.toastr.error("failed to retrieve customers");
-    })
-  }
-  getEmployeeIdAndKnownAs() {
-    return this.sharedService.getEmployeeIdAndKnownAs().subscribe(response => {
-      this.employees = response;
-    })
-  }
-
-  getProfessions() {
-    return this.sharedService.getProfessions().subscribe(response => {
-      this.categories = response;
-    })
-  }
-
-  getMember(id: number) {
-    this.service.getOrder(id).subscribe( 
-      response => {
-        this.member = response;
         this.editOrder(this.member);
-      }
-    )
+      } 
   }
-  
+
   createForm() {
       this.form = this.fb.group({
         id: [null],  orderNo: 0, orderDate: ['', Validators.required],
@@ -184,7 +152,7 @@ export class OrderEditComponent implements OnInit {
       } //, {validator: MustMatch('password', 'confirmPassword')}
       );
 
-      if (!this.isAddMode) this.loadMember();
+      //if (!this.isAddMode) this.loadMember();
     }
 
     editOrder(order: IOrder) {
@@ -212,7 +180,7 @@ export class OrderEditComponent implements OnInit {
             requireInternalReview: ph.requireInternalReview, requireAssess: ph.requireAssess,
             completeBefore: ph.completeBefore, hrExecId: ph.hrExecId, hrSupId: ph.hrSupId,
             hrmId: ph.hrmId, charges: ph.charges, feeFromClientINR: ph.feeFromClientINR, status: ph.status,
-            reviewItemStatusId: ph.reviewItemStatusId
+            reviewItemStatusId: ph.reviewItemStatusId, noReviewBySupervisor:ph.noReviewBySupervisor
           }))
         });
         return formArray;
@@ -241,14 +209,6 @@ export class OrderEditComponent implements OnInit {
         this.orderItems.removeAt(i);
         this.orderItems.markAsDirty();
         this.orderItems.markAsTouched();
-      }
-
-      getCategories() {
-        this.sharedService.getProfessions().subscribe(response => {
-          this.categories = response;
-        }, error => {
-          console.log(error);
-        })
       }
 
 
@@ -360,18 +320,22 @@ export class OrderEditComponent implements OnInit {
           this.rvwService.getReviewItem(orderitemid).subscribe(response => 
             {
               this.contractReviewItem = response;
-              const initialState = {
-                review : this.contractReviewItem,
-                reviewStatus: [
-                  {'id': 0, statusName: 'Not Reviewed'}, 
-                  {'id': 1, statusName: 'Accepted'}, 
-                  {'id': 2, statusName: 'Declined-Salary not feasible'}, 
-                  {'id': 3, statusName: 'Declined-visa availability uncertain'}, 
-                  {'id': 4, statusName: 'Negative background report of customer'}, 
-                ]
+
+              const config = {
+                class: 'modal-dialog-centered modal-lg',
+                initialState: {
+                  review : this.contractReviewItem,
+                  reviewStatus: [
+                    {'id': 0, statusName: 'Not Reviewed'}, 
+                    {'id': 1, statusName: 'Accepted'}, 
+                    {'id': 2, statusName: 'Declined-Salary not feasible'}, 
+                    {'id': 3, statusName: 'Declined-visa availability uncertain'}, 
+                    {'id': 4, statusName: 'Negative background report of customer'}, 
+                  ]
+                }
               };
 
-              this.bsModalRef = this.modalService.show(ReviewModalComponent, {initialState});
+              this.bsModalRef = this.modalService.show(ReviewModalComponent, config);
               this.bsModalRef.content.updateModalReview.subscribe(values => {
                     
                     this.rvwService.updateReviewItem(values).subscribe(() => {
@@ -494,7 +458,7 @@ export class OrderEditComponent implements OnInit {
         */
         this.taskService.createTaskFromAppTask(appTask).subscribe(_response => {
           this.service.updateOrderWithDLFwdToHROn(this.member.id, new Date()).subscribe(() => {
-            this.getMember(+this.routeId);
+            //this.getMember(+this.routeId);
             console.log('updated Order for date forwarded');
           }, error => {
             console.log('failed to update order with dateforwarded to DL');
@@ -506,6 +470,7 @@ export class OrderEditComponent implements OnInit {
 
       }
 
+    
       forwardDLtoAgents() {
         
         //var selectedOrderItems= this.member.orderItems.filter(el => el.selected===true);
@@ -526,56 +491,57 @@ export class OrderEditComponent implements OnInit {
         order.customerName = "customer name to resolve";
         order.orderNo = this.member.orderNo;
         order.orderDate=this.member.orderDate;
-        var associates=  this.getAgentsArray();
-        var agents = associates;
-        //console.log('associates', associates);
+        let agents = this.associates;
         const config = {
           class: 'modal-dialog-centered modal-lg',
           
           initialState: {
-            order,
-            agents  //: this.getAgentsArray()
+            //order,
+            agents
           }
         }
 
         this.bsModalRef = this.modalService.show(ChooseAgentsModalComponent, config);
         this.bsModalRef.content.updateSelectedOfficialIds.subscribe(values => {
           const officialIdsToUpdate = {   //contains only selected official Ids
-              agents: [...values.filter(el => el.checked )
-                  //.map(el => el.officialId)
-                ]
-              //agents: [...values.filter(el => el.checked === true)]
-            };
-
+              agents: [...values.filter(el => el.checked === true)]};
+              for( var i = 0; i < agents.length; i++){ 
+                if ( agents[i].checked) agents.splice(i,1);
+              }
+            
+              console.log('received back from modal', agents);
+/*
             if (!officialIdsToUpdate) {
               this.toastr.error("No Officials selected");
               return; }
             //console.log('officialidstoupdate', officialIdsToUpdate);
-            var agts: IAssociateToFwdDto[]=[];
+            var agts: ICustomerOfficialDto[]=[];
             officialIdsToUpdate.agents.forEach(x => {
-              const elementSelected = associates.find(element => element.officialId == x.officialId);
+              const elementSelected = agents.find(element => element.checked== true);
               if (elementSelected !== null && elementSelected !== undefined)  
                 {
-                  var agt = new AssociateToFwdDto();  
-                  agt.customerCity = elementSelected.city;
+                  var agt = new CustomerOfficialDto();  
+                  agt.city = elementSelected.city;
                   agt.customerId = elementSelected.customerId;
                   agt.customerName = elementSelected.customerName;
-                  agt.customerOfficialId = elementSelected.officialId;
-                  agt.customerOfficialName = elementSelected.officialName;
-                  agt.officialDesignation = elementSelected.designation;
+                  agt.id = elementSelected.officialId;
+                  agt.officialName = elementSelected.officialName;
+                  agt.designation = elementSelected.designation;
                   agt.checked = elementSelected.checked;
                   agt.checkedPhone = elementSelected.checkedPhone;
                   agt.checkedMobile = elementSelected.checkedMobile;
-                  agt.officialEmailId = elementSelected.email;  
-                  agt.phoneNo = elementSelected.phoneNo;
-                  agt.mobile = elementSelected.mobile;
+                  agt.officialEmailId = elementSelected.officialEmailId;  
+                  agt.mobileNo = elementSelected.mobile;
                   agt.title = elementSelected.title;
                   agts.push(agt);  
                 }
               })
            
+              console.log('selected agents', agts);
+            */
             var agentsanditems = new OrderItemsAndAgentsToFwdDto();
-            agentsanditems.agents = agts;
+            
+            agentsanditems.agents = agents;
 
             var items: IOrderItemToFwdDto[]=[];
             selectedOrderItems.forEach(i => {
@@ -611,41 +577,68 @@ export class OrderEditComponent implements OnInit {
         })
       }
     
+          
+      getItemReviewString(i: number)
+      {
+        var st: string='';  
+        switch (i)
+            {
+              case 100:   //enumReviewItemStatus.accepted:
+                st = 'Accepted';
+                break;
+              case 400: // enumReviewItemStatus.negativeBackGroundReport:
+                  st= '-ve Backgrd Report';
+                  break;
+              case 200: // enumReviewItemStatus.salaryNotFeasible:
+                  st= 'Salary Not Feasible';
+                  break;
+              case 300: // enumReviewItemStatus.visaAvailabilityUncertain:
+                  st = 'visa not available';
+                  break;
+              default:
+                  return 'Not Reviewed';
+            }
+            return st;
+        } 
+    
+      /* 
       private getAgentsArray() {
-        let aagents: IChooseAgentDto[]=[];
-        let aagent: IChooseAgentDto;
         this.adminService.getOfficialDto().subscribe(response => {
           this.existingOfficialIds = response;
           if(this.existingOfficialIds.length===0) {
             this.toastr.warning('failed to retrieve any customer data to choose from');
             return;
           } 
-          
+          let agts: ICustomerOfficialDto[];
           this.existingOfficialIds.forEach(role => {
-            aagent = new chooseAgentDto();
+            //aagent = new chooseAgentDto();
+            const agt = new CustomerOfficialDto();
             //arole.email = role.username;
-            aagent.customerId = role.customerId;
-            aagent.customerName=role.customerName;
-            aagent.city=role.city;
-            aagent.checked=false;
-            aagent.checkedPhone=false;
-            aagent.checkedMobile=false;
-            aagent.officialId=role.officialId;
-            aagent.officialName=role.officialName;
-            aagent.email = role.email;
-            aagent.phoneNo = role.phoneNo;
-            aagent.mobile = role.mobile;
-            aagent.title = role.title;
-            aagent.designation = role.designation;
-            aagents.push(aagent);
+            agt.customerId = role.customerId;
+            agt.customerName=role.customerName;
+            agt.city=role.city;
+            agt.checked=false;
+            agt.checkedPhone=false;
+            agt.checkedMobile=false;
+            agt.officialId=role.officialId;
+            agt.officialName=role.officialName;
+            agt.officialEmailId = role.officialEmailId;
+            //aagent.phoneNo = role.phoneNo;
+            agt.mobileNo = role.mobileNo;
+            agt.title = role.title;
+            agt.designation = role.designation;
+
+            agts.push(agt);
 
           })
-          return aagents;
+          return agts;
+          
         }, error => {
           console.log('failed to retrieve agent official dto array', error);
         })
-        return aagents;
+        
       }   
+      */
 
       assignTasksToHRExecs() {
         if (this.isAddMode) {
@@ -728,5 +721,12 @@ export class OrderEditComponent implements OnInit {
         return validator;
       }
   
-    
+      openAssessmentModal(orderitemid: number) {
+
+        this.router.navigateByUrl('/hr/itemassess/' + orderitemid);
+      }
+
+      showProcess() {
+        
+      }
 }

@@ -18,6 +18,7 @@ namespace core.ParamsAndDtos
         public int OfficialUserId { get; set; }
         public string Designation { get; set; }
         public string OfficialEmail { get; set; }
+        public int OrderItemId {get; set;}
         public int OrderNo { get; set; }
         public DateTime OrderDated { get; set; }
         public int ItemSrNo { get; set; }
@@ -25,7 +26,7 @@ namespace core.ParamsAndDtos
         public int ApplicationNo { get; set; }
         public string CandidateName { get; set; }
         public string PPNo { get; set; }
-        public OrderItemReviewStatusDto CumulativeSentSoFar { get; set; }
+        public int CumulativeSentSoFar { get; set; }
         public EnumCandidateAssessmentResult AssessmentGrade { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace api.Helpers
           public MappingProfiles()
           {
                CreateMap<ApplicationTask, TaskDashboardDto>();
-               CreateMap<ChecklistHR, ChecklistDto>();
+               CreateMap<ChecklistHR, ChecklistHRDto>();
                CreateMap<Customer, CustomerTypeNameKnownAsOfficialsToReturnDto>();
                CreateMap<Customer, CustomerDto>();
                CreateMap<CVRef, CVRefDto>();
@@ -29,10 +29,11 @@ namespace api.Helpers
                CreateMap<CVRef, SelectionsPendingDto>();
                CreateMap<EmailMessage, MessageDto>();
                CreateMap<Employee, EmployeeBriefDto>();
-               CreateMap<Employment, EmploymentToReturnDto>();
+               CreateMap<Employment, EmploymentDto>();
                CreateMap<EmployeeToAddDto, EmployeeDto>();
                     
                CreateMap<OrderItem, OrderItemDto>();
+               CreateMap<OrderItem, OrderItemBriefDto>();
                CreateMap<OrderItem, OrderItemToReturnDto>();
                CreateMap<Order, OrderToReturnDto>();
                CreateMap<Order,OrderBriefDto>();
@@ -70,6 +71,7 @@ namespace api.Helpers
                     .ForMember(d => d.CVRefId, o => o.MapFrom(s => s.Id));
                     //.ForMember(d => d.DeployStageId, o => o.MapFrom(s => EnumDeployStatus.GetAttribute<s.DeployStageId>()));
                CreateMap<Deploy, DeployAddedDto>();
+               CreateMap<Deploy, DeployRefDto>();
 
                CreateMap<UserProfession, Prof>();
 

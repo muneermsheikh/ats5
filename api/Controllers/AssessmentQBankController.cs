@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Errors;
 using core.Entities;
 using core.Entities.MasterEntities;
 using core.Interfaces;
@@ -42,10 +43,25 @@ namespace api.Controllers
             return await _service.GetAssessmentQsOfACategoryByName(categoryName);
         }
 
-        [HttpGet("qbank/{id}")]
+        [HttpGet("byid/{id}")]
         public async Task<AssessmentQBank> GetAssessmentQBankByCategoryId(int id)
         {
-            return await _service.GetAssessmentQBankByCategoryId(id);
+            var q = await _service.GetAssessmentQBankByCategoryId(id);
+            return q;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<AssessmentQBank>> InsertAssessmentQ(AssessmentQBank qbank)
+        {
+            var q = await _service.InsertAssessmentQBank(qbank);
+            if (q == null) return BadRequest(new ApiResponse(400, "Bad Request - this probably means the Assessment Question for the chosen category already exists"));
+            return Ok(q);
+        }
+        [HttpPut]
+        public async Task<AssessmentQBank> UpdateAssessmentQ(AssessmentQBank qBank)
+        {
+            var success = await _service.UpdateAssessmentQBank(qBank);
+            return success;
         }
 
     }

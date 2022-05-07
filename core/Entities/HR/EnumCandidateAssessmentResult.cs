@@ -5,14 +5,16 @@ namespace core.Entities.HR
     public enum EnumCandidateAssessmentResult
     {
         [EnumMember(Value="Grade A+ - Excellent - 80%+")]
-        Excellent,
+        Excellent=80,
         [EnumMember(Value="Grade A - Very Good - 70%+")]
-        VeryGood,
+        VeryGood=70,
         [EnumMember(Value="Grade B - Good - 60%+")]
-        Good,
+        Good=60,
         [EnumMember(Value="Grade C - Poor - 50%+")]
-        Poor,
+        Poor=50,
         [EnumMember(Value="Grade D - Very Poor - 49%-")]
-        VeryPoor
+        VeryPoor=49,
+        [EnumMember(Value ="Not Assessed")]
+        NotAssessed=0
     }
 }

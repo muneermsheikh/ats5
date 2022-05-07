@@ -13,7 +13,9 @@ import { IUserHistory } from "../shared/models/userHistory";
      constructor(private candidateHistoryService: CandidateHistoryService) {}
  
      resolve(route: ActivatedRouteSnapshot): Observable<IUserHistory> {
-         return this.candidateHistoryService.getCandidateHistoryByHistoryId(+route.paramMap.get('id'));
+        var routeid = route.paramMap.get('id');
+        if (routeid === '0') return null;
+        return this.candidateHistoryService.getCandidateHistoryByHistoryId(+routeid);
      }
  
  }

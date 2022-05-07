@@ -1,3 +1,5 @@
+using System;
+
 namespace core.Entities.HR
 {
     public class ChecklistHRItem: BaseEntity
@@ -27,6 +29,7 @@ namespace core.Entities.HR
         public string Response {get; set;}
         public string Exceptions {get; set;}
         public bool MandatoryTrue {get; set;}
+        
         //public ChecklistHR ChecklistHR {get; set;}
     }
 }

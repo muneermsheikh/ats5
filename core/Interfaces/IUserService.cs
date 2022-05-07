@@ -21,7 +21,6 @@ namespace core.Interfaces
         Task<Candidate> GetCandidateByIdWithAllIncludes(int id);
         Task<CandidateBriefDto> GetCandidateByAppNo(int appno);
         Task<CandidateBriefDto> GetCandidateBriefById(int candiadteid);
-        Task<CandidateBriefDto> GetCandidateBriefByParams(CandidateSpecParams SpecParams);
         Task<ICollection<Candidate>> GetCandidatesWithProfessions(CandidateSpecParams param);
         Task<string> GetCategoryNameFromCategoryId(int id);
         Task<string> GetCustomerNameFromCustomerId(int id);

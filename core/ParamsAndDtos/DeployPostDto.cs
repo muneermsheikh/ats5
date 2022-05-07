@@ -7,6 +7,6 @@ namespace core.ParamsAndDtos
     {
         public int CVRefId { get; set; }
         public EnumDeployStatus StageId { get; set; }
-        public DateTime TransDate { get; set; }
+        public DateTime TransactionDate { get; set; }
     }
 }

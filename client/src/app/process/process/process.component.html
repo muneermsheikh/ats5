@@ -1,0 +1,82 @@
+<app-pager style="display: inline-block;"
+     [pageSize]="pParams.pageSize" [totalCount]="totalCount" [pageNumber]="pParams.pageNumber" (pageChanged)="onPageChanged($event)"  >
+</app-pager>
+<button type="button" class="stdd mx-5 btn btn-success fa fa-save alignR" (click)="updateDeployStatus()"></button>
+
+<form [formGroup]="form" >
+     <div class="stdd mx-2 b w75">Order No.</div>
+     <div class="stdd mx-2 b w75">dated</div>
+     <div class="stdd mx-2 b w200">Company</div>
+     <div class="stdd mx-2 b w75">Category Ref</div>
+     <div class="stdd mx-2 b w175 fSmall">Category Name</div>
+     <div class="stdd mx-2 b w50">Choose</div>
+     <div class="stdd mx-2 b w75">App No.</div>
+     <div class="stdd mx-2 b w150">Candidate Name</div>
+     <div class="stdd mx-2 b w75">Referred On</div>
+     <div class="stdd mx-2 b w75">Selected On</div>
+     <div class="stdd mx-2 b w150">Current Dep Status</div>
+     <div class="stdd mx-2 b w75">Current Dep<br>Stage Dates</div>
+     <div class="stdd mx-2 b w225">Next Dep Status</div>
+     <div class="stdd mx-2 b w175">Next Dep Status<br>Date</div>
+
+          <div formArrayName="refArray">
+               <div *ngFor="let ref of refArray.controls; let i=index" > 
+                    <div [formGroupName]="i">
+                         <!-- <input class="stdd mx-2 w50" [disabled]="true" style="text-align: center;" formControlName="cvRefId"> -->
+                         <input class="stdd mx-2 w75" style="text-align: center;" formControlName="orderNo">
+                         <input class="stdd mx-2 w75" formControlName="orderDate" >
+                         <input class="stdd mx-2 w200 fSmall" formControlName="customerName" >
+                         <input class="stdd mx-2 w75" style="text-align: center;" formControlName="categoryRef" >
+                         <input class="stdd mx-2 w175 fSmall" formControlName="categoryName">
+                         
+                         <input type="checkbox" 
+                             class="form-check-input" style="margin-left: 10px;"
+                             [checked]="ref.checked"
+                             (change)="checked = !checked"
+                             [name]="'checked'"
+                             formControlName="checked"
+                         >
+                         <input class="stdd ml-5 w75" style="text-align:center" formControlName="applicationNo" >
+                         <input class="stdd mx-2 w150 fMed" routerLink="/process/deploys/{{ref.cvRefId}}" formControlName="candidateName">
+                         <input class="stdd mx-2 w75" formControlName="referredOn" >
+                         <input class="stdd mx-2 w75" formControlName="selectedOn">
+                         <input class="stdd mx-2 w200 fSmall" (dblclick)="displayApp(ref.cVRefId)" formControlName="deployStageName">
+
+                         <input class="stdd mx-2 w75" formControlName="deployStageDate">
+                         <ng-select *ngIf="statuses.length > 0" class="stdd w225 mx-2" 
+                               [items]="statuses"
+                               bindLabel="statusName"
+                               labelForId="stageId"
+                               placeholder="Select Status"
+                               clearAllText="Clear"
+                               formControlName="nextStageId"
+                          >
+                          </ng-select>
+                          <input type="text"
+                               placeholder="nextStageDate"
+                               bsDatepicker
+                               [bsValue]="transactionDate"
+                               [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                               class="stdd w125 ml-2"
+                               formControlName="nextStageDate"
+                          >   
+                          <div>{{ref.nextStageId}}</div> 
+
+                    </div>
+
+               </div>
+
+          </div>
+
+</form>
+<div *ngIf="cvDto !==null">
+     <app-deps [cvreferEdit]="cvDto" [depStatuses]="statuses" ></app-deps>
+</div>
+<div *ngIf="cvDto===null || cvDto===undefined">
+     cvDto not defined
+</div>
+
+<div>
+     {{form.value | json}}
+</div>
+

@@ -192,6 +192,7 @@ namespace infra.Services
                return PerfData;
           }
 
+         /*
           public async Task<OrderItemTransDto> GetOrderItemTransactions(StatsTransParams param)
           {
                var query = _context.OrderItems.AsQueryable();
@@ -216,5 +217,6 @@ namespace infra.Services
                return qry;
 
           }
+          */
      }
 }

@@ -9,9 +9,15 @@ export interface IChecklistHRDto{
      categoryRef: string;
      orderRef: string;
      orderItemId: number;
-     userLoggedIn: string;
+     userLoggedId: number;
+     userLoggedName: string;
      checkedOn: Date;
      hrExecComments: string;
+     charges: number;
+     chargesAgreed: number;
+     exceptionApproved: boolean;
+     exceptionApprovedBy: string;
+     exceptionApprovedOn: Date;
      checklistHRItems: IChecklistHRItem[];
 }
 
@@ -24,8 +30,14 @@ export class ChecklistHRDto implements IChecklistHRDto{
      categoryRef: string;
      candidateName: string;
      orderRef: string;
-     userLoggedIn: string;
+     userLoggedId: number;
+     userLoggedName: string;
      checkedOn: Date;
      hrExecComments: string;
+     charges: number;
+     chargesAgreed: number;
+     exceptionApproved: boolean;
+     exceptionApprovedBy: string;
+     exceptionApprovedOn: Date;
      checklistHRItems: IChecklistHRItem[];
 }

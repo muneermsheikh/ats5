@@ -23,6 +23,6 @@ namespace core.Interfaces
         Task<bool> CustomerExistsByIdAsync(int id);
         Task<ICollection<CustomerCity>> GetCustomerCityNames (string customerType);
         Task<ICollection<string>> GetCustomerIndustryTypes(string customerType);
-        Task<ICollection<ChooseAgentDto>> GetOfficialDetails ();
+        Task<ICollection<CustomerOfficialDto>> GetOfficialDetails ();
     }
 }

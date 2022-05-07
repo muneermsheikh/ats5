@@ -69,30 +69,30 @@ namespace infra.Services
                return items;
           }
 
-          public string GetSelectionDetails(SelectionDecision selection)
+          public string GetSelectionDetails(string CandidateName, int ApplicationNo, string CustomerName, string CategoryName, Employment employmt)
           {
                string strToReturn = "";
-               strToReturn = "<ul><li><b>Employee Name:</b> " + selection.CandidateName + "(Application No.:" + selection.ApplicationNo + ")</li>" +
-                    "<li><b>Employer</b>: " + selection.CustomerName + "</li>" +
-                    "<li><b>Selected as:</b> " + selection.CategoryName + 
-                    "<li><b>Contract Period:</b>" + selection.ContractPeriodInMonths + " months</li>" +
-                    "<li><b>Basic Salary:</b>" + selection.SalaryCurrency + " " + selection.Salary + "</li>" +
+               strToReturn = "<ul><li><b>Employee Name:</b> " + CandidateName + "(Application No.:" + ApplicationNo + ")</li>" +
+                    "<li><b>Employer</b>: " + CustomerName + "</li>" +
+                    "<li><b>Selected as:</b> " + CategoryName + 
+                    "<li><b>Contract Period:</b>" + employmt.ContractPeriodInMonths + " months</li>" +
+                    "<li><b>Basic Salary:</b>" + employmt.SalaryCurrency + " " + employmt.Salary + "</li>" +
                     "<li><b>Housing Provision: </b>";
-                    if (selection.HousingProvidedFree) { strToReturn += "Provided Free"; }
-                    else { strToReturn += selection.HousingAllowance > 0 
-                         ? selection.SalaryCurrency + " " + selection.HousingAllowance : "Not provided"; }
+                    if (employmt.HousingProvidedFree) { strToReturn += "Provided Free"; }
+                    else { strToReturn += employmt.HousingAllowance > 0 
+                         ? employmt.SalaryCurrency + " " + employmt.HousingAllowance : "Not provided"; }
                strToReturn += "</li>" +
                     "<li><b>Food Provision:</b>";
-                    if (selection.FoodProvidedFree) { strToReturn += "Provided Free"; }
-                    else {strToReturn += selection.FoodAllowance > 0 ? 
-                         selection.SalaryCurrency + " " + selection.FoodAllowance : "Not Provided"; }
+                    if (employmt.FoodProvidedFree) { strToReturn += "Provided Free"; }
+                    else {strToReturn += employmt.FoodAllowance > 0 ? 
+                         employmt.SalaryCurrency + " " + employmt.FoodAllowance : "Not Provided"; }
                strToReturn += "</li>" +
                     "<b><li>Transport Provision:</b> ";
-                    if (selection.TransportProvidedFree) { strToReturn += "Provided Free"; }
-                    else { strToReturn += selection.TransportAllowance > 0 
-                         ? selection.SalaryCurrency + " " + selection.TransportAllowance : "Not provided"; }
+                    if (employmt.TransportProvidedFree) { strToReturn += "Provided Free"; }
+                    else { strToReturn += employmt.TransportAllowance > 0 
+                         ? employmt.SalaryCurrency + " " + employmt.TransportAllowance : "Not provided"; }
                strToReturn += "</li>";
-               if (selection.OtherAllowance > 0) strToReturn += "<li><b>Other Allowances:</b>" + selection.SalaryCurrency + " " + selection.OtherAllowance + "</li>";
+               if (employmt.OtherAllowance > 0) strToReturn += "<li><b>Other Allowances:</b>" + employmt.SalaryCurrency + " " + employmt.OtherAllowance + "</li>";
                return strToReturn + "</ul>";
           }
                
@@ -197,7 +197,7 @@ namespace infra.Services
           {
                string strToReturn = "";
                strToReturn = "Pleased to advise you hv been selected by " + selection.CustomerName + " as " + selection.CategoryName;
-               strToReturn += " at a basic salary of " + selection.SalaryCurrency + " " + selection.FoodAllowance;
+               strToReturn += " at a basic salary of " + selection.Employment.SalaryCurrency + " " + selection.Employment.FoodAllowance;
                strToReturn += " plus perks.  Please visit us to review and sign your offer letter and to initiate your joining formalities";
                return strToReturn;
           }

@@ -18,8 +18,10 @@ namespace infra.Data.Config
                
                builder.HasOne(x => x.JobDescription).WithOne().OnDelete(DeleteBehavior.Cascade);
                builder.HasOne(s => s.Remuneration).WithOne().OnDelete(DeleteBehavior.Cascade);
-               builder.HasMany(s => s.CVRefs).WithOne().OnDelete(DeleteBehavior.Cascade);
+               //builder.HasMany(s => s.CVRefs).WithOne().OnDelete(DeleteBehavior.Cascade);
 
+               //builder.HasOne(x => x.CVRefs).HasForeignKey(x => x.OrderItemId);
+               //e.HasOne(x => x.ImageBackground).WithOne(x => x.ImageBackground).HasForeignKey<Publication>(x => x.ImageBackgroundId).IsRequired(false)
           }
      }
 }

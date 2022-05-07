@@ -1,31 +1,37 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { HrforwardComponent } from './hrforward/hrforward.component';
-import { AssessmentQComponent } from './assessment-q/assessment-q.component';
 import { AssessmentQBankComponent } from './assessment-q-bank/assessment-q-bank.component';
 import { SharedModule } from '../shared/shared.module';
 import { AssessmentQBankEditComponent } from './assessment-qbank-edit/assessment-qbank-edit.component';
 import { AssessmentStddComponent } from './assessment-stdd/assessment-stdd.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HrRoutingModule } from './hr-routing.module';
 import { CvAssessComponent } from './cv-assess/cv-assess.component';
+import { HrchecklistComponent } from './hrchecklist/hrchecklist.component';
+import { HrindexComponent } from './hrindex/hrindex.component';
+import { StddqEditComponent } from './stddq-edit/stddq-edit.component';
+import { AssessQComponent } from './assess-q/assess-q.component';
+import { CommonModule } from '@angular/common';
+import { AssessComponent } from './assess/assess.component';
+import { ItemQComponent } from './item-q/item-q.component';
+
 
 
 
 @NgModule({
   declarations: [
-    HrforwardComponent,
-    AssessmentQComponent,
     AssessmentQBankComponent,
     AssessmentQBankEditComponent,
     AssessmentStddComponent,
-    CvAssessComponent
+    CvAssessComponent,
+    HrchecklistComponent,
+    HrindexComponent,
+    StddqEditComponent,
+    AssessQComponent,
+    AssessComponent,
+    ItemQComponent,
   ],
   imports: [
-    CommonModule,
     SharedModule,
-    //FormsModule,
-    //ReactiveFormsModule,
+    CommonModule,
     HrRoutingModule
   ]
 })

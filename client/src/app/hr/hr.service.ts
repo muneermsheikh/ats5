@@ -7,12 +7,11 @@ import { environment } from 'src/environments/environment';
 import { AccountService } from '../account/account.service';
 import { IAssessmentQBank } from '../shared/models/assessmentQBank';
 import { assessmentQBankParams } from '../shared/models/assessmentQBankParams';
-import { IAssessmentStandardQ } from '../shared/models/assessmentStandardQ';
 import { IChecklistHRDto } from '../shared/models/checklistHRDto';
-import { IOrder } from '../shared/models/order';
-import { IPaginationQBank, paginationQBank } from '../shared/models/paginationQBank';
+
 import { IProfession } from '../shared/models/profession';
 import { IUser } from '../shared/models/user';
+import { IPaginationQBank, paginationQBank } from '../shared/pagination/paginationQBank';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +20,8 @@ export class HrService {
   apiUrl = environment.apiUrl;
   private currentUserSource = new ReplaySubject<IUser>(1);
   currentUser$ = this.currentUserSource.asObservable();
+  
+
   qParams = new assessmentQBankParams();
   pagination = new paginationQBank();
   existingCats: IProfession[]=[];
@@ -36,10 +37,7 @@ export class HrService {
       this.accountService.currentUser$.pipe(take(1)).subscribe(user => this.user = user);
     }
   
-    forwardDLtOHRDept(order: IOrder) {
-      
-    }
-
+   
     getExistingProfFromQBank() {
       return this.http.get<IProfession[]>(this.apiUrl + 'assessmentqbank/existingqbankcategories');
     }
@@ -91,10 +89,7 @@ export class HrService {
       return this.http.get<IAssessmentQBank>(this.apiUrl + 'assessmentQBank/qbank/' + id);
     }
 
-    getStddQs() {
-      return this.http.get<IAssessmentStandardQ[]>(this.apiUrl + 'assessmentstddq');
-    }
-
+    
     setQParams(params: assessmentQBankParams) {
       this.qParams = params;
     }
@@ -123,10 +118,7 @@ export class HrService {
       return this.http.put(this.apiUrl + 'assessmentQBank', model);
     }
 
-    deletestddq(id: number) {
-      return this.http.delete(this.apiUrl + 'assessmentstddq/' + id);
-    }
-
+    
     //checklist
     getChecklistHRDto(candidateid: number, orderitemid: number) {
       return this.http.get<IChecklistHRDto>(this.apiUrl + 'checklist/checklisthr/' + candidateid + '/' + orderitemid);

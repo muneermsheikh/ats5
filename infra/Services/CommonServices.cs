@@ -227,7 +227,7 @@ namespace infra.Services
                
           }
 
-          public async Task<string> DeploymentStageNameFromStageId(EnumDeployStatus stageId)
+          public async Task<string> DeploymentStageNameFromStageId(int stageId)
           {
                return await _context.DeployStatus.Where(x => x.StageId == stageId).Select(x => x.StatusName).FirstOrDefaultAsync();
           }

@@ -2,6 +2,7 @@ import { DatePipe, formatDate } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormArray, FormBuilder, FormControl, FormGroup, NgForm, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { TabDirective, TabsetComponent } from 'ngx-bootstrap/tabs';
 import { ToastrService } from 'ngx-toastr';
 import { EMPTY, of, timer } from 'rxjs';
@@ -19,6 +20,7 @@ import { IProfession } from 'src/app/shared/models/profession';
 import { IQualification } from 'src/app/shared/models/qualification';
 import { ISkillData } from 'src/app/shared/models/skillData';
 import { IUser } from 'src/app/shared/models/user';
+import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { BreadcrumbService } from 'xng-breadcrumb';
 import { EmployeeService } from '../employee.service';
@@ -51,11 +53,16 @@ export class EmployeeDetailComponent implements OnInit {
 
   eerrors: string[]=[];
 
-  bsValueDOB = new Date();
-  bsValueDOJ = new Date();
+  //bsValueDOB = new Date();
+  //bsValueDOJ = new Date();
+  bsValueDOB = new Date().toISOString();
+  bsValueDOJ = new Date().toISOString();
+  bsModalRef: BsModalRef;
   bsRangeValue: Date[];
 
-  constructor(private service: EmployeeService, private bcService: BreadcrumbService, private datePipe: DatePipe,
+  todayISOString : string = new Date().toISOString();
+
+  constructor(private service: EmployeeService, private bcService: BreadcrumbService, private confirmService: ConfirmService,
       private activatedRoute: ActivatedRoute, private router: Router, private sharedService: SharedService,
       private accountService: AccountService, private toastr: ToastrService, private fb: FormBuilder) {
     this.bcService.set('@candidateDetail',' ');
@@ -71,7 +78,6 @@ export class EmployeeDetailComponent implements OnInit {
       this.getIndustries();
       this.getSkillData();
       this.createForm();
-      console.log('skilldata', this.skillData, 'industries', this.industries, 'qualification', this.masterQualifications);
 
       if (!this.isAddMode) {
         this.getEmployee(+this.routeId);
@@ -123,7 +129,6 @@ export class EmployeeDetailComponent implements OnInit {
     }
     
     editEmployee(emp: IEmployee) {
-      console.log(emp);
       this.form.patchValue( {
         appUserId: emp.appUserId, id: emp.id,  gender: emp.gender, secondName: emp.secondName, familyName: emp.familyName, 
         knownAs: emp.knownAs, position: emp.position, placeOfBirth: emp.placeOfBirth, aadharNo: emp.aadharNo, 
@@ -422,9 +427,33 @@ export class EmployeeDetailComponent implements OnInit {
         }
       }
 
+      routeToList() {
+        if (this.form.dirty) {
+            this.confirmService.confirm('Confirm move to another page', 
+            'This form has data that is not saved; moving to another page will not commit the save. ' + 
+            'Do you want to move to another page without saving the data?')
+            .subscribe(result => {
+              if (result) {
+                this.router.navigateByUrl('/employee');
+              }
+            })
+        } else {
+          this.router.navigateByUrl('/employee');
+        }
+      }
+      
+
+      dojSelected(dt: any) {
+        this.dojSelected = dt;
+        console.log('dojselected',this.dojSelected);
+        return this.dojSelected;
+      }
       private CreateEmployee() {
-        this.toastr.info('create employee invoked');
+        this.form.controls['dateOfJoining'].setValue(this.dojSelected);
+
         this.service.register(this.form.value).subscribe(response => {
+          this.toastr.success('employee created');
+          this.router.navigateByUrl('/employee');
         }, error => {
           console.log(error);
           this.eerrors = error.errors;

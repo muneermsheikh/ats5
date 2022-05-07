@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Resolve } from "@angular/router";
 import { Observable } from "rxjs";
 import { MastersService } from "../masters/masters.service";
-import { IPaginationQualification } from "../shared/models/paginationQualification";
+import { IPaginationQualification } from "../shared/pagination/paginationQualification";
 
 @Injectable({
      providedIn: 'root'

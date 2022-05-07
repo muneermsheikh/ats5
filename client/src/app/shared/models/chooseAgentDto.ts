@@ -1,5 +1,6 @@
 export interface IChooseAgentDto
 {
+     
      customerId: number;
      customerName: string;
      city: string;
@@ -7,9 +8,9 @@ export interface IChooseAgentDto
      officialName: string;
      designation: string;
      title: string;
-     email: string;
+     officialEmailId: string;
      phoneNo: string;
-     mobile: string;
+     mobileNo: string;
      value: number;
      checked: boolean;
      checkedPhone: boolean;
@@ -26,9 +27,9 @@ export class chooseAgentDto implements IChooseAgentDto
      officialName: string;
      designation: string;
      title: string;
-     email: string;
+     officialEmailId: string;
      phoneNo: string;
-     mobile: string;
+     mobileNo: string;
      value: number;
      checked: boolean;
      checkedPhone: boolean;

@@ -15,6 +15,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxGalleryModule } from '@kolkov/ngx-gallery';
 import { HasRoleDirective } from './_directives/has-role.directive';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
+
 
 
 @NgModule({
@@ -38,6 +40,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true}
 
   ],
   bootstrap: [AppComponent]

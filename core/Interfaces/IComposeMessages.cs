@@ -12,7 +12,7 @@ namespace core.Interfaces
 {
     public interface IComposeMessages
     {
-       public string GetSelectionDetails(SelectionDecision selection);
+       public string GetSelectionDetails(string CandidateName, int ApplicationNo, string CustomerName, string CategoryName, Employment employmt);
        string ComposeOrderItems(int orderNo, ICollection<OrderItem> orderItems, bool hasException);
        string GetSelectionDetailsBySMS(SelectionDecision selection);
        Task<string> TableOfOrderItemsContractReviewedAndApproved(ICollection<int> itemIds);

@@ -56,6 +56,7 @@ namespace infra.Services
                //_logger = logger;
           }
 
+
           public async Task<Candidate> CreateCandidateAsync(RegisterDto registerDto, int loggedInEmployeeId)
           {
                var NextAppNo = await _context.Candidates.MaxAsync(x => x.ApplicationNo);
@@ -185,10 +186,10 @@ namespace infra.Services
                }
                */
 
-               var person = new Person(registerDto.Gender, registerDto.FirstName, registerDto.SecondName,
+               /* var person = new Person(registerDto.Gender, registerDto.FirstName, registerDto.SecondName,
                     registerDto.FamilyName, registerDto.DisplayName, registerDto.DOB,
                     registerDto.PlaceOfBirth, registerDto.AadharNo, "", registerDto.Nationality);
-               
+               */
                var qs = new List<EmployeeQualification>();
                if(registerDto.EmployeeQualifications !=null && registerDto.EmployeeQualifications.Count > 0)
                {
@@ -231,10 +232,10 @@ namespace infra.Services
                     }
                }
                
-               var emp = new Employee(registerDto.Gender, registerDto.FirstName,
+               var emp = new Employee(registerDto.AppUserId, registerDto.Gender, registerDto.FirstName,
                     registerDto.SecondName, registerDto.FamilyName, registerDto.DisplayName,
                     registerDto.DOB, registerDto.AadharNo, qs, registerDto.DOJ, registerDto.Department, 
-                    registerDto.Position, hrskills, otherskills, employeeAddresses);
+                    registerDto.Position, registerDto.Email, hrskills, otherskills, employeeAddresses);
 
                _unitOfWork.Repository<Employee>().Add(emp);
 
@@ -686,24 +687,5 @@ namespace infra.Services
                return cv;
           }
 
-          public async Task<CandidateBriefDto> GetCandidateBriefByParams(CandidateSpecParams SpecParams)
-          {
-               var cand = new Candidate();
-
-               if(SpecParams.ApplicationNoFrom != 0) {
-                    var c = await _context.Candidates.Where(x => x.ApplicationNo == SpecParams.ApplicationNoFrom)
-                         .Select(x => new CandidateBriefDto(x.Id, x.Gender, x.ApplicationNo, x.AadharNo, x.FullName,
-                              x.City, x.ReferredBy, ""))
-                         .FirstOrDefaultAsync();
-                    return c;
-               } else if (SpecParams.CandidateId != 0) {
-                    var c = await _context.Candidates.Where(x => x.Id == SpecParams.CandidateId)
-                         .Select(x => new CandidateBriefDto(x.Id, x.Gender, x.ApplicationNo, x.AadharNo, x.FullName,
-                              x.City, x.ReferredBy, ""))
-                         .FirstOrDefaultAsync();
-                    return c;
-               } 
-               return null;
-          }
      }
 }

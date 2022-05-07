@@ -10,11 +10,10 @@ import { ICandidateCity } from '../shared/models/candidateCity';
 import { candidateParams } from '../shared/models/candidateParams';
 import { ICustomerNameAndCity } from '../shared/models/customernameandcity';
 import { cvReviewDto, ICVReviewDto } from '../shared/models/cvReviewDto';
-import { IPaginationCandidate, PaginationCandidate } from '../shared/models/paginationCandidate';
-import { PaginationCandidateBrief } from '../shared/models/paginationCandidateBrief';
+import { IPaginationCandidate, PaginationCandidate } from '../shared/pagination/paginationCandidate';
 import { IProfession } from '../shared/models/profession';
-import { IQualification } from '../shared/models/qualification';
 import { IUser } from '../shared/models/user';
+import { PaginationCandidateBrief } from '../shared/pagination/paginationCandidateBrief';
 
 @Injectable({
   providedIn: 'root'
@@ -90,21 +89,22 @@ export class CandidateService {
     return this.http.get<ICandidate>(this.apiUrl + 'candidate/byid/' + id);
   }
 
-  getCandidateBriefDtoFromAppNo(id: number) {
-    return this.http.get<ICandidateBriefDto>(this.apiUrl + 'candidate/byappno/' + id);
+  getCandidateBrief(id: number) {
+    let dto: ICandidateBriefDto;
+
+    this.cache.forEach((cv: ICandidateBriefDto) => {
+      var dto = this.pagination.data.find(p => p.id === id);
+    })
+
+    if (dto) {
+      return of(dto);
+    }
+    
+    return this.http.get<ICandidateBriefDto>(this.apiUrl + 'candidate/briefbyid/' + id);
   }
 
-  getCandidateBriefDtoFromSpecParams(candParams: candidateParams): any {
-    let params = new HttpParams();
-    if (candParams.city !== "") params = params.append('city', candParams.city);
-    
-    if (candParams.professionId !== 0) params = params.append('professionId', candParams.professionId.toString());
-    if (candParams.mobile!=="") params = params.append('mobileNo', candParams.mobile);
-    if (candParams.applicationNoFrom!==0) params=params.append('applicationNoFrom', candParams.applicationNoFrom);
-    //if (candParams.applicationNoUpto!==0) params=params.append('applicationNoUpto', candParams.applicationNoUpto);
-    if (candParams.email) params = params.append('emailId', candParams.email);
-
-    return this.http.get<ICandidateBriefDto>(this.apiUrl + 'candidate/briefdtofromparams', {observe: 'response', params});
+  getCandidateBriefDtoFromAppNo(id: number) {
+    return this.http.get<ICandidateBriefDto>(this.apiUrl + 'candidate/byappno/' + id);
   }
 
   register(model: any) {

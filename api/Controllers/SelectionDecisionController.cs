@@ -7,6 +7,7 @@ using core.Entities.EmailandSMS;
 using core.Entities.HR;
 using core.Entities.Identity;
 using core.Interfaces;
+using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
 using Microsoft.AspNetCore.Authorization;
@@ -21,13 +22,15 @@ namespace api.Controllers
           private readonly IEmployeeService _empService;
           private readonly IMapper _mapper;
           private readonly UserManager<AppUser> _userManager;
+          private readonly IEmploymentService _employmentService;
           public SelectionDecisionController(ISelectionDecisionService service, IMapper mapper,
-               UserManager<AppUser> userManager, IEmployeeService empService)
+               UserManager<AppUser> userManager, IEmployeeService empService, IEmploymentService employmentService)
           {
                _empService = empService;
                _userManager = userManager;
                _mapper = mapper;
                _service = service;
+               _employmentService = employmentService;
           }
 
           [Authorize]
@@ -35,7 +38,6 @@ namespace api.Controllers
           public async Task<ActionResult<Pagination<SelectionDecision>>> GetSelectionDecisions(SelDecisionSpecParams selDecisionParams)
           {
                var loggedInDto = await GetLoggedInUserDto();
-               if (loggedInDto == null) return Unauthorized(new ApiResponse(401, "this option requires logged in User"));
                
                var decs = await _service.GetSelectionDecisions(selDecisionParams);
                if (decs != null) return Ok(decs);
@@ -44,10 +46,9 @@ namespace api.Controllers
 
           [Authorize]    //(Policy = "CandidateSelectionRegisterRole")]
           [HttpPost]
-          public async Task<ActionResult<ICollection<EmailMessage>>> RegisterSelectionDecisions(ICollection<SelDecisionToAddDto> dtos)
+          public async Task<ActionResult<SelectionMsgsAndEmploymentsDto>> RegisterSelectionDecisions(ICollection<SelDecisionToAddDto> dtos)
           {
                var loggedInDto = await GetLoggedInUserDto();
-               if (loggedInDto == null) return BadRequest(new ApiResponse(401, "this option requires logged in User"));
               
                var decs = await _service.RegisterSelections(dtos, loggedInDto.LoggedInEmployeeId);
 
@@ -64,22 +65,32 @@ namespace api.Controllers
           }
 
           [Authorize(Policy = "CandidateSelectionRegisterRole")]
-          [HttpDelete]
-          public async Task<ActionResult<bool>> DeleteSelectionDecision(SelectionDecision selectionDecision)
+          [HttpDelete("{id}")]
+          public async Task<ActionResult<bool>> DeleteSelectionDecision(int id)
           {
-               return await _service.DeleteSelection(selectionDecision);
+               return await _service.DeleteSelection(id);
           }
 
           
           [HttpGet("pendingseldecisions")]
           [Authorize]
-          public async Task<ActionResult<Pagination<SelectionsPendingDto>>> SelectionDecisionPending(SelectionsPendingParams selParams)
+          public async Task<ActionResult<Pagination<SelectionsPendingDto>>> SelectionDecisionPending([FromQuery] CVRefSpecParams selParams)
           {
-               var data = await _service.GetPendingSelections();
+               var data = await _service.GetPendingSelections(selParams);
                if (data==null && data.Count == 0) return NotFound(new ApiResponse(404, "No referral decisions found pending as of now"));
                
-               return Ok(new Pagination<SelectionsPendingDto>(selParams.PageIndex, selParams.PageSize, data.Count, data));
+               return Ok(data);
+               //return Ok(new Pagination<SelectionsPendingDto>(selParams.PageIndex, selParams.PageSize, data.Count, (IReadOnlyList<SelectionsPendingDto>)data));
           }
+          
+          [HttpGet("selectionstatus")]
+          public async Task<ActionResult<ICollection<SelectionStatus>>> GetSelectionStatus()
+          {
+               var st = await _service.GetSelectionStatus();    
+               return Ok(st);
+          }
+
+          //HttpGetAttribute()
           private async Task<LoggedInUserDto> GetLoggedInUserDto()
           {
                var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
@@ -96,6 +107,8 @@ namespace api.Controllers
                };
                return loggedInUserDto;
           }
+
+          
 
      }
 }

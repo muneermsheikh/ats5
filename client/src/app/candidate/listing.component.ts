@@ -26,6 +26,7 @@ declare const loadInitialDocument: any;
 export class ListingComponent implements OnInit {
 
   @ViewChild('search', {static: false}) searchTerm: ElementRef;
+  
   cvs: ICandidateBriefDto[];
   cvParams = new candidateParams();
   totalCount: number;
@@ -72,7 +73,6 @@ export class ListingComponent implements OnInit {
     this.service.getCandidates(useCache).subscribe(response => {
       this.cvs = response.data;
       this.totalCount = response.count;
-      console.log('candidates', this.cvs);
     }, error => {
       console.log(error);
     })

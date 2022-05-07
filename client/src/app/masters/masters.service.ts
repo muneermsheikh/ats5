@@ -5,11 +5,11 @@ import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { IIndustryType } from '../shared/models/industryType';
 import { mastersParams } from '../shared/models/mastersParams';
-import { IPaginationCategory, PaginationCategory } from '../shared/models/paginationCategory';
-import { IPaginationQualification, PaginationQualification } from '../shared/models/paginationQualification';
 import { IProfession } from '../shared/models/profession';
 import { IQualification } from '../shared/models/qualification';
 import { IUser } from '../shared/models/user';
+import { IPaginationCategory, PaginationCategory } from '../shared/pagination/paginationCategory';
+import { IPaginationQualification, PaginationQualification } from '../shared/pagination/paginationQualification';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +28,10 @@ export class MastersService {
   cacheQ = new Map();
   
   constructor(private http: HttpClient) { }
+  
+  getCategoryList() {
+      return this.http.get<IPaginationCategory>(this.apiUrl + 'masters/categories');
+  }
 
   getCategories(useCache: boolean) { 
 
@@ -49,21 +53,23 @@ export class MastersService {
     if (this.mParams.id !== 0) {
       params = params.append('id', this.mParams.id.toString());
     }
-    if (this.mParams.search) {
-      params = params.append('search', this.mParams.search);
-    }
-    
-    params = params.append('pageIndex', this.mParams.pageNumber.toString());
-    params = params.append('pageSize', this.mParams.pageSize.toString());
 
-    return this.http.get<IPaginationCategory>(this.apiUrl + 'masters/categorypages', {observe: 'response', params})
-      .pipe(
-        map(response => {
-          this.cacheCat.set(Object.values(this.mParams).join('-'), response.body.data);
-          this.paginationCategory = response.body;
-          return response.body;
-        })
-      )
+      if (this.mParams.search) {
+        params = params.append('search', this.mParams.search);
+      }
+      
+      params = params.append('pageIndex', this.mParams.pageNumber.toString());
+      params = params.append('pageSize', this.mParams.pageSize.toString());
+  
+      return this.http.get<IPaginationCategory>(this.apiUrl + 'masters/categorypages', {observe: 'response', params})
+        .pipe(
+          map(response => {
+            this.cacheCat.set(Object.values(this.mParams).join('-'), response.body.data);
+            this.paginationCategory = response.body;
+            return response.body;
+          })
+        )
+      
   }
 
   getQualifications(useCache: boolean) { 

@@ -10,34 +10,29 @@ namespace core.ParamsAndDtos
         {
         }
 
-        public UserHistoryDto(string partyName, int customerOfficialId, int candidateId, string aadharNo, string emailId, int applicationNo)
+        public UserHistoryDto(string personName, int personId, string emailId, int applicationNo)
         {
-            PartyName = partyName;
-            CustomerOfficialId = customerOfficialId;
-            CandidateId = candidateId;
-            AadharNo = aadharNo;
+            PersonName = personName;
+            PersonId = personId;
             EmailId = emailId;
             ApplicationNo = applicationNo;
         }
 
-        public UserHistoryDto(int id, string partyName, int customerOfficialId, int candidateId, string aadharNo, string emailId, int applicationNo, ICollection<UserHistoryItemDto> historyitems)
+        public UserHistoryDto(int id, string partyName, int personId, string emailId, int applicationNo, ICollection<UserHistoryItemDto> historyitems)
         {
             Id = id;
-            PartyName = partyName;
-            CustomerOfficialId = customerOfficialId;
-            CandidateId = candidateId;
-            AadharNo = aadharNo;
+            PersonName = partyName;
+            PersonId = personId;
             EmailId = emailId;
             ApplicationNo = applicationNo;
             UserHistoryItems = historyitems;
         }
 
         public int Id {get; set;}
-        public string PartyName {get; set;}
-        public int CustomerOfficialId {get; set;}
-        public int CandidateId {get; set;}
-        public string AadharNo {get; set;}
+        public string PersonName {get; set;}
+        public int PersonId {get; set;}
         public string EmailId {get; set;}
+        public string PhoneNo { get; set; }
         public int ApplicationNo {get; set;}
         public ICollection<UserHistoryItemDto> UserHistoryItems { get; set; }
     }

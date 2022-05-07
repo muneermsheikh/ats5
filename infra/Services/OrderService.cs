@@ -405,11 +405,11 @@ namespace infra.Services
 
           public async Task<IReadOnlyList<OrderItem>> GetOrderItemsByOrderIdAsync(int orderId)
           {
-               var spec = new OrderItemsSpecs(orderId, 0);
+               var spec = new OrderItemSpecs(orderId);
                var items = await _orderItemRepo.ListAsync(spec);
                return items;
           }
-
+          
           public async Task<OrderItem> GetOrderItemByOrderItemIdAsync(int Id)
           {
                var item = await _orderItemRepo.GetByIdAsync(Id);
@@ -667,21 +667,26 @@ namespace infra.Services
 
           public async Task<ICollection<OrderItemBriefDto>> GetOpenOrderItemsNotPaged()
           {
-               var qry = await (from i in _context.OrderItems
+               var  qry = await (from i in _context.OrderItems
                     where(i.ReviewItemStatusId == EnumReviewItemStatus.Accepted
                          && (i.Status == (int) EnumOrderItemStatus.UnderProcess 
                          || i.Status == (int)EnumOrderItemStatus.NotStarted))
                     join o in _context.Orders on i.OrderId equals o.Id
                     join c in _context.Customers on o.CustomerId equals c.Id
                     join cat in _context.Categories on i.CategoryId equals cat.Id
+                    join ass in _context.OrderItemAssessments on i.Id equals ass.OrderItemId into itemAss 
+                         from itemAssessments in itemAss.DefaultIfEmpty()
                     select new OrderItemBriefDto {
                          OrderItemId = i.Id, OrderId = o.Id, 
                          CustomerName = c.CustomerName, OrderDate = o.OrderDate,
                          CategoryId = i.CategoryId, CategoryName = cat.Name,
                          Quantity = i.Quantity, Status = (int)i.Status,
                          CategoryRef = o.OrderNo + "-" + i.SrNo,
-                         CategoryRefAndName = o.OrderNo +"-" + i.SrNo + "-" + cat.Name
-                    }).OrderBy(x => x.CategoryId).ToListAsync();
+                         CategoryRefAndName = cat.Name + "(" + o.OrderNo + "-" + i.SrNo + ")",
+                         RequireInternalReview = i.RequireInternalReview,
+                         AssessmentQDesigned = (itemAssessments.OrderItemId > 0)
+                    }).ToListAsync();
+
                /*var qry2 = await _context.Orders.Where(x => x.Status == EnumOrderStatus.ReviewedAndAccepted)
                          .Include(x => x.Customer)
                          .Include(x => x.OrderItems.Where(y => y.ReviewItemStatusId == EnumReviewItemStatus.Accepted 
@@ -696,15 +701,42 @@ namespace infra.Services
                          })
                     )
                */
-               var qry1 = await (from i in _context.OrderItems
-                    where(i.Status == (int) EnumOrderItemStatus.NotStarted
-                       )
-                    select(i)
-               ).ToListAsync();
-                   
                
                return qry;
           }
+
+          public async Task<ICollection<OrderItemBriefDto>> GetOrderItemsBriefDtoByOrderId(int OrderId)
+          {
+               var spec = new OrderItemSpecs(OrderId);
+               var items = await _orderItemRepo.ListAsync(spec);
+               if (items==null) return null;
+               return _mapper.Map<ICollection<OrderItem>, ICollection<OrderItemBriefDto>>((ICollection<OrderItem>)items);
+          }
+
+          public async Task<OrderBriefDtoR> GetOrderBrief(int OrderId)
+          {
+               
+               var qry = await (from o in _context.Orders where o.Id == OrderId
+                    join c in _context.Customers on o.CustomerId equals c.Id 
+                    select new {Id = o.Id, OrderNo = o.OrderNo, OrderDate = o.OrderDate, CustomerName = c.CustomerName}
+                    ).FirstOrDefaultAsync();
+               
+               if (qry == null) return null;
+
+               var items = await (from i in _context.OrderItems where i.OrderId == OrderId
+                    join c in _context.Categories on i.CategoryId equals c.Id
+                    select new {OrderId = OrderId, OrderItemId = i.Id, CategoryRef = qry.OrderNo + "-" + i.SrNo, CategoryName = c.Name, Quantity = i.Quantity}
+                    ).ToListAsync();
+               var dtoitems = new List<OrderItem_Dto>();
+               foreach(var item in items) {
+                    dtoitems.Add(new OrderItem_Dto{OrderId = OrderId, OrderItemId = item.OrderItemId, CategoryRef = item.CategoryRef, 
+                         CategoryName = item.CategoryName, Quantity = item.Quantity});
+               }
+               var dto = new OrderBriefDtoR{OrderNo = qry.OrderNo, OrderDate = qry.OrderDate, CustomerName = qry.CustomerName, Items = dtoitems};
+
+               return dto;
+          }
+
      }
 
 }

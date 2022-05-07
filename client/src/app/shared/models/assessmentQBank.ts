@@ -5,6 +5,13 @@ export interface IAssessmentQBank
      categoryName: string;
      assessmentQBankItems: IAssessmentQBankItem[];
 }
+export class AssessmentQBank
+{
+     id=0;
+     categoryId=0;
+     categoryName='';
+     assessmentQBankItems=null;
+}
 
 export interface IAssessmentQBankItem
 {

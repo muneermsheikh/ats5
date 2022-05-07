@@ -1,23 +1,59 @@
 .stdd {
      display: inline-block !important;
      vertical-align: top;
+     margin-left: 3px;
+     margin-right:3px;
+     margin-top: 1px;
+     margin-bottom: 1px;
+     padding-right: 3px;
+
 }
+
+.incharges {
+  display: inline-block !important;
+  width: 75px;
+  text-align: right;
+  padding-right: 2px;
+  font-weight: bold;
+}
+.lblFirst {
+  display: inline-block !important;
+  padding-right: 2px;
+  font-weight: bold;
+  color: blue;
+  margin-right: 2px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  text-align: left;
+  width: 135p;
+}
+
 .lbl {
      display: inline-block !important;
-     vertical-align: middle;
-     text-align: right;
      padding-right: 2px;
      font-weight: bold;
      color: blue;
+     margin-right: 2px;
+     margin-top: 1px;
+     margin-bottom: 1px;
+     text-align: left;
+     width: 135p;
 }
+
+.vAlignMiddle {vertical-align: middle;}
+.vAlignTop {vertical-align: top;}
+.fontSmall {font-size: small;}
+.fontSmaller {font-size: smaller;}
 
 .w10 {width: 10px;}
 .w30 {width: 30px;}
 .w35 {width: 35px;}
+.w40 {width: 40px;}
 .w50 {width: 50px;}
+.w65 {width: 65px;}
 .w75 {width: 75px;}
 .w90 {width: 90px;}
-.w100 {width: 100px;}
+.w125 {width: 125px;}
 .w115 {width: 115px;}
 .w125 {width: 125px;}
 .w150 {width: 150px;}

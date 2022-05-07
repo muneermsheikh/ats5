@@ -27,16 +27,16 @@ export class ErrorInterceptor implements HttpInterceptor {
             }
           }
           if (error.status === 401) {
-            console.log(error);
-            if (error.error?.message !==null) {
+            if (error.error?.message !==null && error.error?.message !== undefined) {
               this.toastr.error(error.error.message, error.error.statusCode);
             } else {
-              this.toastr.error(error.message, error.error.statusCode);
+              //this.toastr.error(error.message, error.error.statusCode);
+              this.toastr.error(error.message, error.statusCode);
             }
           }
           if (error.status === 404) {
             this.toastr.error(error.error.message, error.error.statusCode);
-            //this.router.navigateByUrl('/not-found');
+            this.router.navigateByUrl('/not-found');
           }
           if (error.status === 500) {
             this.router.navigateByUrl('/server-error');

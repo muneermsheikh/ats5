@@ -1,18 +1,26 @@
-<div class="row" style="font-size: smaller;">
-     <div class="col-2" style="font-size: smaller;">
+<div class="row" >
+     <div class="col-2" >
           <ng-container>
                <div class="stdd b w50 blue">Sort</div>
-               <select name="" id="" class="custom-select mb-2" style="font-size: small;" (change)="onSortSelected($event.target.value)">
+               <select name="" id="" class="custom-select mb-2" (change)="onSortSelected($event.target.value)">
                     <option *ngFor="let sort of sortOptions"
                          [value] = "sort.value"
                     >{{sort.name}}</option>
                </select>
                <div class="stdd b w50 blue">City</div>
-               <select name="" id="" class="custom-select mb-2" style="font-size: small;" (change)="onCitySelected($event.target.value)">
+               <!-- <select name="" id="" class="custom-select mb-2" (change)="onCitySelected($event.target.value)">
                     <option *ngFor="let city of orderCities"
                          [value] = "city.id"
                     >{{city.cityName}}</option>
                </select>
+          -->
+               <ul class="list-group mb-3">
+                    <li class="list-group-item" *ngFor="let city of orderCities"
+                        [class.active]="city.cityName === oParams.city" [value]="city.cityName"
+                        (click)="onCitySelected(city.cityName)">
+                        {{city.cityName}}
+                    </li>
+                </ul>
 <!--
                <ul class="list-group">
                     <li class="list-group-item" style="height: 22px; padding-top: 0%; padding-bottom: 0%;"

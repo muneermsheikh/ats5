@@ -206,6 +206,9 @@ namespace infra.Data.IdentityMigrations
                     b.Property<string>("UserType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("loggedInEmployeeId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")

@@ -18,9 +18,12 @@ namespace core.Interfaces
             Task<bool> OrderForwardedToHRDept(int orderId);
             Task<ICollection<CustomerCity>> GetOrderCityNames();
             Task<Order> GetOrderByIdAsyc (int id);
+            Task<OrderBriefDtoR> GetOrderBrief(int OrderId);
+            //Task<ICollection<OrderBriefDtoR>> GetOpenOrdersBrief();
 
         //order items
             Task<IReadOnlyList<OrderItem>> GetOrderItemsByOrderIdAsync(int OrderId);
+            Task<ICollection<OrderItemBriefDto>> GetOrderItemsBriefDtoByOrderId(int OrderId);
             Task<OrderItem> GetOrderItemByOrderItemIdAsync(int Id);
             
             void AddOrderItem(OrderItem orderItem);

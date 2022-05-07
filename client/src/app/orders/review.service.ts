@@ -1,14 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ToastrComponentlessModule } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { IContractReview } from '../shared/models/contractReview';
 import { IContractReviewItem } from '../shared/models/contractReviewItem';
 import { contractReviewParams } from '../shared/models/contractReviewParams';
-import { IPaginationContractReview, PaginationContractReview } from '../shared/models/paginationContractReview';
 import { IReviewItem } from '../shared/models/reviewItem';
+import { IReviewItemData } from '../shared/models/reviewItemData';
+import { IPaginationContractReview, PaginationContractReview } from '../shared/pagination/paginationContractReview';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +24,7 @@ export class ReviewService {
   constructor(private http: HttpClient) { }
 
   getReview(id: number) {
-    return this.http.get<IContractReview>(this.apiUrl + 'contractreview/' + id);
+    return this.http.get<IContractReview[]>(this.apiUrl + 'contractreview/' + id);
   }
 
   getReviewItem(id: number) {
@@ -88,6 +88,9 @@ export class ReviewService {
       )
   }
   
+  getReviewData() {
+    return this.http.get<IReviewItemData[]>(this.apiUrl + 'contractreview/reviewdata');
+  }
   
   register(model: any) {
     return this.http.post(this.apiUrl + 'orders/review', model);

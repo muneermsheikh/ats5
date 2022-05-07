@@ -6,7 +6,7 @@ namespace core.Entities.Process
     public class DeployStatus: BaseEntity
     {
         [Required]
-        public EnumDeployStatus StageId { get; set; }
+        public int StageId { get; set; }
         [Required]
         public string StatusName { get; set; }
         [Required]

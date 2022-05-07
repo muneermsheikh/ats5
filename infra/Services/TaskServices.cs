@@ -82,7 +82,7 @@ namespace infra.Services
                task = new ApplicationTask((int)EnumTaskType.AssignTaskToHRExec, DateTime.Now, t.ProjectManagerId, t.HrExecId, (int)t.OrderId, (int)t.OrderNo,
                     (int)t.OrderItemId, "Task assigned for " + t.Quantity + " CVs of " + t.CategoryName + ", Category Reference " + t.CategoryRef + " for " + t.CustomerName, 
                     t.CompleteBy, "Not Started", 0, taskitems);
-               string ErrString = ValidateTaskObject(task);
+               string ErrString = await ValidateTaskObject(task);
                if (string.IsNullOrEmpty(ErrString)) tasks.Add(task);
 
           }
@@ -95,7 +95,7 @@ namespace infra.Services
           
           var recordsAffected = await _unitOfWork.Complete();
 
-          if (recordsAffected == 0) throw new Exception("Failed to create the task");
+          if (recordsAffected == 0) return null;  // throw new Exception("Failed to create the task");
 
           var emailMsgs = (List<EmailMessage>) await _composeMsgHR.ComposeMessagesToHRExecToSourceCVs(assignments);
           if (emailMsgs != null && emailMsgs.Count ==0) return null;
@@ -150,10 +150,10 @@ namespace infra.Services
                }
           }
 
-          if(added == 0) throw new Exception("no valid records found to generate order assignments");
+          if(added == 0) return false;   // throw new Exception("no valid records found to generate order assignments");
           var recordsAffected = await _unitOfWork.Complete();
 
-          if (recordsAffected == 0) throw new Exception("Failed to create the task");
+          if (recordsAffected == 0) return false;  // throw new Exception("Failed to create the task");
 
           var dtos = new List<OrderAssignmentDto>();
           foreach(var model in modelOrder.OrderItems)
@@ -191,36 +191,36 @@ namespace infra.Services
           return recordsAffected > 0 ;
      }
 
-     public async Task<ICollection<EmailMessage>> CreateNewApplicationTask(ApplicationTask task, LoggedInUserDto loggedInDto)
+     public async Task<MessagesDto> CreateNewApplicationTask(ApplicationTask task, int LoggedInEmployeeId)
      {
-          string ErrString = ValidateTaskObject(task);
-          if (!string.IsNullOrEmpty(ErrString)) throw new Exception(ErrString);
+          var dto = new MessagesDto();
+
+          string ErrString = await ValidateTaskObject(task);
+          if (!string.IsNullOrEmpty(ErrString)) {
+               dto.ErrorString = ErrString;
+               return dto;
+          } 
 
           _unitOfWork.Repository<ApplicationTask>().Add(task);
 
           var recordsAffected = await _unitOfWork.Complete();
 
-          if (recordsAffected == 0) throw new Exception("Failed to create the task");
+          if (recordsAffected == 0) {
+               dto.ErrorString = "failed to create the task";
+               return dto;
+          }
 
-          var emailMsgs = new List<EmailMessage>();
+          if (task.PostTaskAction == EnumPostTaskAction.DoNotComposeAnyMessage) {
+               dto.ErrorString = "Tasks created, but no Task Messages composed since the Order Category defined it as not required";
+               return dto;
+          }
 
-          switch (task.TaskTypeId)
-          {
-               case (int)EnumTaskType.DesignOrderAssessmentQ:
-                    emailMsgs = (List<EmailMessage>)
-                         await _composeMsgHR.ComposeMessagesToDesignOrderAssessmentQs((int)task.OrderId, loggedInDto);
-                    break;
+          var emailMsgs = await CreateMessageFromTask(task, LoggedInEmployeeId);
 
-               case (int)EnumTaskType.AssignTaskToHRExec:
-                    var orderitemids = await _context.OrderItems.Where(x => x.OrderId == task.OrderId).Select(x => x.Id).ToListAsync();
-
-                    var assignmentdtos = await GetAssignmentDtoFromItemIds(orderitemids);
-                    emailMsgs = (List<EmailMessage>)
-                         await _composeMsgHR.ComposeMessagesToHRExecToSourceCVs((ICollection<OrderAssignmentDto>)orderitemids);
-                    break;
-
-               default:
-                    break;
+          if(emailMsgs.Count == 0) {
+               dto.emailMessages = null;
+               dto.ErrorString="Failed to create email messages";
+               return dto;
           }
 
           if ((task.PostTaskAction == EnumPostTaskAction.ComposeAndSendEmail || 
@@ -232,7 +232,7 @@ namespace infra.Services
                {
                     _emailService.SendEmail(msg, attachments);
                }
-               
+               dto.emailMessages = emailMsgs;
           }
           /*   //TODO - test for recipient particulars before allowing direct send
           if (msg != null) {
@@ -240,10 +240,44 @@ namespace infra.Services
                msg = await _emailService.SendEmail(msg, attachments);
           }
           */
-          return emailMsgs;
-
+          return dto;
      }
+     
 
+     private async Task<ICollection<EmailMessage>> CreateMessageFromTask(ApplicationTask task, int LoggedInEmployeeId)
+     {
+          var emailMsgs = new List<EmailMessage>();
+          switch (task.TaskTypeId)
+          {
+               case (int)EnumTaskType.DesignOrderAssessmentQ:
+                    emailMsgs = (List<EmailMessage>)
+                         await _composeMsgHR.ComposeMessagesToDesignOrderAssessmentQs((int)task.OrderId, LoggedInEmployeeId);
+                    break;
+
+               case (int)EnumTaskType.AssignTaskToHRExec:
+                    var orderitemids = await _context.OrderItems.Where(x => x.OrderId == task.OrderId).Select(x => x.Id).ToListAsync();
+
+                    var assignmentdtos = await GetAssignmentDtoFromItemIds(orderitemids);
+                    emailMsgs = (List<EmailMessage>)
+                         await _composeMsgHR.ComposeMessagesToHRExecToSourceCVs((ICollection<OrderAssignmentDto>)orderitemids);
+                    break;
+               case (int)EnumTaskType.CVForwardToCustomers:
+                    //check unique index violations  - TaskType + candidateId + orderItemId + assignedToId
+                    
+                    //update CandidateAssessment.TaskIdDocControllerAdmin
+                    var candidateassessment = await _context.CandidateAssessments
+                         .Where(x => x.CandidateId == task.CandidateId && x.OrderItemId == task.OrderItemId)
+                         .SingleOrDefaultAsync();
+                    candidateassessment.TaskIdDocControllerAdmin = task.Id;
+                    _unitOfWork.Repository<CandidateAssessment>().Update(candidateassessment);
+                    await _unitOfWork.Complete();
+                    break;
+               default:
+                    break;
+          }
+
+          return emailMsgs;
+     }
      public async Task<TaskItem> CreateNewTaskItem(TaskItem taskItem)
      {
           _unitOfWork.Repository<TaskItem>().Add(taskItem);
@@ -263,7 +297,7 @@ namespace infra.Services
           return await _unitOfWork.Complete() > 0;
      }
 
-     public async Task<ApplicationTask> EditApplicationTask(ApplicationTask taskModel)
+     public async Task<MessagesDto> EditApplicationTask(ApplicationTask taskModel, int LoggedInEmployeeId)
      {
           //thanks to @slauma of stackoverflow
           var existingObj = _context.Tasks.Where(p => p.Id == taskModel.Id)
@@ -321,7 +355,17 @@ namespace infra.Services
           }
           _context.Entry(existingObj).State = EntityState.Modified;
 
-          return await _context.SaveChangesAsync() > 0 ? existingObj : null;
+          var dto = new MessagesDto();
+
+          if (await _context.SaveChangesAsync() > 0) {
+               var msgs = await CreateMessageFromTask(existingObj, LoggedInEmployeeId);
+               dto.emailMessages = msgs;
+          } else {
+               dto.emailMessages=null;
+               dto.ErrorString = "Failed to create the messages";
+          }
+
+          return dto;
      }
 
      public async Task<TaskItem> EditTaskItem(TaskItem taskItem)
@@ -375,7 +419,7 @@ namespace infra.Services
                     .OrderBy(x => x.TaskDate)
                     .ToListAsync();
 
-          if (tasks == null) throw new Exception("No tasks on record for the logged-in user");
+          if (tasks == null)  return null;   // throw new Exception("No tasks on record for the logged-in user");
 
           var lst = new List<TaskDashboardDto>();
           foreach (var item in tasks)
@@ -437,7 +481,7 @@ namespace infra.Services
           return await _context.SaveChangesAsync() > 0;
      }
 
-     private string ValidateTaskObject(ApplicationTask task)
+     private async Task<string> ValidateTaskObject(ApplicationTask task)
      {
           string ErrorString = "";
 
@@ -469,7 +513,15 @@ namespace infra.Services
                case (int)EnumTaskType.SubmitCVToHRMMgrForReview:
                     if (task.OrderId == 0 || task.OrderNo == 0) ErrorString = "Order Id and Order No not provided";
                     break;
-               case (int)EnumTaskType.SubmitCVToDocControllerAdmin:
+               case (int)EnumTaskType.CVForwardToCustomers:
+                    //check for uniqueindex violations -'IX_Tasks_AssignedToId_OrderItemId_CandidateId_TaskTypeId
+                    //'IX_Tasks_AssignedToId_OrderItemId_CandidateId_TaskTypeId'. The duplicate key value is (2, 5, 4, 17).
+                    var taskExists = await _context.Tasks.Where(x => 
+                         x.CandidateId == task.CandidateId && x.OrderItemId == task.OrderItemId
+                         && x.AssignedToId == task.AssignedToId && x.TaskTypeId == task.TaskTypeId).FirstOrDefaultAsync();
+                    if (taskExists != null) {
+                         ErrorString = "the task already exists";
+                    }
                     if (task.OrderItemId == 0 || task.OrderNo == 0 || task.CandidateId == 0) ErrorString = "Order Item/Candidate details not provided";
                     break;
                case (int)EnumTaskType.SelectionFollowupByDocControllerAdmin:

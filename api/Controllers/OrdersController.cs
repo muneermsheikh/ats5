@@ -25,12 +25,14 @@ namespace api.Controllers
           private readonly IMapper _mapper;
           private readonly IGenericRepository<Order> _orderRepo;
           private readonly UserManager<AppUser> _userManager;
-          public OrdersController(IOrderService orderService, IMapper mapper, IGenericRepository<Order> orderRepo, UserManager<AppUser> userManager)
+          private readonly IOrderItemService _orderItemService;
+          public OrdersController(IOrderService orderService, IOrderItemService orderItemService, IMapper mapper, IGenericRepository<Order> orderRepo, UserManager<AppUser> userManager)
           {
                _userManager = userManager;
                _orderRepo = orderRepo;
                _mapper = mapper;
                _orderService = orderService;
+               _orderItemService = orderItemService;
           }
 
 
@@ -60,6 +62,38 @@ namespace api.Controllers
           {
                return await _orderService.GetOpenOrderItemsNotPaged();
           }
+
+          [HttpGet("orderitemsbyorderid/{orderid}")]
+          public async Task<ActionResult<ICollection<OrderItemBriefDto>>> GetOrderItemsByOrderId (int orderid)
+          {
+               var orderItems = await _orderService.GetOrderItemsBriefDtoByOrderId(orderid);
+
+               if (orderItems !=null) return Ok(orderItems);
+
+               return NotFound();
+          }
+
+          [HttpGet("orderbriefdto/{orderid}")]
+          public async Task<ActionResult<OrderBriefDtoR>> GetOrderBrief (int orderid)
+          {
+               var orderItems = await _orderService.GetOrderBrief(orderid);
+
+               if (orderItems !=null) return Ok(orderItems);
+
+               return NotFound();
+          }
+
+          
+          [HttpGet("itemdtobyid/{orderitemid}")]
+          public async Task<ActionResult<ICollection<OrderItemBriefDto>>> GetOrderItemBriefByOrderItemId (int orderitemid)
+          {
+               var orderItems = await _orderItemService.GetOrderItemRBriefDtoFromOrderItemId(orderitemid);
+
+               if (orderItems !=null) return Ok(orderItems);
+
+               return NotFound();
+          }
+
           [HttpGet("byid/{id}")]
           public async Task<ActionResult<Order>> GetOrderById (int id)
           {

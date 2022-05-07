@@ -1,19 +1,22 @@
 import { Injectable } from "@angular/core";
-import { Resolve } from "@angular/router";
+import { ActivatedRouteSnapshot, Resolve } from "@angular/router";
 import { Observable } from "rxjs";
-import { HrService } from "../hr/hr.service";
-import { IAssessmentQBank } from "../shared/models/assessmentQBank";
+import { StddqsService } from "../hr/stddqs.service";
 import { IAssessmentStandardQ } from "../shared/models/assessmentStandardQ";
 
 @Injectable({
      providedIn: 'root'
  })
- export class AssessmentStddQResolver implements Resolve<IAssessmentStandardQ[]> {
+ export class AssessmentStddQResolver implements Resolve<IAssessmentStandardQ> {
  
-     constructor(private qBankService: HrService) {}
+     constructor(private service: StddqsService) {}
  
-     resolve(): Observable<IAssessmentStandardQ[]> {
-        return this.qBankService.getStddQs();
+     resolve(route: ActivatedRouteSnapshot): Observable<IAssessmentStandardQ> {
+
+        var routeid = route.paramMap.get('id');
+        var q = this.service.getStddQ(+routeid);
+        console.log('stddq resolver, q is', q);
+        return q;
      }
  
  }

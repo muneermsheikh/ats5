@@ -1,18 +1,17 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { of, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { IApplicationTask } from '../shared/models/applicationTask';
 import { IApplicationTaskInBrief } from '../shared/models/applicationTaskInBrief';
-import { IOrder } from '../shared/models/order';
 import { IOrderAssignmentDto } from '../shared/models/orderAssignmentDto';
-import { IOrderItem } from '../shared/models/orderItem';
-import { IPaginationTask, PaginationTask } from '../shared/models/paginationTask';
 import { ITaskItem } from '../shared/models/taskItem';
 import { IUser } from '../shared/models/user';
-import { userTaskParams } from '../shared/models/userTaskParams';
+import { IPaginationTask, PaginationTask } from '../shared/pagination/paginationTask';
+import { userTaskParams } from '../shared/params/userTaskParams';
+
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +26,7 @@ export class UserTaskService {
   pagination = new PaginationTask();
   cache = new Map();
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, private toastr:ToastrService) { }
 
     createOrderAssignmentTasks(assignmentTasks: IOrderAssignmentDto[]) {
       return this.http.post(this.apiUrl + 'orderassignment/orderitems', assignmentTasks);
@@ -35,7 +34,7 @@ export class UserTaskService {
 
     createTaskFromAppTask(task: IApplicationTask)
     {
-      
+      this.toastr.info('entered createTAskFromAppTask');
       return this.http.post(this.apiUrl + 'task', task);
     }
 

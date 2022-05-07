@@ -1,20 +1,20 @@
-<div class="row mx-2" style="font-size: smaller;">
-     <div class="col-2" style="font-size: small;">
-          <ng-container *ngIf="candidateCities && professions && agents ">
-               <div class="w50 b" style="display: inline-block;">Sort</div>
-               <select name="" id="" class="custom-select mb-2" style="font-size: smaller;" (change)="onSortSelected($event.target.value)">
+<div class="stdd col-2">
+          
+          <div *ngIf="candidateCities && professions && agents ">
+               <div class="stdd w50 b" >Sort</div>
+               <select name="" id="" class="custom-select mb-2" (change)="onSortSelected($event.target.value)">
                     <option *ngFor="let sort of sortOptions"
                          [value] = "sort.value"
                     >{{sort.name}}</option>
                </select>
-               <div class="w50 b" style="display: inline-block;">City</div>
-               <select name="" id="" class="custom-select mb-2" style="font-size: smaller;" (change)="onCitySelected(city.city)">
+               <div class="stdd w50 b">City</div>
+               <select name="" id="" class="custom-select mb-2"  (change)="onCitySelected(city.city)">
                     <option *ngFor="let city of candidateCities"
                          [value] = "city.city"
                          [class.active]="city.city === cvParams.City"
                     >{{city.city}}</option>
                </select>
-               <div class="b w50" style="display: inline-block; font-size: smaller;">Agents</div>
+               <div class="stdd b w50" >Agents</div>
                <select name="" id="" class="custom-select mb-2" (change)="onAgentSelected(agent.id)">
                     <option *ngFor="let agent of agents"
                          [value] = "agent.id"
@@ -22,11 +22,12 @@
                     >{{agent.customerName}}</option>
                </select>
 
-               <div class="b w50" style="display: inline-block; font-size: smaller;">Professions</div>
-               <select name="" id="" class="custom-select mb-2" (change)="onCategorySelected(cat.id)">
+               <div class="stdd b w50">Professions</div>
+               <select name="" id="" class="custom-select mb-2" (change)="onCategorySelected(id)" >
                     <option *ngFor="let cat of professions"
                          [value] = "cat.id"
                          [class.active]="cat.Id === cvParams.professionId"
+                         (click)="onCategorySelected(cat.id)"
                     >{{cat.name}}</option>
                </select>
                <!-- change to ng-Select, as it loads items dynamically -->
@@ -51,27 +52,29 @@
                 </div>
                -->
 
-          </ng-container>
-     </div>
-     <div class="col-10">
+          </div>
+     
+</div>
+<div class="stdd col-10">
           <div class="d-flex justify-contents-between align-items-center">
                <app-paging-header [totalCount]="totalCount" [pageNumber]="cvParams.pageNumber" [pageSize]="cvParams.pageSize"></app-paging-header>
 
                <div class="d-flex justify-contents-between align-items-center">
                     <div class="form-inline mt-2" *ngIf="cvs">
-                         <input (keyup.enter)="onSearch()" type="text" class="form-control ml-5" #search style="width: 300px; font-size: small;" placeholder="Search">
-                         <button (click)="onSearch()" class="btn btn-outline-primary my-1" style="font-size: small;">Search</button>
-                         <button (click)="onReset()" class="btn btn-outline-success ml-2 my-1" style="font-size: small;">Reset</button>
-                         <button class="btn btn-outline-success ml-2 my-1 fa fa-plus" routerLink="/cv/add"></button>
+                         <input (keyup.enter)="onSearch()" type="text" class="form-control ml-5 w300" #search placeholder="Search">
+                         <button type="button" (click)="onSearch()" class="btn btn-outline-primary mx-1 my-1" style="font-size: small;">Search</button>
+                         <button type="button" (click)="onReset()" class="btn btn-outline-success mx-1 my-1" style="font-size: small;">Reset</button>
+                         <button type="button" (click)="onCategoryRef()" class="btn btn-outline-success mx-1 my-1" style="font-size: small;">Category Ref</button>
+                         <button type="button" class="btn btn-outline-success ml-2 my-1 fa fa-plus" routerLink="/cv/add"></button>
                     </div>
                </div>
           </div>
-          <div class="form-inline" style="font-weight: bold; font-size: smaller;">
-               <div style="width: 50px; " class="px-0 ml-5;">Appl No</div>
-               <div style="width: 200px;" class="px-0;">Candidate Name</div>
-               <div style="width: 70px" class="px-0">City</div>
-               <div style="width: 200px;" class="px-0">Agent</div>
-               <div style="width: 200px;" class="px-0">Professions</div>
+          <div class="form-inline" style="font-weight: bold;">
+               <div class="stdd ml-5 w50">Appl No</div>
+               <div class="stdd w200 mx-1">Candidate Name</div>
+               <div class="stdd w70 mx-1">City</div>
+               <div class="stdd w200 mx-1">Agent</div>
+               <div class="stdd w200 mx-1">Professions</div>
           </div>
           <div class="row" *ngFor="let cv of cvs" >
                <app-candidate-item [cv]="cv" (msgEvent)="showDocumentViewer($event)" ></app-candidate-item>
@@ -81,5 +84,6 @@
                     [pageSize]="cvParams.pageSize" [totalCount]="totalCount" [pageNumber]="cvParams.pageNumber" (pageChanged)="onPageChanged($event)"  >
                </app-pager>
           </div>
-     </div>
+
 </div>
+

@@ -15,6 +15,7 @@ using System.Collections.ObjectModel;
 using core.Entities.Identity;
 using core.Entities;
 using AutoMapper;
+using core.Entities.HR;
 
 namespace infra.Services
 {
@@ -36,28 +37,12 @@ namespace infra.Services
                _context = context;
           }
 
-          public async Task<UserHistoryDto> GetUserHistoryData(UserHistorySpecParams userParams)
+           public async Task<UserHistory> AddUserContact(UserHistory userContact)
           {
-               var spec = new UserContactSpecs(userParams);
-               var userhistory = await _unitOfWork.Repository<UserHistory>().GetEntityWithSpec(spec);
-               if (userhistory == null) return null;
-               return _mapper.Map<UserHistory, UserHistoryDto>(userhistory);
-          }
-
-          public async Task<UserHistory> AddUserContact(UserHistory userContact)
-          {
-               if (userContact.CandidateId !=0) {
-                    var user = await _context.Candidates.FindAsync(userContact.CandidateId);
+               if (userContact.PersonId !=0) {
+                    var user = await _context.Candidates.FindAsync(userContact.PersonId);
                     if (user == null) return null;
-                    userContact.PartyName = user.FullName;
-                    userContact.ApplicationNo = user.ApplicationNo;
-                    userContact.AadharNo = user.AadharNo;
-               } else if (userContact.CustomerOfficialId !=0) {
-                    var user = await (from o in _context.CustomerOfficials where o.Id == userContact.CustomerOfficialId
-                         join c in _context.Customers on o.CustomerId equals c.Id 
-                         select new {o.OfficialName, c.Id}).FirstOrDefaultAsync();
-                    userContact.PartyName = user.OfficialName;
-                    //userContact.CustomerId = user.Id;
+                    userContact.PersonName = user.FullName;
                }
                _unitOfWork.Repository<UserHistory>().Add(userContact);
                
@@ -70,9 +55,6 @@ namespace infra.Services
           {
                var contact = await _context.UserHistories.FindAsync(userContact.Id);
                if (contact == null) throw new Exception("invalid object");
-
-               //_context.Entry(contact).CurrentValues.SetValues(contact);
-               //_context.Entry(contact).State = EntityState.Deleted;
 
                _unitOfWork.Repository<UserHistory>().Delete(userContact);
                return await _unitOfWork.Complete() > 0;
@@ -92,48 +74,122 @@ namespace infra.Services
                return await _context.ContactResults.OrderBy(x => x.Name).ToListAsync();
           }
 
-
-          public async Task<UserHistoryDto> GetOrAddUserHistoryByParams(UserHistorySpecParams specParams)
+          /*
+          public async Task<UserHistoryDto> GetOrAddUserHistoryByNamePhone(string callerame, string mobileno) 
           {
-               var history = new UserHistory();
-               if (specParams.CandidateId.HasValue) {
-                    history = await _context.UserHistories.Where(x=> x.CandidateId == (int)specParams.CandidateId)
-                         .Include(x => x.UserHistoryItems.OrderByDescending(x => x.DateOfContact))
-                         .FirstOrDefaultAsync();
-               } else if (specParams.ApplicationNo.HasValue) {
-                    history = await _context.UserHistories.Where(x => x.ApplicationNo == (int)specParams.ApplicationNo)
-                         .Include(x => x.UserHistoryItems.OrderByDescending(x => x.DateOfContact))
-                         .FirstOrDefaultAsync();
-               };
-               //var spec = new UserContactSpecs(specParams);
-               //var history = await _unitOfWork.Repository<UserHistory>().GetEntityWithSpec(spec);
+               var ph = mobileno;
+               if (ph.StartsWith("00")) ph=ph.Substring(3);
+               if (ph.StartsWith("0")) ph=ph.Substring(2);
+               if (ph.StartsWith("+91")) ph=ph.Substring(4);
+               
+               ph=mobileno.Trim();
+               if (ph.Length < 10) throw new Exception("invalid phone no. " + mobileno + ", it should be 10 digits log");
 
+               var history = await _context.UserHistories.Where(x=> x.PhoneNo == ph)
+                    .Include(x => x.UserHistoryItems.OrderByDescending(x => x.DateOfContact))
+                    .FirstOrDefaultAsync();
                if (history == null) {
-                    if(specParams.CandidateId.HasValue) {
-                         var cand = await _userService.GetCandidateBriefById((int)specParams.CandidateId);
-                         if (cand == null) return null;
-                         history = new UserHistory(cand.Id, cand.AadharNo, cand.FullName, cand.ApplicationNo, null);
+                    var newhistory = new UserHistory{PhoneNo = ph, PartyName = callerame};
+                    _unitOfWork.Repository<UserHistory>().Add(newhistory);
+                    if (await _unitOfWork.Complete() == 0) throw new Exception("failed to write the user history to Database");
+               }
+               return _mapper.Map<UserHistory, UserHistoryDto>(history);
+          }
+          */
+          public async Task<UserHistoryDto> GetHistoryFromHistoryId(int historyId)
+          {
+               var history = await _context.UserHistories.Where(x => x.Id == historyId).Include(x => x.UserHistoryItems).FirstOrDefaultAsync();
+               return _mapper.Map<UserHistory, UserHistoryDto>(history);
+          }
+
+          public async Task<UserHistoryDto> GetOrAddUserHistoryByParams(UserHistoryParams histParams)
+          {
+               //check if the object has empty elements
+               
+               var cv = new Candidate();
+               var history = new UserHistory();
+               string ph = histParams.MobileNo;
+
+               if (histParams.Id > 0) {
+                    history = await _context.UserHistories.Where(x => x.Id == histParams.Id)
+                         .Include(x => x.UserHistoryItems).FirstOrDefaultAsync();
+                    if(history !=null) return _mapper.Map<UserHistory, UserHistoryDto>(history);
+               }
+
+               var qry = _context.UserHistories.AsQueryable();
+               if (histParams.ApplicationNo.HasValue) {
+                    qry =  qry.Where(x =>x.ApplicationNo == histParams.ApplicationNo);
+               } else {
+                    if (!string.IsNullOrEmpty(ph)) qry = qry.Where(x => x.PhoneNo == ph);
+                    if (!string.IsNullOrEmpty(histParams.EmailId)) qry = qry.Where(x => x.EmailId.ToLower() == histParams.EmailId.ToLower());
+                    if(histParams.PersonId.HasValue) qry = qry.Where(x => x.PersonId==histParams.PersonId);
+               }
+               qry = qry.Include(x => x.UserHistoryItems);
+               history = await qry.FirstOrDefaultAsync();
+
+               if (history == null) {        //
+                    //based upon persontype, get person details either from customer or candidate
+                    //and create new history object
+                    switch(histParams.PersonType.ToLower()) {
+                         case "customer":
+                         case  "vendor":
+                         case "associate":
+                              var qryC = _context.CustomerOfficials.Where(x => x.IsValid).AsQueryable();
+                              if (histParams.PersonId.HasValue) qryC = qryC.Where(x => x.Id == histParams.PersonId);
+                              if (!string.IsNullOrEmpty(histParams.EmailId)) qryC = qryC.Where(x => x.Email.ToLower() == histParams.EmailId.ToLower());
+                              if (!string.IsNullOrEmpty(histParams.MobileNo)) qryC = qryC.Where(x => x.Mobile == ph);
+                              var off = await qryC.Select(x => new {x.Id, x.OfficialName, x.Customer.CustomerName, x.Mobile, x.Customer.CustomerType}).FirstOrDefaultAsync();
+                              if (off != null) {
+                                   //history = new UserHistory(cust.Id, cust.OfficialName + "(" + custname + ")", null);
+                                   history = new UserHistory{PersonId=off.Id, PersonName=off.OfficialName + "(" + off.CustomerName + ")", 
+                                        PhoneNo = off.Mobile, PersonType = off.CustomerType};
+                              }
+                              break;
+                         case "candidate":
+                              if (!string.IsNullOrEmpty(histParams.MobileNo )) {
+                                   cv = await _context.UserPhones.Where(x => x.MobileNo==ph).Select(x => x.Candidate).FirstOrDefaultAsync();
+                              } else {
+                                   var qryD = _context.Candidates.Include(x => x.UserPhones).AsQueryable();
+                                   if (histParams.PersonId.HasValue) qryD = qryD.Where(x => x.Id == histParams.PersonId);
+                                   if (!string.IsNullOrEmpty(histParams.EmailId )) qryD = qryD.Where(x => x.Email.ToLower() == histParams.EmailId.ToLower());
+                                   cv = await qryD.FirstOrDefaultAsync();
+                              }
+                              
+                              if (cv != null) {
+                                   history = new UserHistory{PersonType=histParams.PersonType, PersonName = cv.FullName, PersonId = cv.Id,
+                                        PhoneNo = cv.UserPhones.Where(x => x.IsMain).Select(x => x.MobileNo).FirstOrDefault()};
+                              } 
+                              break;
+                         default:
+                              break;
+                    }
+               
+                    if (history !=null) {
                          _unitOfWork.Repository<UserHistory>().Add(history);
-                         if(await _unitOfWork.Complete() == 0) return null;
+                         if (await _unitOfWork.Complete() == 0) return null;
+                    } else if(histParams.CreateNewIfNull && cv==null && !string.IsNullOrEmpty(ph) && !string.IsNullOrEmpty(histParams.PersonName)) {
+                         history = new UserHistory{PersonType=histParams.PersonType, PersonName = histParams.PersonName, PhoneNo = ph};
                     }
                }
                if (history == null) return null;
-               var historyDto = new UserHistoryDto();
-               historyDto = _mapper.Map<UserHistory, UserHistoryDto>(history);
+          
+               var historyDto = _mapper.Map<UserHistory, UserHistoryDto>(history);
 
-               foreach(var item in historyDto.UserHistoryItems) {
-                    if (item.LoggedInUserId > 0) item.LoggedInUserName = await _commonServices.GetEmployeeNameFromEmployeeId(item.LoggedInUserId);
-                    if (item.ContactResult > 0) item.ContactResultName = Enum.GetName(typeof(EnumContactResult), item.ContactResult);
+               if(historyDto.UserHistoryItems != null) {
+                    foreach(var item in historyDto.UserHistoryItems) {
+                         if (item.LoggedInUserId > 0) item.LoggedInUserName = await _commonServices.GetEmployeeNameFromEmployeeId(item.LoggedInUserId);
+                         if (item.ContactResult > 0) item.ContactResultName = Enum.GetName(typeof(EnumContactResult), item.ContactResult);
+                    }
                }
+               
                return historyDto;
           }
 
- 
           public async Task<bool> EditContactHistory(UserHistory model, AppUser appuser)
           {
-               if (string.IsNullOrEmpty(model.AadharNo) &&
-                    model.ApplicationNo == 0 ) return false;
-               if (string.IsNullOrEmpty(model.PartyName)) return false;
+               if (string.IsNullOrEmpty(model.PersonName) &&
+                    model.PersonId == 0 ) return false;
+               if (model.Id==0) return false;
 
                var existingHistory = await _context.UserHistories
                     .Where(x => x.Id == model.Id)
@@ -181,6 +237,54 @@ namespace infra.Services
 
                return await _context.SaveChangesAsync() > 0;
 
+          }
+     
+          public async Task<CandidateBriefDto> GetCandidateBriefByParams(CandidateSpecParams SpecParams)
+          {
+               var cand = new Candidate();
+
+               if(SpecParams.ApplicationNoFrom != 0) {
+                    var c = await _context.Candidates.Where(x => x.ApplicationNo == SpecParams.ApplicationNoFrom)
+                         .Select(x => new CandidateBriefDto(x.Id, x.Gender, x.ApplicationNo, x.AadharNo, x.FullName,
+                              x.City, x.ReferredBy, ""))
+                         .FirstOrDefaultAsync();
+                    return c;
+               } else if (SpecParams.CandidateId != 0) {
+                    var c = await _context.Candidates.Where(x => x.Id == SpecParams.CandidateId)
+                         .Select(x => new CandidateBriefDto(x.Id, x.Gender, x.ApplicationNo, x.AadharNo, x.FullName,
+                              x.City, x.ReferredBy, ""))
+                         .FirstOrDefaultAsync();
+                    return c;
+               } 
+               return null;
+          }
+
+          public async Task<UserHistoryDto> GetHistoryByCandidateId(int candidateid)
+          {
+               var history = await _context.UserHistories.Where(x => x.PersonId == candidateid && x.PersonType.ToLower() == "candidate")
+                    .Include(x => x.UserHistoryItems)
+                    .FirstOrDefaultAsync();
+
+               if (history == null) {
+                    var cv = await _context.Candidates.Where(x => x.Id == candidateid)
+                         .Select(x => new {id=x.Id, name=x.FullName, appno=x.ApplicationNo, emailid=x.Email, ph=x.UserPhones.Where(x => x.IsMain).Select(x => x.MobileNo).FirstOrDefault()})
+                         .FirstOrDefaultAsync();
+                    if (cv == null) return null;
+                    history = new UserHistory{ApplicationNo=cv.appno, PersonId=cv.id, PersonName=cv.name, PersonType="candidate", PhoneNo=cv.ph, EmailId=cv.emailid};
+                    _unitOfWork.Repository<UserHistory>().Add(history);
+                    if (await _unitOfWork.Complete() == 0) return null;
+               }
+               
+               var historyDto = _mapper.Map<UserHistory, UserHistoryDto>(history);
+
+               if(historyDto.UserHistoryItems != null) {
+                    foreach(var item in historyDto.UserHistoryItems) {
+                         if (item.LoggedInUserId > 0) item.LoggedInUserName = await _commonServices.GetEmployeeNameFromEmployeeId(item.LoggedInUserId);
+                         if (item.ContactResult > 0) item.ContactResultName = Enum.GetName(typeof(EnumContactResult), item.ContactResult);
+                    }
+               }
+
+               return historyDto;
           }
      }
 }

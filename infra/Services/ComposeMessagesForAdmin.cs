@@ -16,12 +16,13 @@ namespace infra.Services
 {
     public class ComposeMessagesForAdmin : IComposeMessagesForAdmin
     {
-        private const string _smsNewLine = "<smsbr>";
-          private readonly IEmployeeService _empService;
-          private readonly ATSContext _context;
-          private readonly IComposeMessages _commonMessages;
-          private readonly IConfiguration _confg;
-          private readonly ICommonServices _commonServices;
+            private const string _smsNewLine = "<smsbr>";
+            private readonly IEmployeeService _empService;
+            private readonly ATSContext _context;
+            private readonly IComposeMessages _commonMessages;
+            private readonly IConfiguration _confg;
+            private readonly ICommonServices _commonServices;
+            private readonly int _empId_HRSup=12;
 
         public ComposeMessagesForAdmin( IEmployeeService empService, ATSContext context, IComposeMessages commonMessages, IConfiguration confg, ICommonServices commonServices )
         {
@@ -36,26 +37,46 @@ namespace infra.Services
           {
                var sels = selectionsDto.Select(x => x.SelectionDecision).ToList();
                var qry = (from s in sels 
+                    join employ in _context.Employments on s.CVRefId equals employ.CVRefId into employmt 
+                    from employ in employmt.DefaultIfEmpty()
                     join c in _context.Candidates on s.CandidateId equals c.Id
                     join i in _context.OrderItems on s.OrderItemId equals i.Id
-                    join e in _context.Employees on i.HrExecId equals e.Id
-                    select new {s, c.Gender, c.Email, c.KnownAs, HRExecKnownAs=e.KnownAs, 
-                         HRExecEmail=e.Email, c.AppUserId})
+                    join e in _context.Employees on i.HrExecId equals e.Id into empJoin
+                    from emp in empJoin.DefaultIfEmpty()
+                    select new {employment = employ, selDecs=s, Gender=c.Gender, candidateEmail=c.Email, candidateKnownAs=c.KnownAs, 
+                        HRExecId=i.HrExecId, HRExecEmail=emp?.Email, HRExecKnownAs=emp?.KnownAs })
                     .ToList();
 
-               string msg = "";
-               var msgs = new List<EmailMessage>();
-               string subject = "";
-
+                string msg = "";
+                var msgs = new List<EmailMessage>();
+                string subject = "";
+                string msgToEmail;
+                string msgToKnownAs;
+                string msgToTitle;
+                string candidateTitle="Mr.";
+                int msgToEmpId;
                foreach(var sel in qry)
                {
-                    if (string.IsNullOrEmpty(sel.Email)) continue;
+                    //address email to HRSup if HRExecId is not defined
+                    if(sel.HRExecId == 0) {
+                        var sup = await _context.Employees.FindAsync(_empId_HRSup);
+                        if(sup==null) continue;
+                        msgToEmpId=_empId_HRSup;
+                        msgToKnownAs = sup.KnownAs;
+                        msgToEmail = sup.Email;
+                        msgToTitle = sup.Gender == "M" ? "Mr. " : "Ms. ";
+                    } else {
+                        msgToEmpId=(int)sel.HRExecId;
+                        if(string.IsNullOrEmpty(sel.HRExecEmail)) continue;
+                        msgToKnownAs= sel.HRExecKnownAs;
+                        msgToEmail = sel.HRExecEmail;
+                        msgToTitle = sel.Gender == "M" ? "Mr. " : "Ms. ";
+                    }
 
-                    var title = sel.Gender.ToLower() == "m" ? "Mr." : "Ms.";
-                    subject = "<b><u>Subject: </b>Your selection as " + sel.s.CategoryName + " for " + sel.s.CustomerName + "</u>";
+                    subject = "<b><u>Subject: </b>Your selection as " + sel.selDecs?.CategoryName + " for " + sel.selDecs?.CustomerName + "</u>";
                     msg = string.Format("{0: dd-MMMM-yyyy}", DateTime.Today) + "<br><br>" + 
-                         title + " " + sel.s.CandidateName + "email: " + sel.Email + "<br><br>" + 
-                         "copy: " + sel.HRExecKnownAs + ", email: " + sel.HRExecEmail + "<br><br>Dear " + title + " " + sel.s.CandidateName + ":" +
+                         candidateTitle + " " + sel.selDecs.CandidateName + "email: " + msgToEmail + "<br><br>" + 
+                         "copy: " + sel.HRExecKnownAs + ", email: " + msgToEmail + "<br><br>Dear " + candidateTitle + " " + sel.selDecs?.CandidateName + ":" +
                          "<br><br>" + subject + "<br><br>";
 
                     //MessageComposeSources contains collection of static text lines for each type of message.
@@ -66,23 +87,29 @@ namespace infra.Services
                     {
                          //if m.LineText equals "<tableofselectiondetails>", then it is a dynamic data, to be
                          //retreived from SelectionDecision, else accept the static data m.LineText
-                         msg += m.LineText == "<tableofselectiondetails>" ? _commonMessages.GetSelectionDetails(sel.s) : m.LineText;
+                         if(sel.employment != null) {
+                            msg += m.LineText == "<tableofselectiondetails>" 
+                            ? _commonMessages.GetSelectionDetails(sel.selDecs?.CandidateName, (int)sel.selDecs?.ApplicationNo, 
+                                    sel.selDecs?.CustomerName, sel.selDecs?.CategoryName, sel.employment)
+                            : m.LineText;
+                            msg += "<br>Best Regards<br>HR Supervisor";
+
+                            var emailMessage = new EmailMessage
+                            {
+                                RecipientId = msgToEmpId,
+                                RecipientUserName = sel.selDecs.CandidateName,
+                                RecipientEmailAddress = msgToEmail + ", " + sel.HRExecEmail,       //TODO - HRExecEmail included in Recipient, as CC and BCC not working
+                                CcEmailAddress = sel.HRExecEmail,
+                                BccEmailAddress = "",
+                                Subject = subject,
+                                Content = msg,
+                                MessageTypeId = (int)EnumMessageType.SelectionAdvisebyemail
+                            };
+
+                            msgs.Add(emailMessage);
+
+                         }
                     }
-                    msg += "<br>Best Regards<br>HR Supervisor";
-
-                    var emailMessage = new EmailMessage
-                    {
-                         RecipientId = sel.AppUserId,
-                         RecipientUserName = sel.s.CandidateName,
-                         RecipientEmailAddress = sel.Email + ", " + sel.HRExecEmail,       //TODO - HRExecEmail included in Recipient, as CC and BCC not working
-                         CcEmailAddress = sel.HRExecEmail,
-                         BccEmailAddress = "",
-                         Subject = subject,
-                         Content = msg,
-                         MessageTypeId = (int)EnumMessageType.SelectionAdvisebyemail
-                    };
-
-                    msgs.Add(emailMessage);
                }
 
                if (msgs.Count > 0) return msgs;
@@ -92,9 +119,9 @@ namespace infra.Services
           {
                var selection = selectionParam.SelectionDecision;
                var candidate = await (from cvref in _context.CVRefs
-                                   where cvref.Id == selection.CVRefId
-                                   join cand in _context.Candidates on cvref.CandidateId equals cand.Id
-                                   select cand).FirstOrDefaultAsync();
+                        where cvref.Id == selection.CVRefId
+                        join cand in _context.Candidates on cvref.CandidateId equals cand.Id
+                        select cand).FirstOrDefaultAsync();
 
                var candidateName = candidate.KnownAs;
                var title = candidate.Gender.ToLower() == "m" ? "Mr." : "Ms.";
@@ -315,12 +342,16 @@ namespace infra.Services
             return emailMsg;
         }
     
-        public ICollection<EmailMessage> ComposeCVFwdMessagesToClient(ICollection<CVRef> cvsReferred, LoggedInUserDto loggedIn)
+        public async Task<ICollection<EmailMessage>> ComposeCVFwdMessagesToClient(ICollection<int> CVRefIds, LoggedInUserDto loggedIn)
         {
             DateTime dateTimeNow = DateTime.Now;
             var emails = new List<EmailMessage>();
+            var uniqueorderitemids = await _context.CVRefs.Where(x => CVRefIds.Contains(x.Id)).Select(x => x.OrderItemId).Distinct().ToListAsync();
 
-            var cvsref = from r in cvsReferred
+            var refdata = await ( _context.CVRefs.Where(a => uniqueorderitemids.Contains(a.OrderItemId))
+                         .GroupBy(a => a.OrderItemId)
+                         .Select(g => new { orderitemid= g.Key, refcount = g.Count() })).ToListAsync();
+            var result = await( from r in _context.CVRefs where CVRefIds.Contains(r.Id)
                 join i in _context.OrderItems on r.OrderItemId equals i.Id
                 join cat in _context.Categories on i.CategoryId equals cat.Id
                 join o in _context.Orders on i.OrderId equals o.Id
@@ -328,19 +359,46 @@ namespace infra.Services
                 join cust in _context.Customers on o.CustomerId equals cust.Id
                 join off in _context.CustomerOfficials on cust.Id equals off.CustomerId 
                         where off.IsValid && off.Divn.ToLower()=="hr"
+                join ass in _context.CandidateAssessments on new {a=r.CandidateId, b=r.OrderItemId} equals new {a=ass.CandidateId, b=ass.CandidateId} into g
+                from grade in g.DefaultIfEmpty()
                 select new CVFwdMsgDto {
                         CustomerId = o.CustomerId, CustomerName = cust.CustomerName, City = cust.City, 
                         OfficialId = off.Id, OfficialTitle = off.Title, OfficialName = off.OfficialName, 
                         Designation = off.Designation, OfficialEmail = off.Email, OfficialUserId = off.AppUserId,
                         OrderNo = o.OrderNo, OrderDated = o.OrderDate.Date, ItemSrNo = i.SrNo, CategoryName = cat.Name,
                         ApplicationNo = cand.ApplicationNo, PPNo = cand.PpNo, CandidateName = cand.FullName,
-                        CumulativeSentSoFar = _commonMessages.CumulativeCountForwardedSoFar(r.OrderItemId).Result,
-                        AssessmentGrade = _commonMessages.AssessmentGrade(r.CandidateId, r.OrderItemId).Result
-                };
-            //var result = await cvsref.AsQueryable().ToListAsync(); //TODO - this does not work
-            //the source 'IQueryable' doesn't implement 'IAsyncEnumerable<core.ParamsAndDtos.CVFwdMsgDto>'. Only sources that implement 'IAsyncEnumerable' can be used for Entity Framework asynchronous operations
-            var result = cvsref.ToList();
+                        OrderItemId = i.Id,
+                        //AssessmentGrade = grade.AssessResult 
+                }).ToListAsync();
 
+            foreach(var r in result)
+            {
+                var data = refdata.Where(x => x.orderitemid == r.OrderItemId).Select(x => x.refcount).FirstOrDefault();
+                r.CumulativeSentSoFar = data;
+
+                if (r.OfficialId == 0) {
+                    var ids = await _context.CustomerOfficials.Where(x => x.CustomerId == r.CustomerId).ToListAsync();
+                    foreach(var id in ids)
+                    {
+                        switch (id.Divn.ToLower()) {
+                            case "admin":
+                                r.OfficialId=id.Id;
+                                break;
+                            case "account":
+                                r.OfficialId=id.Id;
+                                break;
+                            case "logistics":
+                                r.OfficialId=id.Id;
+                                break;
+                            
+                        }
+                        if (r.OfficialId != 0) break;
+                    }
+                }
+                //r.OfficialId = r.OfficialId == 0 ? 2 : r.OfficialId;
+            }
+            
+            //extract official data from the result set
             var officials = result.Select(x => new 
                 {x.OfficialId, x.OfficialTitle, x.OfficialName, x.CustomerName, 
                         x.City, x.OfficialEmail, x.Designation, x.OfficialUserId}).ToList();
@@ -378,7 +436,7 @@ namespace infra.Services
                 emails.Add(email);
             }
 
-            return emails;
+            return (ICollection<EmailMessage>)emails;
         
         }
 

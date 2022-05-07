@@ -302,31 +302,48 @@ namespace infra.Data.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("AadharNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ApplicationNo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CandidateId")
+                    b.Property<int?>("ApplicationNo")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CustomerOfficialId")
+                    b.Property<string>("EmailId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("PersonId")
                         .HasColumnType("int");
 
-                    b.Property<string>("EmailId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PersonName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("PartyName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PersonType")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("PhoneNo")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailId")
+                        .IsUnique()
+                        .HasFilter("[EmailId] IS NOT NULL");
+
+                    b.HasIndex("PersonType");
+
+                    b.HasIndex("PhoneNo")
+                        .IsUnique();
+
+                    b.HasIndex("PersonId", "PersonType")
+                        .IsUnique()
+                        .HasFilter("PersonId > 0");
 
                     b.ToTable("UserHistories");
                 });
@@ -572,6 +589,9 @@ namespace infra.Data.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CustomerId1")
+                        .HasColumnType("int");
+
                     b.Property<string>("Designation")
                         .HasColumnType("nvarchar(max)");
 
@@ -612,6 +632,8 @@ namespace infra.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("CustomerId1");
+
                     b.ToTable("CustomerOfficials");
                 });
 
@@ -638,7 +660,7 @@ namespace infra.Data.Migrations
                     b.Property<string>("MessageGroup")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("MessageSentOn")
+                    b.Property<DateTime?>("MessageSentOn")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("MessageTypeId")
@@ -854,13 +876,13 @@ namespace infra.Data.Migrations
                     b.Property<int?>("DeployStageId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DeployStageId1")
-                        .HasColumnType("int");
-
                     b.Property<bool>("Ecnr")
                         .HasColumnType("bit");
 
                     b.Property<int>("HRExecId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NextStageId")
                         .HasColumnType("int");
 
                     b.Property<int>("OrderId")
@@ -878,12 +900,15 @@ namespace infra.Data.Migrations
                     b.Property<int>("RefStatus")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("RefStatusDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("ReferredOn")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DeployStageId1");
+                    b.HasIndex("DeployStageId");
 
                     b.HasIndex("OrderItemId");
 
@@ -1033,10 +1058,19 @@ namespace infra.Data.Migrations
                     b.Property<int>("AssessedById")
                         .HasColumnType("int");
 
+                    b.Property<string>("AssessedByName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("AssessedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("CandidateId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CvRefId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HrChecklistId")
                         .HasColumnType("int");
 
                     b.Property<int>("OrderItemId")
@@ -1044,6 +1078,12 @@ namespace infra.Data.Migrations
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TaskIdDocControllerAdmin")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("requireInternalReview")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -1106,7 +1146,22 @@ namespace infra.Data.Migrations
                     b.Property<int>("CandidateId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Charges")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ChargesAgreed")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CheckedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("ExceptionApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ExceptionApprovedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExceptionApprovedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("HrExecComments")
@@ -1265,6 +1320,9 @@ namespace infra.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CVRefId")
+                        .IsUnique();
+
+                    b.HasIndex("SelectionDecisionId")
                         .IsUnique();
 
                     b.ToTable("Employments");
@@ -1514,32 +1572,11 @@ namespace infra.Data.Migrations
                     b.Property<int>("Charges")
                         .HasColumnType("int");
 
-                    b.Property<int>("ContractPeriodInMonths")
-                        .HasColumnType("int");
-
                     b.Property<string>("CustomerName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DecisionDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("FoodAllowance")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("FoodProvidedFree")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("HousingAllowance")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("HousingProvidedFree")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LeaveAirfareEntitlementAfterMonths")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LeavePerYearInDays")
-                        .HasColumnType("int");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -1550,16 +1587,7 @@ namespace infra.Data.Migrations
                     b.Property<int>("OrderNo")
                         .HasColumnType("int");
 
-                    b.Property<int>("OtherAllowance")
-                        .HasColumnType("int");
-
                     b.Property<string>("Remarks")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Salary")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SalaryCurrency")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("SelectedOn")
@@ -1567,12 +1595,6 @@ namespace infra.Data.Migrations
 
                     b.Property<int>("SelectionStatusId")
                         .HasColumnType("int");
-
-                    b.Property<int>("TransportAllowance")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("TransportProvidedFree")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -1687,6 +1709,9 @@ namespace infra.Data.Migrations
 
                     b.Property<string>("UserType")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("loggedInEmployeeId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -2280,6 +2305,9 @@ namespace infra.Data.Migrations
 
                     b.Property<int>("Charges")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Checked")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("CompleteBefore")
                         .HasColumnType("datetime2");
@@ -3172,6 +3200,9 @@ namespace infra.Data.Migrations
                     b.Property<int>("CandidateId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CandidateId1")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
 
@@ -3189,6 +3220,8 @@ namespace infra.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CandidateId");
+
+                    b.HasIndex("CandidateId1");
 
                     b.ToTable("UserPhones");
                 });
@@ -3251,6 +3284,18 @@ namespace infra.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("UserQualifications");
+                });
+
+            modelBuilder.Entity("core.ParamsAndDtos.CVsRefCountDto", b =>
+                {
+                    b.Property<int>("Ct")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("int")
+                        .HasColumnName("OrderItemId");
+
+                    b.ToView("ats_CVsSubmitted");
                 });
 
             modelBuilder.Entity("core.Entities.Admin.AgencySpecialty", b =>
@@ -3318,26 +3363,42 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.CustomerOfficial", b =>
                 {
-                    b.HasOne("core.Entities.Customer", null)
-                        .WithMany("CustomerOfficials")
+                    b.HasOne("core.Entities.Customer", "Customer")
+                        .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("core.Entities.Customer", null)
+                        .WithMany("CustomerOfficials")
+                        .HasForeignKey("CustomerId1");
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("core.Entities.HR.CVRef", b =>
                 {
-                    b.HasOne("core.Entities.MasterEntities.DeployStage", "DeployStage")
+                    b.HasOne("core.Entities.Users.Candidate", "Candidate")
                         .WithMany()
-                        .HasForeignKey("DeployStageId1");
-
-                    b.HasOne("core.Entities.Orders.OrderItem", null)
-                        .WithMany("CVRefs")
-                        .HasForeignKey("OrderItemId")
+                        .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("core.Entities.MasterEntities.DeployStage", "DeployStage")
+                        .WithMany()
+                        .HasForeignKey("DeployStageId");
+
+                    b.HasOne("core.Entities.Orders.OrderItem", "OrderItem")
+                        .WithOne()
+                        .HasForeignKey("core.Entities.HR.CVRef", "OrderItemId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
                     b.Navigation("DeployStage");
+
+                    b.Navigation("OrderItem");
                 });
 
             modelBuilder.Entity("core.Entities.HR.CandidateAssessment", b =>
@@ -3384,6 +3445,15 @@ namespace infra.Data.Migrations
                     b.HasOne("core.Entities.HR.ChecklistHR", null)
                         .WithMany("ChecklistHRItems")
                         .HasForeignKey("ChecklistHRId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("core.Entities.HR.Employment", b =>
+                {
+                    b.HasOne("core.Entities.HR.SelectionDecision", null)
+                        .WithOne("Employment")
+                        .HasForeignKey("core.Entities.HR.Employment", "SelectionDecisionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -3645,11 +3715,17 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.Users.UserPhone", b =>
                 {
-                    b.HasOne("core.Entities.Users.Candidate", null)
-                        .WithMany("UserPhones")
+                    b.HasOne("core.Entities.Users.Candidate", "Candidate")
+                        .WithMany()
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("core.Entities.Users.Candidate", null)
+                        .WithMany("UserPhones")
+                        .HasForeignKey("CandidateId1");
+
+                    b.Navigation("Candidate");
                 });
 
             modelBuilder.Entity("core.Entities.Users.UserProfession", b =>
@@ -3732,6 +3808,11 @@ namespace infra.Data.Migrations
                     b.Navigation("InterviewFollowups");
                 });
 
+            modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
+                {
+                    b.Navigation("Employment");
+                });
+
             modelBuilder.Entity("core.Entities.Identity.AppRole", b =>
                 {
                     b.Navigation("UserRoles");
@@ -3770,8 +3851,6 @@ namespace infra.Data.Migrations
             modelBuilder.Entity("core.Entities.Orders.OrderItem", b =>
                 {
                     b.Navigation("ContractReviewItem");
-
-                    b.Navigation("CVRefs");
                 });
 
             modelBuilder.Entity("core.Entities.Orders.OrderItemAssessment", b =>

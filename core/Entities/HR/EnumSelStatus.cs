@@ -2,29 +2,31 @@ using System.Runtime.Serialization;
 
 namespace core.Entities.HR
 {
+
     public enum EnumSelStatus
-    {
+{
         
         [EnumMember(Value="Not Reviewed")]
-        NotReviewed=100,
+        NotReviewed=11,
         
         [EnumMember(Value="Selected")]
-        Selected=200,
+        Selected=10,
         [EnumMember(Value="Rejected - Not Suitable")]
-        RejectedNotSuitable=300,
+        RejectedNotSuitable=7,
         [EnumMember(Value="Rejected - Medically Unfit")]
         RejectedMedicallyUnfit=400,
         [EnumMember(Value="Rejected - Salary Expectation High")]
-        RejectedHighSalaryExpectation=500,
+        RejectedHighSalaryExpectation=3,
         [EnumMember(Value="Rejected - No relevant exp")]
-        RejectedNoRelevantExp=600,
+        RejectedNoRelevantExp=6,
         [EnumMember(Value="Rejected - Not qualified")]
-        RejectedNotQualified=700,
+        RejectedNotQualified=12,
         [EnumMember(Value="Rejected - Overage")]
-        RejectedOverAge=800,
+        RejectedOverAge=2,
         [EnumMember(Value="Rejected - Not Available")]
         NotAvailable=900,
         [EnumMember(Value="Not Interested")]
-        NotInterested=1000
+        NotInterested=13,
+        [EnumMember(Value ="Referred")] Referred=14
     }
 }

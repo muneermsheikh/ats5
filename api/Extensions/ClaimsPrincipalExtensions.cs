@@ -32,10 +32,9 @@ namespace api.Extensions
         {
             return user?.FindFirst(ClaimTypes.Email)?.Value;
         }
- 
-        public static int GetIdentityUserEmployeeId(this ClaimsPrincipal user)
+         public static int GetUserIdentityUserEmployeeId(this ClaimsPrincipal user)
         {
-            return user.GetIdentityUserEmployeeId();
+            return 0;   //user.GetIdentityUserEmployeeId();
         }
  
         public static bool IsUserAuthenticated(this ClaimsPrincipal user)

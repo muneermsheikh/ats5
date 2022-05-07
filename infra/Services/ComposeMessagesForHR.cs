@@ -39,14 +39,14 @@ namespace infra.Services
             _empService = empService;
         }
 
-        public async Task<ICollection<EmailMessage>> ComposeMessagesToDesignOrderAssessmentQs(int orderId, LoggedInUserDto loggedIn )
+        public async Task<ICollection<EmailMessage>> ComposeMessagesToDesignOrderAssessmentQs(int orderId, int loggedinEmployeeId )
           {
                //Order.OrderItems can have different HR Supervisors who are tasked with designing assessment Q
                //So there will be one email message for each HR Supervisor
                //So the object to return will be collection of EmailMessage
                
                //compile data for use in the email message
-               var loggedInUserObj = await _empService.GetEmployeeBriefAsyncFromAppUserId(loggedIn.LoggedInAppUserId);
+               var loggedInUserObj = await _empService.GetEmployeeBriefAsyncFromEmployeeId(loggedinEmployeeId);
 
                //details of the ORder Items for use in the email message table
                var orderItemDetails = await _context.OrderItems.Where(x => x.OrderId == orderId && x.RequireAssess==true)
@@ -86,7 +86,7 @@ namespace infra.Services
                };
 
                
-               var senderObj = await _empService.GetEmployeeBriefAsyncFromAppUserId(loggedIn.LoggedInAppUserId);
+               var senderObj = await _empService.GetEmployeeBriefAsyncFromEmployeeId(loggedinEmployeeId);
                var emailmessages = new List<EmailMessage>();
                
                foreach (var item in categoriesToDesignQ)
@@ -106,7 +106,7 @@ namespace infra.Services
                     }
                     content += "</table><br><br>For any clarification, refer the Job Description available at the above given url or consult the undersigned" +
                          "<br><br>Regards<br><br>" + senderObj.EmployeeName + "<br>" + senderObj.Position;
-                    var emailMsg = new EmailMessage("HR", loggedIn.LoggedInAppUserId, item.AppUserId, senderObj.Email,
+                    var emailMsg = new EmailMessage("HR", loggedinEmployeeId, item.AppUserId, senderObj.Email,
                          senderObj.EmployeeName, item.AppUserName, item.AppUserEmail, "", "",
                          "Task to design assessment Questions",
                          content, (int)EnumMessageType.OrderAssessmentQDesigning, 3);
@@ -461,7 +461,7 @@ namespace infra.Services
                 hdr += catTable + "<br><br>Regards<br><br>" + senderObj.EmployeeName + "<br>" + senderObj.Position;
 
                 var message = new EmailMessage("DLFwdToAgent", loggedInUserId,
-                        agent.CustomerOfficialId, agent.OfficialEmailId,
+                        agent.OfficialId, agent.OfficialEmailId,
                         senderObj.OfficialEmailAddress, agent.CustomerName,
                         agent.OfficialEmailId, "","", "Requirement", hdr, 
                         (int)EnumMessageType.DLForwardToAgents,0 );

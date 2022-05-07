@@ -10,7 +10,7 @@ namespace core.Interfaces
     public interface IComposeMessagesForHR
     {
           //HR
-        Task<ICollection<EmailMessage>> ComposeMessagesToDesignOrderAssessmentQs(int orderId, LoggedInUserDto loggedIn);
+        Task<ICollection<EmailMessage>> ComposeMessagesToDesignOrderAssessmentQs(int orderId, int LoggedInEmployeeId);
         Task<ICollection<EmailMessage>> ComposeMessagesToHRExecToSourceCVs(ICollection<OrderAssignmentDto> orderItemIds);
         Task<ICollection<EmailMessage>> ComposeMessagesToHRSupToReviewCVs(ICollection<CVsSubmittedDto> cvsSubmitted, LoggedInUserDto loggedIn);
         Task<ICollection<EmailMessage>> ComposeMessagesToHRMToReviewCVs(ICollection<CVsSubmittedDto> cvsSubmitted, LoggedInUserDto loggedIn);

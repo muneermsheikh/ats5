@@ -20,5 +20,6 @@ namespace core.Interfaces
         Task<EmployeeDto> GetEmployeeBriefAsyncFromEmployeeId(int id);
         Task<string> GetEmployeeNameFromEmployeeId(int id);
         Task<ICollection<EmployeePosition>> GetEmployeePositions();
+        Task<int> GetEmployeeIdFromEmail(string email);
     }
 }

@@ -6,9 +6,9 @@ import { environment } from 'src/environments/environment';
 import { IEmployee } from '../shared/models/employee';
 import { employeeParams } from '../shared/models/employeeParams';
 import { IEmployeePosition } from '../shared/models/empPosition';
-import { IPaginationEmployee, PaginationEmployee } from '../shared/models/paginationEmp';
 import { IProfession } from '../shared/models/profession';
 import { IUser } from '../shared/models/user';
+import { IPaginationEmployee, PaginationEmployee } from '../shared/pagination/paginationEmp';
 
 @Injectable({
   providedIn: 'root'
@@ -75,6 +75,7 @@ export class EmployeeService {
     }
 
     register(model: any) {
+      
       return this.http.post(this.apiUrl + 'account/registeremployee', model, {})
     }
     

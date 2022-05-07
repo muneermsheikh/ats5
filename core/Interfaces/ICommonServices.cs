@@ -9,7 +9,7 @@ namespace core.Interfaces
 {
     public interface ICommonServices
     {
-         //order and order items
+     //order and order items
          Task<string> CategoryNameFromCategoryId(int categoryId);
          Task<string> CustomerNameFromOrderDetailId(int orderDetailId);
          Task<string> CustomerNameFromCustomerId(int customerId);
@@ -18,7 +18,7 @@ namespace core.Interfaces
          Task<string> GetEmployeePositionFromEmployeeId(int employeeId);
  
          Task<CustomerBriefDto> CustomerBriefDetailsFromCustomerId(int customerId);
-         Task<string> DeploymentStageNameFromStageId(EnumDeployStatus stageId);
+         Task<string> DeploymentStageNameFromStageId(int stageId);
          Task<CommonDataDto> CommonDataFromCVRefId(int cvrefid);
          Task<CommonDataDto> CommonDataFromOrderDetailIdAndCandidateId(int CVReviewId);
          Task<CommonDataDto> CommonDataFromOrderDetailIdAndCandidateId(int OrderItemId, int CandidateId);
@@ -29,7 +29,6 @@ namespace core.Interfaces
          Task<CommonDataDto> PendingDeployments();
          Task<OrderAssignmentDto> GetOrderAssignmentDto(int orderId);
          Task<string> CategoryRefFromOrderItemId(int OrderItemId);  
-
          Task<string> CandidateNameFromCandidateId(int CandidateId);
     }
 }

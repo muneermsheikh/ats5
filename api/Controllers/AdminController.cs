@@ -51,7 +51,7 @@ namespace api.Controllers
      */
      
 
-          //[Authorize]
+          [Authorize]
           [HttpPost("edit-roles/{useremail}")]
           public async Task<ActionResult> EditRoles(string useremail, [FromQuery] string roles)
           {
@@ -81,7 +81,7 @@ namespace api.Controllers
                return Ok(await _userManager.GetRolesAsync(user));
           }
 
-
+          [Authorize]
           [HttpPut("userrole/{userEmail}/{oldRoleName}/{newRoleName}")]
           public async Task<ActionResult<bool>> EditUserRole(string userEmail, string oldRoleName, string newRoleName)
           {
@@ -108,6 +108,7 @@ namespace api.Controllers
                return Ok(users);
           }
 
+          [Authorize]
           [HttpGet("userwithroles/{useremail}")]
           public async Task<ActionResult<IReadOnlyList<AppUserRole>>> GetIdentityUserWithRoles(string useremail)
           {
@@ -118,6 +119,7 @@ namespace api.Controllers
                return Ok(roles);
           }
 
+          [Authorize]
           [HttpGet("userhastherole/{useremail}/{rolename}")]
           public async Task<ActionResult<bool>> UserHasTheRole(string useremail, string roleName)
           {
@@ -137,7 +139,7 @@ namespace api.Controllers
 
                
 //Roles
-
+          [Authorize]
           [HttpGet("identityroles")]
           public async Task<ActionResult<IReadOnlyList<String>>> GetIdentityRoles()
           {

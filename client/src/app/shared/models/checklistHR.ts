@@ -8,5 +8,11 @@ export interface IChecklistHR{
      userId: number;
      checkedOn: Date;
      hrExecRemarks: string;
+     charges: number;
+     chargesAgreed: number;
+     exceptionApproved: boolean;
+     exceptionApprovedBy: string;
+     exceptionApprovedOn: Date;
+
      checklistHRItems: IChecklistHRItem[];
 }

@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using core.Entities.Identity;
+using core.Entities.Tasks;
 
 namespace core.Entities.EmailandSMS
 {
-    public class EmailMessage: BaseEntity
+     public class EmailMessage: BaseEntity
     {
           public EmailMessage()
           {
@@ -38,9 +36,9 @@ namespace core.Entities.EmailandSMS
         public string RecipientUserName { get; set; }  
         [Required, EmailAddress]  
         public string RecipientEmailAddress { get; set; }  
-        [EmailAddress]  
+        //[EmailAddress]  
         public string CcEmailAddress { get; set; }  
-        [EmailAddress]  
+        //[EmailAddress]  
         public string BccEmailAddress { get; set; }  
         [Required]  
         public string Subject { get; set; }  
@@ -48,13 +46,13 @@ namespace core.Entities.EmailandSMS
         public string Content { get; set; }  
         public int MessageTypeId {get; set;}    //??
         public DateTime? DateReadOn { get; set; }
-        public DateTime MessageSentOn {get; set;}=DateTime.Now;
+        public DateTime? MessageSentOn {get; set;}
         public bool SenderDeleted { get; set; }
         public bool RecipientDeleted { get; set; }
         public int SenderId { get; set; }
         //[ForeignKey("SenderId")]
         //public AppUser Sender { get; set; }
-        public int PostAction {get; set;}
+        public int PostAction {get; set;} = (int)EnumPostTaskAction.OnlyComposeEmailMessage;
         public int RecipientId { get; set; }
         //[ForeignKey("RecipientId")]
         //public AppUser Recipient { get; set; }

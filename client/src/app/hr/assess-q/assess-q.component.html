@@ -1,0 +1,37 @@
+<div class="container" *ngIf="orderitem" >
+     <form [formGroup]="form" >
+          <div class="stdd b">Define Assessment Questions for Order Category for Order No. </div>
+          <div class="stdd mx-2"><strong>{{orderitem.orderNo}}</strong></div>
+          <div class="stdd ml-2">Category Name <strong>{{orderitem.categoryName}}</strong></div>
+          <button class="stdd btn btn-success fa fa-save" style="margin-left: 15px;" (click)="update()" ></button>
+          <button class="stdd btn btn-secondary fa fa-home" style="margin-left: 15px;" routerLink=""  ></button>
+          <br>
+          <hr>
+          <div class="stdd w50 mx-2 hAlignCenter mt-3 b">Q No.</div>
+          <div class="stdd w75 mx-2 hAlignCenter b">Is<br>Mandatory</div>
+          <div class="stdd w200 mx-2 b">Subject</div>
+          <div class="stdd w400 mx-2 b">Question</div>
+          <div class="stdd w75 hAlignCenter mx-2 b">Points</div>
+          <button class="fa mx-2 fa-plus blue" title="add a new assessment question" [disabled]="assess" type="button" (click)="addOrderItemAssessmentQ()" ></button>
+          <button class="mx-2 fa fa-list green" title="copy standard assessment questions" type="button" (click)="addStddQ()" ></button>
+          <hr>
+          <div formArrayName="orderItemAssessmentQs" class="my-1" >
+               <div *ngFor="let item of orderItemAssessmentQs.controls; let i=index"> 
+                    <div [formGroupName]="i">
+                         <input type="text" class="stdd hAlignCenter w50 mx-2" formControlName="questionNo" >
+                         <input type="checkbox" class="stdd hAlignCenter w75 mx-2" formControlName="isMandatory" >
+                         <input type="text" class="stdd w200 mx-2" formControlName="subject" >
+                         <input type="text" class="stdd w400 mx-2" formControlName="question">
+                         <input type="number" class="stdd w75 mx-2" formControlName="maxMarks">
+                         <button class="stdd red fa fa-trash mx-2" (click)="removeOrderItemAssessmentQ(i)" ></button>
+                    </div>
+               </div>
+               <!-- <div class="ml-100">{{calculateTotals()}}</div> -->
+          </div>
+          
+     </form>
+</div>
+
+<div class="mt-10">
+     {{this.form.value | json}}
+</div>

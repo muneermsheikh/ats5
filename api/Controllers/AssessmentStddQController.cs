@@ -21,6 +21,12 @@ namespace api.Controllers
             _logger = logger;
         }
 
+        [HttpGet("byid/{id}")]
+        public async Task<AssessmentStandardQ> GetStandardQ(int id)
+        {
+            return await _service.GetStandardAssessmentQ(id);
+        }   
+
         [HttpGet]
         public async Task<ICollection<AssessmentStandardQ>> GetStandardQs()
         {
@@ -31,6 +37,18 @@ namespace api.Controllers
         public async Task<bool> deleteStddQ(int id) 
         {
             return await _service.DeleteStandardAssessmentQ(id);
+        }
+
+        [HttpPost]
+        public async Task<AssessmentStandardQ> PostNewStddQ(AssessmentStandardQ stddQ)
+        {
+            return await _service.CreateStandardAssessmentQ(stddQ);
+        }
+
+        [HttpPut]
+        public async Task<bool> UpdateNewStddQ(ICollection<AssessmentStandardQ> stddqs)
+        {
+            return await _service.EditStandardAssessmentQ(stddqs);
         }
         
     }

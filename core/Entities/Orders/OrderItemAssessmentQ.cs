@@ -15,7 +15,7 @@ namespace core.Entities.Orders
             MaxMarks = maxMarks;
         }
         public OrderItemAssessmentQ(int orderItemId, int orderId, int orderAssessmentItemId, int questionNo, 
-            string subject, string question, int maxMarks)
+            string subject, string question, int maxMarks, bool isMandatory)
         {
             OrderItemId = orderItemId;
             OrderId = orderId;
@@ -24,6 +24,7 @@ namespace core.Entities.Orders
             Subject = subject;
             Question = question;
             MaxMarks = maxMarks;
+            IsMandatory = isMandatory;
         }
 
         public int OrderAssessmentItemId { get; set; }

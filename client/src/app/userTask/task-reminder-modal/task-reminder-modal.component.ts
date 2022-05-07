@@ -39,7 +39,6 @@ export class TaskReminderModalComponent implements OnInit {
       this.toastr.warning('task description cannot be blank');
       return;
     }
-    console.log('in modal reminder, object is', this.obj);
     this.updatedRemidner.emit(this.obj);
     this.bsModalRef.hide();
   }

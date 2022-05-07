@@ -68,6 +68,7 @@ namespace api.Controllers
             return Ok(await _customerService.GetCustomerIdAndName(usertype));
         }
 
+
         [HttpGet("byId/{id}")]
         public async Task<ActionResult<CustomerDto>> GetCustomerById(int Id)
         {
@@ -90,14 +91,14 @@ namespace api.Controllers
 
         //officialid and names
         [HttpGet("officialidandname/{custType}")]
-        public async Task<ActionResult<ICollection<CustomerOfficialIdAndNameDto>>> CustomerOfficialIdAndNames(string custType)
+        public async Task<ActionResult<ICollection<CustomerOfficialDto>>> CustomerOfficialIdAndNames(string custType)
         {
             var users = await _customerService.GetCustomerIdAndName(custType);
             return Ok(users);
         }
         
-        [HttpGet("getagentdetails")]
-        public async Task<ActionResult<ICollection<ChooseAgentDto>>> GetCustomerOfficialIds()
+        [HttpGet("agentdetails")]
+        public async Task<ActionResult<ICollection<CustomerOfficialDto>>> GetCustomerOfficialIds()
         {
             var users = await _customerService.GetOfficialDetails();
             return Ok(users);

@@ -33,6 +33,7 @@ export interface IOrderItem{
      charges: number; 
      feeFromClientINR: number; 
      status: number;
+     checked: boolean;
      reviewItemStatusId: number; 
      jobDescription: IJobDescription; 
      remuneration: IRemuneration;

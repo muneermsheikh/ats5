@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Route } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { IAssessmentStandardQ } from 'src/app/shared/models/assessmentStandardQ';
+import { assessmentStddQParam } from 'src/app/shared/models/assessmentStddQParam';
 import { HrService } from '../hr.service';
+import { StddqsService } from '../stddqs.service';
 
 @Component({
   selector: 'app-assessment-stdd',
@@ -11,12 +13,14 @@ import { HrService } from '../hr.service';
 })
 export class AssessmentStddComponent implements OnInit {
 
+  qParams = new assessmentStddQParam();
   stddqs: IAssessmentStandardQ[];
 
   constructor(private activatedRoute: ActivatedRoute, 
-      private service: HrService, private toastr: ToastrService) { }
+      private service: StddqsService , private toastr: ToastrService) { }
 
   ngOnInit(): void {
+    this.service.setQParams(this.qParams);
     this.activatedRoute.data.subscribe(data => { 
       this.stddqs = data.stddqs;
     })
@@ -29,4 +33,5 @@ export class AssessmentStddComponent implements OnInit {
       this.toastr.error(error);
     })
   }
+
 }

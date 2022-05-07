@@ -82,6 +82,7 @@ namespace core.Entities.Orders
         public int Charges { get; set; }
         public int FeeFromClientINR {get; set;}
         public int Status { get; set; }=(int)EnumOrderItemStatus.NotStarted;
+        public bool Checked {get; set;}
         public EnumReviewItemStatus ReviewItemStatusId { get; set; }=EnumReviewItemStatus.NotReviewed;
         public virtual Employee Assigned { get; set; }
         public Category Category { get; set; }
@@ -93,7 +94,7 @@ namespace core.Entities.Orders
         public virtual Remuneration Remuneration { get; set; }
         public ContractReviewItem ContractReviewItem { get; set; }
         //public Order Order { get; set; }
-        public ICollection<CVRef> CVRefs { get; set; }
+        //public ICollection<CVRef> CVRefs { get; set; }
 
     }
 }

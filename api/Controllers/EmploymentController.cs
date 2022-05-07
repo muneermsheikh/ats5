@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using core.Entities.HR;
 using core.Interfaces;
@@ -11,8 +13,10 @@ namespace api.Controllers
      public class EmploymentController : BaseApiController
      {
           private readonly IUnitOfWork _unitOfWork;
-          public EmploymentController(IUnitOfWork unitOfWork)
+          private readonly IEmploymentService _employmentService;
+          public EmploymentController(IUnitOfWork unitOfWork, IEmploymentService employmentService)
           {
+               _employmentService = employmentService;
                _unitOfWork = unitOfWork;
           }
 
@@ -45,6 +49,44 @@ namespace api.Controllers
                   return null;
               }
           }
+
+            [HttpGet("employment/{cvrefid}")]
+            public async Task<Employment> GetEmployment (int cvrefid)
+            {
+                return await _employmentService.GetEmployment(cvrefid);
+            }
+
+            [HttpGet("employmentsbyorderno/{orderno}")]
+            public async Task<ICollection<EmploymentDto>> GetEmploymentsFromOrderNo(int orderno)
+            {
+                return await _employmentService.GetEmploymentDtoFromOrderNo(orderno);
+            }
+            [HttpGet("employmentsbydates/{datefrom}/{dateupto}")]
+            public async Task<ICollection<EmploymentDto>> GetEmploymentsFromOrderNo(DateTime dateform, DateTime dateupto)
+            {
+                return await _employmentService.GetEmploymentDtoBetwenDates(dateform, dateupto);
+            }
+
+            [HttpGet("employmentsbycvref/{cvref}")]
+            public async Task<ICollection<EmploymentDto>> GetEmploymentsFromCVRef(int cvref)
+            {
+                return await _employmentService.GetEmploymentDtoFromCVRefId(cvref);
+            }
+
+
+            [HttpGet("employmentfromselid/{id}")]
+            public async Task<Employment> GetEmploymentFromSelId (int id)
+            {
+                return await _employmentService.GetEmploymentFromSelId(id);
+            }
+
+            [HttpPut("employment")]
+            public async Task<bool> UpdateEmployment(Employment employment)
+            {
+                return await _employmentService.EditEmployment(employment);
+            }
+
+
 
      }
 }

@@ -11,15 +11,22 @@ namespace core.Interfaces
     public interface IOrderAssessmentService
     {
         //stddASsessment
+        Task<ICollection<OrderItemAssessment>> CreateNewOrderAssessment(int orderid);
         Task<OrderItemAssessment> CopyStddQToOrderAssessmentItem(int orderitemid);
+        Task<OrderItemAssessment> AddNewOrderAssessmentItem(int orderitemid);
         Task<IReadOnlyList<AssessmentQBank>> GetAssessmentQsFromBankBySubject (AssessmentStddQsParams qsParams);
         
         //orderAssessment
-        Task<OrderItemAssessment> GetOrderAssessmentItemQs (int OrderItemId);
-        //Task<OrderAssessment> GetOrderAssessmentAsync (int orderId);
+        Task<OrderItemAssessment> GetOrAddOrderAssessmentItem (int OrderItemId);
+        Task<ICollection<OrderItemAssessment>> GetOrderAssessment (int orderId);
         Task<bool> EditOrderAssessmentItem(OrderItemAssessment assessmentItem);
+        Task<bool> EditOrderAssessmentQs(ICollection<OrderItemAssessmentQ> assessmentQs);
+        Task<bool> EditOrderAssessmentQ(OrderItemAssessmentQ assessmentQ);
         Task<bool> DeleteAssessmentItemQ(int orderitemid);
+        Task<bool> DeleteAssessmentQ(int assessmentQid);
 
+        //assessmentQs
+        Task<ICollection<OrderItemAssessmentQ>> GetAssessmentQsOfOrderItemId(int orderitemid);
         
     }
 }

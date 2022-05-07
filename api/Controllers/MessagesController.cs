@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using api.Errors;
@@ -44,97 +45,77 @@ namespace api.Controllers
           [HttpPost]
           public async Task<ActionResult<MessageDto>> SendNewMessage(EmailMessage message)
           {
-               if (User == null) return BadRequest(new ApiResponse(400, "the user must log in to invoke this function"));
+               //if (User == null) return BadRequest(new ApiResponse(400, "the user must log in to invoke this function"));
                var sender = await _userManager.FindByEmailAsync(message.SenderEmailAddress);
                if(sender == null) return BadRequest(new ApiResponse(400, "invalid sender user id"));
-               var recipient = await _userManager.FindByEmailAsync(message.RecipientEmailAddress);
+               /*var recipient = await _userManager.FindByEmailAsync(message.RecipientEmailAddress);
                if(recipient == null) return BadRequest(new ApiResponse(400, "invalid recipient user id"));
-
+               */
                message.SenderId = sender.Id;      //User.GetIdentityUserId();
                message.SenderUserName = sender.UserName; 
                //message.Sender = sender;
                
-               message.RecipientId = recipient.Id;
-               message.RecipientUserName=recipient.UserName;
+               //message.RecipientId = recipient.Id;
+              // message.RecipientUserName=recipient.UserName;
                var AttachmentFilePaths = new List<string>();
                //message.Recipient = recipient;
-               var sentMsg = _emailService.SendEmail(message, AttachmentFilePaths);
+
+               
+               var sentMsg =  _emailService.SendEmail(message, AttachmentFilePaths);       //not async
                
                if (sentMsg == null) {
-                    return BadRequest(new ApiResponse(400, "Failed to send the email"));
+                    return BadRequest(new ApiResponse(400, "message saved, but Failed to send it"));
                } else {
+                    DateTime dtTimeNow;
+                    dtTimeNow = DateTime.Now;
+                    
+                    message.MessageSentOn = dtTimeNow;
+                    _unitOfWork.Repository<EmailMessage>().Update(message);
+                    await _unitOfWork.Complete();
                     return new MessageDto {
                          Id = sentMsg.Id, 
                          //SenderId = sentMsg.SenderId, 
                          SenderUsername = sentMsg.SenderUserName,
                          //RecipientId = sentMsg.RecipientId, 
                          RecipientUsername = sentMsg.RecipientUserName,
-                         MessageSent= sentMsg.MessageSentOn, DateRead = sentMsg.DateReadOn,
+                         MessageSent= dtTimeNow, DateRead = sentMsg.DateReadOn,
                          //SenderDeleted = sentMsg.SenderDeleted, RecipientDeleted = sentMsg.RecipientDeleted,
                          Content = sentMsg.Content
                     };
                }
           }
 
+          [HttpGet("savemessage")]
+          public async Task<ActionResult<EmailMessage>> SaveMessage(EmailMessage message) {
+               var msg =  await _emailService.SaveEmailMessage(message);
+               if (msg==null) return BadRequest(new ApiResponse(400, "failed to save email message"));
+               return msg;
+          }
+          
           [Authorize]
           [HttpGet("loggedInUser")]
-          public async Task<ActionResult<Pagination<MessageDto>>> GetMessagesForLoggedInUser(EmailMessageSpecParams messageParams)
+          public async Task<ActionResult<Pagination<EmailMessage>>> GetMessagesForLoggedInUser([FromQuery] EmailMessageSpecParams messageParams)
           {
-               var loggedInUser = await _userManager.FindByEmailAsync(User.GetIdentityUserEmailId());
-               if (string.IsNullOrEmpty(loggedInUser.Email)) 
-                    return Unauthorized(new ApiResponse(404, "Only the loggedIn user can access this feature"));
-               messageParams.SenderEmail = loggedInUser.Email;
-               var spec = new EmailMessagesSpecs(messageParams);
-               var CtSpec = new EmailMessagesForCountSpecs(messageParams);
-               var totalItems = await _unitOfWork.Repository<EmailMessage>().CountAsync(CtSpec);
-               if (totalItems == 0) return NotFound(new ApiResponse(400, "No records found"));
-               var messages = await _unitOfWork.Repository<EmailMessage>().ListAsync(spec);
+               if (messageParams.Container != "Inbox" && messageParams.Container != "Sent") return BadRequest(new ApiResponse(400, "invalid Params container"));
 
-               return Ok(new Pagination<MessageDto>(messageParams.PageIndex,
-                    messageParams.PageSize, totalItems, _mapper.Map<List<MessageDto>>(messages)));
-          }
+               var user = await _userManager.FindByEmailAsync(User.GetIdentityUserEmailId());
+               //if(user==null) return BadRequest(new ApiResponse(401, "Unauthorized"));
+               messageParams.Username=user.UserName;
 
-          [HttpGet("usermessages")]
-          public async Task<ActionResult<Pagination<MessageDto>>> GetMessagesForUser(EmailMessageSpecParams messageParams)
-          {
-               /*
-               if (!User.IsInRole("Admin"))
-               {
-                    if (string.IsNullOrEmpty(messageParams.SenderEmail)) return BadRequest(new ApiResponse(400, "Sender email not available"));
-                    var loggedInUser = await _userManager.FindByEmailAsync(User.GetIdentityUserEmailId());
-                    if (!messageParams.SenderEmail.Equals(loggedInUser.Email)) 
-                         return Unauthorized(new ApiResponse(404, "Only the loggedIn user can access this feature"));
-               }
+               /* 
+               var specs = new EmailMessagesForUserSpecs(messageParams.Container, messageParams.Username, messageParams.PageSize, messageParams.PageIndex);
+               var countSpecs = new EmailMessagesForUserCountSpecs(messageParams.Container, messageParams.Username, messageParams.PageSize, messageParams.PageIndex);
+               var totalItems = await _unitOfWork.Repository<EmailMessage>().CountAsync(specs);
+               var messages = await _unitOfWork.Repository<EmailMessage>().ListAsync(specs);
                */
-               var spec = new EmailMessagesSpecs(messageParams);
-               var CtSpec = new EmailMessagesForCountSpecs(messageParams);
-               var totalItems = await _unitOfWork.Repository<EmailMessage>().CountAsync(CtSpec);
-               //if (totalItems == 0) return NotFound(new ApiResponse(400, "No records found"));
-               var messages = await _unitOfWork.Repository<EmailMessage>().ListAsync(spec);
 
-               return Ok(new Pagination<MessageDto>(messageParams.PageIndex,
-                    messageParams.PageSize, totalItems, _mapper.Map<List<MessageDto>>(messages)));
+               var messages = await _emailService.GetEmailMessageOfLoggedinUser(messageParams);
+               //if (messages == null) return NotFound(new ApiResponse(404,"No " + messageParams.Container=="Inbox" ? " incoming " : " outgoing " + "email messages in record for the logged in user"));
+               return Ok(messages);
           }
 
-          [HttpGet("msgthreadforuser/{ReceiptUserName}/{pageIndex}/{pageSize}")]
-          public async Task<ActionResult<Pagination<MessageDto>>> GetMessageThreadForLoggedInUser(
-          string RecipientEmail, int pageIndex, int pageSize)
-          {
-               var loggedInUserEmail = User.GetIdentityUserEmailId();
-               if (string.IsNullOrEmpty(loggedInUserEmail)) return Unauthorized();
-               
-               var specParams = new EmailMessageSpecParams{RecipientEmail=RecipientEmail, SenderEmail = loggedInUserEmail };
-               var spec = new EmailMessagesSpecs(specParams);
-               var CtSpec = new EmailMessagesForCountSpecs(specParams);
 
-               var totalItems = await _unitOfWork.Repository<EmailMessage>().CountAsync(CtSpec);
-
-               var messages = await _unitOfWork.Repository<EmailMessage>().ListAsync(spec);
-               //messages.MarkUnreadAsRead(loggedInUser);
-               return Ok(new Pagination<MessageDto>(pageIndex,
-                    pageSize, totalItems, _mapper.Map<List<MessageDto>>(messages)));
-          }
-
+/*
           [HttpDelete("{id}")]
           public async Task<ActionResult> DeleteMessage(int id)
           {
@@ -156,7 +137,7 @@ namespace api.Controllers
 
                return BadRequest("Problem deleting the message");
           }
-
+*/
           [HttpGet("ComposeCVAcknToCandidateByEmail")]
           public async Task<EmailMessage> ComposeCVAcknEmailMessage(CandidateMessageParamDto paramDto)
           {

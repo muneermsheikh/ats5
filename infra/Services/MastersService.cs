@@ -213,5 +213,10 @@ namespace infra.Services
           {
                return await _context.Industries.FindAsync(id);
           }
+
+          public async Task<ICollection<Category>> GetCategoriesAsync()
+          {
+               return await _context.Categories.OrderBy(x => x.Name).ToListAsync();
+          }
      }
 }

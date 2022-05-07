@@ -18,7 +18,7 @@ export class AdminGuard implements CanActivate {
         if (user?.roles?.includes('Admin') || user?.roles?.includes('HRManager')) {
           return true;
         }
-        this.toastr.error('Unauthorized');
+        this.toastr.error('Unauthorizzed');
       })
     )
   }

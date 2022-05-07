@@ -1,26 +1,78 @@
-<div class="modal-header">
-    <div class="modal-title pull-left">HR Checklist</div>
-    <div>{{chklst.applicationNo}} - {{chklst.candidateName}}</div>
-    <div>{{chklst.orderRef}} - {{chklst.candidateName}} </div>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
-        <span aria-hidden="true">&times;</span>
-    </button>
+<div class="mx-2 mt-2">
+    <div class="stdd b">Candidate:</div> 
+        <div class="stdd mx-1">{{chklst.applicationNo}} - {{chklst.candidateName}}</div>
+    <br><div class="stdd b mx-1">Category:</div> 
+        <div class="stdd mx-1">{{chklst.categoryRef}} </div>
+    <div class="stdd mx-1">{{chklst.orderRef}}</div>
+
+    <br><div class="stdd b mx-1">Charges:</div> 
+    <div *ngIf="chklst.charges===undefined || chklst.charges===undefined" class="stdd mx-1 w100 text-danger" >Not Defined</div>
+    <div *ngIf="chklst.charges !==null" class="stdd mx-1 w50" >{{chklst.charges}}</div>
+    <div class="stdd b mx-1">Agreed:</div> 
+        <input class="form-text-input stdd w75 mx-1" [name]="'chargesAgreed'" [(ngModel)]="chklst.chargesAgreed">
+    
+    <div class="stdd b ml-5 mx-1" style="padding-right: 5px;">Exception Approved:</div> 
+    <input type="checkbox" 
+        class="form-check-input mx-1" 
+        [checked]="chklst.exceptionApproved"
+        (change)="chklst.exceptionApproved=!chklst.exceptionApproved"
+        [disabled]="true"
+    >
+    <br>
+    
+    <div class="stdd w25 mx-1">On: </div>
+    <input type="text"
+        class="form-text-input w100 mx-1" [name]="'exceptionApprovedOn'" [(ngModel)]="chklst.exceptionApprovedOn"
+        [disabled]="true"
+    >
+    
+    <div class="stdd ml-20 b">By:</div> 
+        <input class="stdd form-text-input w100" [name]="'exceptionApprovedBy'" [(ngModel)]="chklst.exceptionApprovedBy">
+  
+    
+    <div class="stdd ml-5 b">checked on:</div> 
+        <div class="stdd">{{chklst.checkedOn | date: 'd-MMM-yy'}}</div>
+    
+        <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
 </div>
+
    <div class="modal-body">
      <form #checklistForm="ngForm" id="checklistForm">
+        <label class="stdd b">HR Exec comments:</label>
+        <input type="text" class="stdd w400 my-2" [(ngModel)]="chklst.hrExecComments" [name]="'hrExecComments'" >
+        <hr>
           <label class="stdd w25">Sr#</label>
-          <label class="stdd w250">Parameter</label>
-          <label class="stdd w100">Candidate<br>Response</label>
-          <label class="stdd w100">Candidate<br>accepts</label>
-          <label class="stdd w100">Must<br>accept</label>
+          <label class="stdd w200">Parameter</label>
+          <label class="stdd w50">Must<br>accept</label>
+          <label class="stdd w175">Candidate<br>Response</label>
+          <label class="stdd w50 b mx-2 fontSmall">Candidate<br>accepts</label>
+          
           <label class="stdd w250">Exception</label>
-          <div class="form-check" *ngFor="let lst of chklst.checklistHRItems" >
-              <input class="form-text-input w25" id="lst.srNo" name="lst.srNo" #srNo value="lst.srNo" >
-              <input class="form-check-input stdd w250" id="lst.parameter" value="lst.parameter" name="lst.parameter" #parameter >
-              <input class="form-check-input stdd w100" id="lst.response" name="lst.response" #response value="lst.response" >
-              <input class="form-check-input stdd w100" type="checkbox" id="lst.accepts" name="lst.accepts" #accepts  value="lst.accepts" >
-              <input class="form-check-input stdd w100" type="checkbox" id="lst.mandatoryTrue" name="lst.mandatoryTrue" #mandatoryTrue disabled value="lst.mandatoryTrue" >
-              <input class="form-check-input stdd w250" id="lst.exception" name="lst.exception" #exception value="lst.exception" >
+          <div *ngFor="let lst of chklst.checklistHRItems; let i=index" >
+              <label class="stdd w25">{{lst.srNo}}</label>
+              <label class="stdd mx-1 w200">{{lst.parameter}}</label>
+              <input type="checkbox" style="margin-left: 10px;"
+                  class="form-check-input"
+                  [checked]="lst.mandatoryTrue"
+                  [disabled]="true"
+              >
+              <input style="margin-left: 50px; width: 200px; display: inline-block;" 
+                type="text"  [name]="'response'+i" 
+                [(ngModel)]="lst.response"
+              >
+              
+              <input type="checkbox" style="margin-left: 40px;"
+                  class="form-check-input stdd mx-1"
+                  [checked]="lst.accepts"
+                  (change)="lst.accepts = !lst.accepts"
+              >
+              <input style="margin-left: 40px;" 
+                class="stdd w250" type="text"  
+                [name]="'exception'+i" 
+                [(ngModel)]="lst.exceptions"
+              >
           </div>
      </form>
    </div>

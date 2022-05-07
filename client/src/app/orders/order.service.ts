@@ -7,14 +7,15 @@ import { ICustomerNameAndCity } from '../shared/models/customernameandcity';
 import { idAndDate } from '../shared/models/idAndDate';
 import { IJDDto } from '../shared/models/jdDto';
 import { IOrder } from '../shared/models/order';
+import { IOrderBriefDto } from '../shared/models/orderBriefDto';
 import { IOrderCity } from '../shared/models/orderCity';
-import { IOrderItemBriefDto, OrderItemBriefDto } from '../shared/models/orderItemBriefDto';
-import { orderParams } from '../shared/models/orderParams';
-import { IPaginationOrder, PaginationOrder } from '../shared/models/paginationOrder';
+import { IOrderItemBriefDto } from '../shared/models/orderItemBriefDto';
+import { orderParams } from '../shared/params/orderParams';
 import { IProfession } from '../shared/models/profession';
-import { IRemuneration } from '../shared/models/remuneration';
 import { IRemunerationDto } from '../shared/models/remunerationDto';
 import { IUser } from '../shared/models/user';
+import { IPaginationOrder, PaginationOrder } from '../shared/pagination/paginationOrder';
+import { IPaginationOrderBrief, PaginationOrderBrief } from '../shared/pagination/pagnationBriefDto';
 
 @Injectable({
   providedIn: 'root'
@@ -30,9 +31,46 @@ export class OrderService {
   customers: ICustomerNameAndCity[]=[];
   professions: IProfession[]=[];
   cache = new Map();
+  cacheBrief = new Map();
+  paginationBrief = new PaginationOrderBrief()
+  bParams = new orderParams();
 
   constructor(private http: HttpClient) { }
 
+  getOrdersBrief(useCache: boolean) { 
+
+    if (useCache === false) {
+      this.cacheBrief = new Map();
+    }
+    if (this.cacheBrief.size > 0 && useCache === true) {
+      if (this.cacheBrief.has(Object.values(this.bParams).join('-'))) {
+        this.paginationBrief.data = this.cache.get(Object.values(this.bParams).join('-'));
+        return of(this.paginationBrief);
+      }
+    }
+
+    let params = new HttpParams();
+    if (this.bParams.city !== "") {
+      params = params.append('cityOfWorking', this.bParams.city);
+    }
+   
+    if (this.bParams.search) {
+      params = params.append('search', this.bParams.search);
+    }
+    
+    params = params.append('sort', this.bParams.sort);
+    params = params.append('pageIndex', this.bParams.pageNumber.toString());
+    params = params.append('pageSize', this.bParams.pageSize.toString());
+    console.log('orders.service.getOrdersBrief, params is:', params);
+    return this.http.get<IPaginationOrderBrief>(this.apiUrl + 'orders/ordersbriefpaginated', {observe: 'response', params})
+      .pipe(
+        map(response => {
+          this.cacheBrief.set(Object.values(this.oParams).join('-'), response.body.data);
+          this.paginationBrief = response.body;
+          return response.body;
+        })
+      )
+    }
 
   getOrders(useCache: boolean) { 
 
@@ -49,7 +87,7 @@ export class OrderService {
 
     let params = new HttpParams();
     if (this.oParams.city !== "") {
-      params = params.append('city', this.oParams.city);
+      params = params.append('cityOfWorking', this.oParams.city);
     }
     if (this.oParams.categoryId !== 0) {
       params = params.append('categoryId', this.oParams.categoryId.toString());
@@ -80,6 +118,10 @@ export class OrderService {
     getOrder(id: number) {
       return this.http.get<IOrder>(this.apiUrl + 'orders/byid/' + id);
     }
+    getOrderBrief(id: number) {
+      return this.http.get<IOrderBriefDto>(this.apiUrl + 'orders/orderbriefdto/' + id);
+    }
+
 
     getJD(orderitemid: number) {
       return this.http.get<IJDDto>(this.apiUrl + 'orders/jd/' + orderitemid);
@@ -96,7 +138,6 @@ export class OrderService {
     
     updateRemuneration(model: any) {
       return this.http.put(this.apiUrl + 'orders/remuneration', model);
-
     }
 
     register(model: any) {

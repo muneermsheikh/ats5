@@ -16,7 +16,7 @@ namespace core.ParamsAndDtos
         public string CandidateName {get; set;}
         DateTime DecisionDate {get; set;}
         public int SelectionStatusId { get; set; }
-        public EmploymentToReturnDto Employment {get; set;}
+        public EmploymentDto Employment {get; set;}
         public string Remarks {get; set;}
     }
 }

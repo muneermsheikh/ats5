@@ -1,15 +1,23 @@
 .stdd {
      display: inline-block;
-     font-size: x-small;
      vertical-align: top;
+     font-size: small;
+
 }
 .headerTitle {
      display: inline-block !important;
-     font-size: x-small !important;
      vertical-align: middle;
      text-decoration: underline;
      font-weight: bold;
 }
+
+.noTopMargin{
+     margin-top: 0px;
+     margin-bottom: 0px;
+     padding-top: 0px;
+     padding-bottom: 0px;
+}
+
 .w10 {width: 10px;}
 .w35 {width: 35px;}
 .w50 {width: 50px;}

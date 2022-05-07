@@ -1,10 +1,13 @@
-.stddmx2 {
+.stdd {
      display: inline-block;
-     margin: 2px;
-     padding: 2px;
-     font-size: small;
+     vertical-align: top;
  }
-
+.lbl {
+    display: inline-block;
+    vertical-align: middle;
+    font-weight: bold;
+    padding-bottom: 2px;
+}
  .alignR {text-align: right;}
  .b {font-weight: bold;}
 

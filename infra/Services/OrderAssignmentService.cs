@@ -49,15 +49,9 @@ namespace infra.Services
                 DateTime.Now.AddDays(1), "Open",0, null);
 
             //emails are composed in ComposeServices and sent in TaskServices
-            var msgs = await _taskService.CreateNewApplicationTask(task, new LoggedInUserDto
-            {
-                LoggedIAppUsername = loggedInAppUser.UserName,
-                LoggedInAppUserEmail = loggedInAppUser.Email,
-                LoggedInAppUserId = loggedInAppUser.Id,
-                LoggedInEmployeeId = loggedInEmployeeId
-            });
+            var msgs = await _taskService.CreateNewApplicationTask(task, loggedInEmployeeId);
 
-            return msgs;
+            return msgs.emailMessages;
 
         }
 

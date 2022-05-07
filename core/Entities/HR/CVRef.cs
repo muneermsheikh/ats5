@@ -47,12 +47,17 @@ namespace core.Entities.HR
         public int ApplicationNo {get; set;}
         public string CandidateName {get; set;}
         public DateTime ReferredOn { get; set; } = DateTime.Now;
-        public EnumDeployStatus? DeployStageId { get; set; }
+        public int? DeployStageId { get; set; }
+        public int? NextStageId {get; set;}
+        public DateTime? DeployStageDate {get; set;}
         public int Charges {get; set;}
         public string PaymentIntentId {get; set;}
         public int RefStatus { get; set; }=(int)EnumCVRefStatus.Referred;
+        public DateTime RefStatusDate {get; set;}
         public DeployStage DeployStage {get; set;}
-        public DateTime? DeployStageDate {get; set;}
+        
+        public Candidate Candidate {get; set;}
+        public OrderItem OrderItem {get; set;}
         //public ICollection<Candidate> Candidates {get; set;}
         //[ForeignKey("OrderItemId")]
         //public ICollection<OrderItem> OrderItems { get; set; }

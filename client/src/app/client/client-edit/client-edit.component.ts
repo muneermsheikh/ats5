@@ -105,7 +105,6 @@ export class ClientEditComponent implements OnInit {
   }
 
     patchCustomer(cv: ICustomer) {
-      this.toastr.info('patching customer');
       this.form.patchValue( {
         id: cv.id, customerType: cv.customerType, customerName: cv.customerName, 
         knownAs: cv.knownAs, add: cv.add, add2: cv.add2, city: cv.city,

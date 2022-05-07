@@ -1,40 +1,55 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using core.Entities.Admin;
 using core.Entities.Attachments;
+using core.Entities.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace api.Controllers
 {
-    public class FileUploadController : BaseApiController
+     public class FileUploadController : BaseApiController
     {
         private readonly ILogger<FileUploadController> _logger;
+        private readonly UserManager<AppUser> _userManager;
         const string FILE_PATH = @"D:\Samples\";
         
-          public FileUploadController(ILogger<FileUploadController> logger)
+          public FileUploadController(ILogger<FileUploadController> logger, UserManager<AppUser> userManager)
           {
             _logger = logger;
+            _userManager = userManager;
           }
 
-        
+        [Authorize]
         [HttpPost]
-        public IActionResult Post([FromBody]FileToUpload theFile) 
+        public async Task<ActionResult<bool>> Post([FromBody]FileToUpload theFile) 
         {
+            var email = HttpContext.User?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+            if (email==null) return BadRequest("User email not found");
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user==null) return BadRequest("User Claim not found");
+            var username = user.UserName;
+
             var filePathName = FILE_PATH + Path.GetFileNameWithoutExtension(theFile.FileName) + "-" +
             DateTime.Now.ToString().Replace("/", "").Replace(":", "").Replace(" ", "") +
+            username +
             Path.GetExtension(theFile.FileName);
             
-            if (theFile.FileAsBase64.Contains(","))
+            if (theFile.FileAsBase64.Contains(","))     //the file begins with a header of file type followed by a comma, strip off this header from the filename
             {
                 theFile.FileAsBase64 = theFile.FileAsBase64.Substring(theFile.FileAsBase64.IndexOf(",") + 1);
             }
 
+            //the file of type FileAsBase64 is a base64 encoded file.  to be readable by systems, it needs to be converted from base64string
             theFile.FileAsByteArray = Convert.FromBase64String(theFile.FileAsBase64);
+            
+            //create a new object and pass the byte array to the method of this method. 
+            //Pass in a zero as the second parameter and the length of the byte array as the third parameter so the complete file is written to disk
             
             using (var fs = new FileStream(filePathName, FileMode.CreateNew)) 
             {

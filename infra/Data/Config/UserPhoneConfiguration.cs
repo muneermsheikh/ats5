@@ -16,7 +16,7 @@ namespace infra.Data.Config
 
                //builder.HasIndex(x => x.CandidateId).HasFilter("[IsValid]=1");  //TODO - or should it be=True?
 
-               //builder.HasOne(p => p.Candidate).WithMany().HasForeignKey(p => p.CandidateId);
+               builder.HasOne(p => p.Candidate).WithMany().HasForeignKey(p => p.CandidateId);
           }
      }
 }

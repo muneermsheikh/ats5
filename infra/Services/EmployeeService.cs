@@ -252,9 +252,9 @@ namespace infra.Services
                     var hrskills = new List<EmployeeHRSkill>();
                     var otherSkills = new List<EmployeeOtherSkill>();
                     var employeeAddresses = new List<EmployeeAddress>();
-                    var emp = new Employee(employee.Gender ?? "M", employee.FirstName, employee.SecondName, employee.FamilyName,
+                    var emp = new Employee(employee.AppUserId, employee.Gender ?? "M", employee.FirstName, employee.SecondName, employee.FamilyName,
                          employee.KnownAs, employee.DOB, employee.AadharNo, qualifications, employee.DOJ, employee.Department, 
-                         employee.Position ?? "Not Available", hrskills, otherSkills, employeeAddresses);
+                         employee.Position ?? "Not Available", employee.Email, hrskills, otherSkills, employeeAddresses);
                     //var emp = _mapper.Map<EmployeeToAddDto, Employee>(employee);
                     emp.AppUserId = user.Id;
                     emp.Email = employee.Email;
@@ -403,6 +403,10 @@ namespace infra.Services
           public async Task<string> GetEmployeeNameFromEmployeeId(int id)
           {
                return await _context.Employees.Where(x => x.Id == id).Select(x => x.FirstName + " " + x.FamilyName).FirstOrDefaultAsync();
+          }
+          public async Task<int> GetEmployeeIdFromEmail(string email)
+          {
+               return await _context.Employees.Where(x => x.Email.ToLower() == email.ToLower()).Select(x => x.Id).FirstOrDefaultAsync();
           }
 
           public async Task<ICollection<EmployeeIdAndKnownAsDto>> GetEmployeeIdAndKnownAs() {

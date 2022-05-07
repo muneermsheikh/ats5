@@ -54,6 +54,14 @@ namespace api.Controllers
                if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
                return Ok(lst);
           }
+
+          [HttpGet("categories")]
+          public async Task<ActionResult<ICollection<Category>>> GetCategoriesAsync()
+          {
+               var lst = await _mastersService.GetCategoriesAsync();
+               if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
+               return Ok(lst);
+          }
      //industry
           [Authorize]         //(Policy = "MastersAddRole")]
           [HttpPost("addindustry/{industryname}")]

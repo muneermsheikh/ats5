@@ -132,6 +132,10 @@ namespace infra.Data
           public DbSet<EmailMessage> EmailMessages {get; set;}
           public DbSet<PhoneMessage> PhoneMessages {get; set;}
           public DbSet<SMSMessage> SMSMessages {get; set;}
+     
+     //View from SQLServer -
+          //CVRefCount
+          public DbSet<CVsRefCountDto> CVsRefCountDtos {get; set;}
 
           //required for migrations
           protected override void OnModelCreating(ModelBuilder modelBuilder)

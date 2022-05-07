@@ -14,7 +14,7 @@ namespace core.Interfaces
          //Admin
         Task<EmailMessage> AckEnquiryToCustomer(OrderMessageParamDto orderMessageDto);
         Task<EmailMessage> ForwardEnquiryToHRDept(Order order);
-        ICollection<EmailMessage> ComposeCVFwdMessagesToClient(ICollection<CVRef> cvsReferred, LoggedInUserDto loggedIn);
+        Task<ICollection<EmailMessage>> ComposeCVFwdMessagesToClient(ICollection<int> cvRefIds, LoggedInUserDto LoggedInDto);
         Task<ICollection<EmailMessage>> AdviseSelectionStatusToCandidateByEmail(ICollection<SelectionDecisionMessageParamDto> selections);
         Task<SMSMessage> AdviseSelectionStatusToCandidateBySMS(SelectionDecisionMessageParamDto selection);
         ICollection<EmailMessage> AdviseRejectionStatusToCandidateByEmail(ICollection<RejDecisionToAddDto> rejectionsDto);

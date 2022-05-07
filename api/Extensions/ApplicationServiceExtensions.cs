@@ -21,6 +21,7 @@ namespace api.Extensions
                 //services.AddScoped<IMessageRepository, MessageRepository>();
                 services.AddScoped<IUnitOfWork, UnitOfWork>();
                 services.AddScoped<IOrderService, OrderService>();
+                services.AddScoped<IOrderItemService, OrderItemService>();
                 services.AddScoped<IUserService, UserService>();
                 services.AddScoped<ICustomerService, CustomerService>();
                 services.AddScoped<IMastersService, MastersService>();
@@ -29,6 +30,7 @@ namespace api.Extensions
                 services.AddScoped<ICandidateAssessmentService, CandidateAssessmentService>();
                 services.AddScoped<ICVRefService, CVRefService>();
                 services.AddScoped<ISelectionDecisionService, SelectionDecisionService>();
+                services.AddScoped<IEmploymentService, EmploymentService>();
                 services.AddScoped<IStatsService, StatsService>();
                 services.AddScoped<IContractReviewService, ContractReviewService>();
                 services.AddScoped<IDeployService, DeployService>();

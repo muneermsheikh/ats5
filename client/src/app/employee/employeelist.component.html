@@ -1,5 +1,5 @@
-<div class="row" style="font-size: smaller;">
-     <div class="col-2" style="font-size: smaller;">
+<div class="row">
+     <div class="col-2" >
           <ng-container *ngIf="positions ">
                <h5 class="text-warning">Sort</h5>
                <select name="" id="" class="custom-select mb-2" (change)="onSortSelected($event.target.value)">
@@ -9,7 +9,7 @@
                </select>
                <h5 class="text-warning">Positions</h5>
                <ul class="list-group">
-                    <li class="list-group-item" style="height: 22px; padding-top: 0%; padding-bottom: 0%;"
+                    <li class="list-group-item" style="padding-top: 0%; padding-bottom: 0%;"
                          *ngFor="let pos of positions"
                          [class.active] = "pos.name=== empParams.position"
                          [value] = "pos.name"
@@ -34,12 +34,12 @@
                </div>
           </div>
           <div class="form-inline" style="font-weight: bold;">
-               <div style="width: 50px; " class="px-0;">Emp Id</div>
-               <div style="width: 70px; " class="px-0;">Gender</div>
-               <div style="width: 200px;" class="px-0;">Employee Name</div>
-               <div style="width: 70px; " class="px-0;">Known As</div>
-               <div style="width: 200px" class="px-0">Position</div>
-               <div style="width: 250px;" class="px-0">Department</div>
+               <!-- <div style="width: 50px; " class="px-0;">Emp Id</div> -->
+               <div class="stdd w70" >Gender</div>
+               <div class="stdd w200">Employee Name</div>
+               <div class="stdd w70">Known As</div>
+               <div class="stdd w250">Position</div>
+               <div class="stdd w250">Department</div>
           </div>
           <div class="row" *ngFor="let emp of employees" >
                <app-employee-item [emp]="emp"></app-employee-item>

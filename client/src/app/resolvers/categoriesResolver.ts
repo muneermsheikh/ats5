@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Resolve } from "@angular/router";
 import { Observable } from "rxjs";
 import { MastersService } from "../masters/masters.service";
-import { IPaginationCategory } from "../shared/models/paginationCategory";
+import { IPaginationCategory } from "../shared/pagination/paginationCategory";
 
 @Injectable({
      providedIn: 'root'
@@ -12,7 +12,7 @@ import { IPaginationCategory } from "../shared/models/paginationCategory";
      constructor(private mastersService: MastersService) {}
  
      resolve(): Observable<IPaginationCategory> {
-        return this.mastersService.getCategories(false);
+        return this.mastersService.getCategoryList();
      }
  
  }

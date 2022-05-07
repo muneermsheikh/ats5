@@ -16,14 +16,14 @@ namespace core.Interfaces
         Task<Pagination<ApplicationTask>> GetApplicationPendingTasksPaginated(string taskStatus, int pageIndex, int pageSize);
         Task<Pagination<ApplicationTask>> GetApplicationPendingTasksOfAUserPaginated(int userid, int pageIndex, int pageSize);
         Task<ICollection<TaskDashboardDto>> GetDashboardTasks(int loggedInEmployeeId);
-        Task<ICollection<EmailMessage>> CreateNewApplicationTask(ApplicationTask task, LoggedInUserDto loggedInDto);
+        Task<MessagesDto> CreateNewApplicationTask(ApplicationTask task, int LoggedInEmployeeId);
         /*
         Task<ICollection<CVSubmitToHRSupDto>> CreateAndSaveTaskForCVRvwByHRSup(
             LoggedInUserDto loggedInDto, ICollection<CVSubmitToHRSupDto> cvsSubmitted);
         Task<ICollection<CVSubmitToHRMDto>> CreateAndSaveTaskForCVRvwByHRM(
             LoggedInUserDto loggedInDto, ICollection<CVSubmitToHRMDto> cvsSubmitted);
         */
-        Task<ApplicationTask> EditApplicationTask(ApplicationTask task);
+        Task<MessagesDto> EditApplicationTask(ApplicationTask task, int employeeId);
         Task<bool> DeleteApplicationTask(ApplicationTask task);
         Task<TaskItem> CreateNewTaskItem(TaskItem taskItem);
         Task<TaskItem> EditTaskItem(TaskItem taskItem);

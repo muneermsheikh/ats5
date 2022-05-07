@@ -1,12 +1,14 @@
 
 <div class="mt-2">
-     <div class="col-3 py-0 my-0" style="display: inline-block;">
+     <div class="stdd col-3 py-0 my-0" >
          <h3>Your profile</h3>
      </div>
-     <div class="col-9 py-0 my-0 alignR" style="display: inline-block;" >
-        <button [disabled]="!form.dirty" type="submit" class="btn btn-success btn-block alignR W30 fa fa-save" (click)="onSubmit()" >
-            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1">Update</span>
+     <div class="stdd col-9 py-0 my-0 alignR" >
+        <!-- <button class="stdd btn btn-priamry btn-block fa fa-list"  (click)="routeToList()">Back to List</button>
+        <button class="stdd btn btn-success btn-block W30 fa fa-save" [disabled]="!form.dirty" type="submit"  (click)="onSubmit()" >
+            <span *ngIf="loading" class="stdd spinner-border spinner-border-sm mr-1">Update</span>
         </button> 
+    -->
         <!--
         <div class="alert alert-info" *ngIf="form.dirty">
              <strong>Information: </strong> You have made changes.  Any unsaved changes will be lost
@@ -46,8 +48,13 @@
  
      
     <div class="col-9" style="display: inline-block; vertical-align: top; ">
+        <button class="stdd w100"  (click)="routeToList()">Back to List</button>
+        <button class="stdd btn btn-success mx-2 fa fa-save" [disabled]="!form.dirty" type="submit"  (click)="onSubmit()" > </button> 
+       
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <tabset class="member-tabset">
+                <!-- <span *ngIf="loading" class="stdd spinner-border spinner-border-sm mr-1">Update</span> -->
+       
+            <tabset class="member-tabset">
             <tab heading='About {{employee?.knownAs}}' (selectTab)="onTabActivated($event)">
                 <div style="line-height: 1em;">
                     <div class="lbl w80 b">Gender</div>
@@ -71,21 +78,23 @@
                     <input class="stdd w150" type="text" formControlName="department" >
                     <!--   [minDate]="minDate"  [maxDate]="maxDate"  [daysDisabled]="[6,0]"  [datesDisabled]="disabledDates" -->
                     <br>
-                    <div class="stdd w175">
+                    <div class="lbl w130 b">Date of birth</div>
+                    <div class="stdd w150">
                         <input type="text"
                             placeholder="Date of birth"
                             formControlName="dateOfBirth"
                             bsDatepicker
-                            [bsValue]="bsValueDOB"
                             [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
                         >
                     </div>
-                    <div class="stdd w175">
+                    <br>
+                    <div class="lbl b w130" >Date of joining</div>
+                    <div class="stdd w150">
                         <input type="text"
                             placeholder="Date of Joining"
                             formControlName="dateOfJoining"
                             bsDatepicker
-                            [bsValue]="bsValueDOJ"
+                            (selected)="dojSelected($event)"
                             [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
                         >
                     </div>

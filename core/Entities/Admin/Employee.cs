@@ -11,13 +11,14 @@ namespace core.Entities.Admin
           {
           }
 
-          public Employee(string gender, string firstName, string secondName, string familyName, 
+          public Employee(int appUserId, string gender, string firstName, string secondName, string familyName, 
                string knownAs, DateTime dob, string aadharNo, ICollection<EmployeeQualification> qualifications, 
-               DateTime dOJ, string department, string position, ICollection<EmployeeHRSkill> hrSkills, //string password,
+               DateTime dOJ, string department, string position, string email, ICollection<EmployeeHRSkill> hrSkills, //string password,
                ICollection<EmployeeOtherSkill> otherSkills, ICollection<EmployeeAddress> employeeAddresses)
           {
-               Gender=gender; FirstName = firstName; SecondName=secondName; FamilyName=familyName;
-               KnownAs=knownAs; DateOfBirth= dob; AadharNo=aadharNo; EmployeeQualifications = qualifications;
+               AppUserId = appUserId; Gender=gender; FirstName = firstName; SecondName=secondName; FamilyName=familyName;
+               KnownAs=knownAs; DateOfBirth= dob; AadharNo=aadharNo; Email = email;
+               EmployeeQualifications = qualifications;
                DateOfJoining = dOJ; Department = department; HrSkills = hrSkills; OtherSkills = otherSkills;
                Position = position; EmployeeAddresses = employeeAddresses;
           }

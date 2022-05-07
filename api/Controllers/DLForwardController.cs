@@ -28,6 +28,7 @@ namespace api.Controllers
           [HttpPost]
           public async Task<ActionResult<bool>> ForwardDLToAgents(OrderItemsAndAgentsToFwdDto ItemsAndAgents)
           {
+               if (ItemsAndAgents.Agents==null) return BadRequest(new ApiResponse(400, "bad request - object contains nulls"));
                var loggedInEmployeeId = 0;
                var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
                loggedInEmployeeId = loggedInUser == null ? 0 : await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);

@@ -98,21 +98,7 @@ namespace api.Controllers
                     candidateParam.PageSize, totalItems, dtos));
           }
 
-          [HttpGet("briefdtofromparams")]
-          public async Task<ActionResult<CandidateBriefDto>> GetCandidateBriefDtoFromParams([FromQuery]CandidateSpecParams candidateParam)
-          {
-               candidateParam.IncludeUserProfessions=false;
-               candidateParam.PageSize=0;
-               
-               var spec = new CandidateSpecs(candidateParam);
-               var cand = await _userService.GetCandidateBriefByParams(candidateParam);
-               //var cand = await _unitOfWork.Repository<Candidate>().GetEntityWithSpec(spec);
-
-               if (cand==null) return null;
-               //return Ok(_mapper.Map<Candidate, CandidateBriefDto>(cand));
-               return cand;
-          }
-
+          
 
           [HttpGet("candidatelist")]
           public async Task<ActionResult<ICollection<CandidateBriefDto>>> GetCandidateListAsync(CandidateSpecParams candidateParam)
@@ -159,6 +145,15 @@ namespace api.Controllers
           public async Task<ActionResult<CandidateBriefDto>> GetCandidateFromApplicationNo(int appno) {
                var cv = await _userService.GetCandidateByAppNo(appno);
                if (cv==null) return NotFound(new ApiResponse(404, "Application No. " + appno + " not found"));
+
+               return Ok(cv);
+          }
+          
+          [HttpGet("briefbyid/{id}")]
+          public async Task<ActionResult<CandidateBriefDto>> GetCandidateBriefById(int id) {
+               var cv = await _userService.GetCandidateBriefById(id);
+               
+               if (cv==null) return NotFound(new ApiResponse(404, "Candidate with id " + id + " not found"));
 
                return Ok(cv);
           }

@@ -4,8 +4,10 @@ import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { ICustomer } from '../shared/models/customer';
 import { ICustomerCity } from '../shared/models/customerCity';
+import { ICustomerOfficialDto } from '../shared/models/customerOfficialDto';
 import { customerParams } from '../shared/models/customerParams';
-import { IPagination } from '../shared/models/pagination';
+import { IPagination } from '../shared/pagination/pagination';
+
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +62,11 @@ export class ClientService {
 
   updateCustomer(model: any) {
     return this.http.put(this.baseUrl + 'customers', model);
+  }
+
+  //associates
+  getAgents() {
+    return this.http.get<ICustomerOfficialDto[]>(this.baseUrl + 'customers/agentdetails');
   }
 
 }

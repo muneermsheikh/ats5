@@ -33,44 +33,6 @@ namespace core.Entities.HR
                 Charges = charges;
           }
 
-          public Employment(int cVRefId, DateTime selectedOn, string salaryCurrency, int salary, int contractPeriodInMonths, 
-            bool housingProvidedFree, int housingAllowance, bool foodProvidedFree,  int foodAllowance, 
-            bool transportProvidedFree, int transportAllowance, int otherAllowance,  int leavePerYearInDays, 
-            int leaveAirfareEntitlementAfterMonths, DateTime offerAcceptedOn, string categoryName, int orderItemId, 
-            int orderId, int orderNo, int customerId, int categoryId, int candidateId, int applicationNo, 
-            string candidateName, string companyName, int charges)
-          {
-               CVRefId = cVRefId;
-               SelectedOn = selectedOn;
-               SalaryCurrency = salaryCurrency;
-               Salary = salary;
-               ContractPeriodInMonths = contractPeriodInMonths;
-               HousingProvidedFree = housingProvidedFree;
-               HousingAllowance = housingAllowance;
-               FoodProvidedFree = foodProvidedFree;
-               FoodAllowance = foodAllowance;
-               TransportProvidedFree = transportProvidedFree;
-               TransportAllowance = transportAllowance;
-               OtherAllowance = otherAllowance;
-               LeavePerYearInDays = leavePerYearInDays;
-               LeaveAirfareEntitlementAfterMonths = leaveAirfareEntitlementAfterMonths;
-               
-               //SelectionAcceptance = selectionAcceptance;
-               OfferAcceptedOn = offerAcceptedOn;
-               CategoryName = categoryName;
-               OrderItemId = orderItemId;
-               OrderId = orderId;
-               OrderNo = orderNo;
-               CustomerId = customerId;
-               CategoryId = categoryId;
-               CandidateId = candidateId;
-               ApplicationNo = applicationNo;
-               CandidateName = candidateName;
-               CompanyName = companyName;
-               
-               Charges = charges;
-          }
-
           public int CVRefId { get; set; }
           public int SelectionDecisionId {get; set;}
           public DateTime SelectedOn { get; set; }

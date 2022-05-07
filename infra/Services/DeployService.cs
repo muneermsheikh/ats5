@@ -10,6 +10,7 @@ using core.Entities.Orders;
 using core.Entities.Process;
 using core.Entities.Tasks;
 using core.Interfaces;
+using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
 using infra.Data;
@@ -33,53 +34,94 @@ namespace infra.Services
                _unitOfWork = unitOfWork;
           }
 
-          public async Task<IReadOnlyList<DeploymentPendingDto>> GetPendingDeployments()
+          public async Task<Pagination<CVRefAndDeployDto>> GetPendingDeployments(DeployParams deployParams)
           {
-               //var specs = new CVRefSpecs(pageIndex, pageSize);
-               //var pendings = await _unitOfWork.Repository<CVRef>().ListAsync(specs);
-               //var pendingToReturn = _mapper.Map<List<CVRef>, List<DeploymentPendingDto>>(pendings.ToList());
-               //return pendingToReturn;
-               
-               /* var qry = from c in _context.Deploys where c.StageId < EnumDeployStatus.Concluded
-                        orderby c.CVRefId, c.StageId
-                        group c.CVRefId by c.CVRefId ;
+               /* var qry = _context.CVRefs.Where(x => x.RefStatus == (int)EnumCVRefStatus.Selected)
+                    .Include(x => x.Candidate)
+                    .Include(x => x.Deploys).Include(x => x.OrderItem).ThenInclude(x => x.Category)
+                    .Select(x => new {OrderId = x.OrderItem.OrderId, OrderNo = x.OrderNo, 
+                         ApplicationNo = x.ApplicationNo, CandidateId = x.CandidateId, CandidateName = x.CandidateName, 
+                         OrderItemId = x.OrderItemId, CategoryName = x.OrderItem.Category.Name, 
+                         CategoryRef = x.OrderNo + "-" + x.OrderItem.SrNo + "-" + x.OrderItem.Category.Name,
+                         CustomerName = x.CustomerName, Deploys = x.Deploys, CVRefId = x.Id, ReferredOn = x.ReferredOn,
+                         SelectedOn = x.RefStatusDate, RefStatus = x.RefStatus
+                         })
+                    .OrderBy(x => x.OrderItemId).ThenBy(x => x.CVRefId)
+                    .AsQueryable();
                */
-               var fromCVRef = await  _context.CVRefs.Where(x => x.DeployStageId < EnumDeployStatus.Concluded && 
-                    x.DeployStageId > EnumDeployStatus.None).Select(x => new {
-                         x.Id, x.OrderNo, x.ApplicationNo, x.CandidateId, x.CandidateName, x.CustomerName,
-                         x.CategoryName, x.DeployStageId, x.Ecnr, x.ReferredOn, x.DeployStageDate
-                    }).OrderByDescending(x => x.OrderNo).ToListAsync();
-               
-               //TODO - this is most inefficient and dangerous query, a trip to teh DB for each record in fromcVRef
-               //till this is resolved, consider omitting fields from deploys
-               var lst = new List<DeploymentPendingDto>();
-               foreach(var c in fromCVRef)
-               {
-                    var dep = await _context.Deploys.Where(x => x.CVRefId == c.Id && x.StageId == c.DeployStageId)
-                         .Select(x => new {x.NextStageId, x.NextEstimatedStageDate}).FirstOrDefaultAsync();
-                    if (dep != null)
-                    {
-                         lst.Add(new DeploymentPendingDto{
-                              CVRefId = c.Id,
-                              ApplicationNo = c.ApplicationNo,
-                              CandidateName = c.CandidateName,
-                              CategoryName = c.CategoryName,
-                              CustomerName  = c.CustomerName,
-                              DeployStageId = c.DeployStageId == null ? EnumDeployStatus.None : (EnumDeployStatus)c.DeployStageId,
-                              DeployStageDate= c.DeployStageDate == null ? Convert.ToDateTime("1900-01-01") : Convert.ToDateTime(c.DeployStageDate).Date,
-                              NextStageId = dep.NextStageId,
-                              NextEstimatedStageDate= dep.NextEstimatedStageDate,
-                              OrderNo=c.OrderNo
-                         });
+          
+               var qry = (from r in _context.CVRefs where r.RefStatus == (int)EnumCVRefStatus.Selected
+                    join i in _context.OrderItems on  r.OrderItemId equals i.Id
+                    join st in _context.DeployStatus on r.DeployStageId equals st.StageId
+                    join c in _context.Candidates on r.CandidateId equals c.Id
+                    join o in _context.Orders on i.OrderId equals o.Id
+                    join cust in _context.Customers on o.CustomerId equals cust.Id
+                    join cat in _context.Categories on i.CategoryId equals cat.Id
+                    orderby r.OrderItemId, r.Id 
+                    
+                    select new CVRefAndDeployDto{
+                         Checked=false, CVRefId = r.Id, CustomerName = cust.CustomerName, 
+                         OrderId = i.OrderId, OrderNo = o.OrderNo, OrderDate = o.OrderDate,
+                         OrderItemId = r.OrderItemId,
+                         CategoryRef = o.OrderNo + "-" + i.SrNo,
+                         CategoryName = cat.Name, CustomerId = o.CustomerId,
+                         CandidateId = c.Id, ApplicationNo=c.ApplicationNo,
+                         CandidateName = c.FullName, ReferredOn = r.ReferredOn, SelectedOn = r.RefStatusDate,
+                         RefStatus = r.RefStatus,
+                         DeployStageName = st.StatusName,
+                         DeployStageDate = (DateTime)r.DeployStageDate,
+                         NextStageId = st.NextStageId,
+                         NextStageDate = DateTime.Now
                     }
-               } 
-               return lst;
+               ).AsQueryable();
+               
+               if(deployParams.OrderItemId > 0) qry = qry.Where(x => x.OrderItemId == deployParams.OrderItemId);
+               if(deployParams.OrderId > 0) qry = qry.Where(x => x.OrderId == deployParams.OrderId);
+               if (deployParams.CVRefId > 0) qry = qry.Where(x => x.CVRefId == deployParams.CVRefId);
+               //if(deployParams.CustomerId > 0) qry=qry.Where(x => x.CustomerId == deployParams.CustomerId);
+               
+               var count = await qry.CountAsync();
+               if (count == 0) return null;
+
+               var data = await qry.Skip((deployParams.PageIndex-1)*deployParams.PageSize).Take(deployParams.PageSize).ToListAsync();
+               /* var deployHeaders = new List<CVRefAndDeployDto>();
+               var candidates = new List<CandidateSelected>();
+               int lastOrderItemId=0;
+               var Sels = new List<CandidateSelected>();
+               var deployHeader = new CVRefAndDeployDto();
+
+               foreach(var d in data) {
+                    if (d.OrderItemId != lastOrderItemId) {
+                         deployHeader = new CVRefAndDeployDto{
+                              OrderId = d.OrderId, OrderNo = d.OrderNo, CompanyName = d.CustomerName,
+                              OrderItemId = d.OrderItemId, CategoryRef = d.CategoryRef, CategoryName = d.CategoryName};
+                         deployHeader.CompanyName=d.CustomerName;
+                         lastOrderItemId=d.OrderItemId;
+                         deployHeader.SelectedCandidates = new List<CandidateSelected>();
+                         lastOrderItemId = d.OrderItemId;
+                    } 
+                    var candidate = new CandidateSelected{
+                         Checked=false, CVRefId = d.CVRefId, CandidateId = d.CandidateId, ApplicationNo=d.ApplicationNo,
+                         CandidateName = d.CandidateName, ReferredOn = d.ReferredOn, SelectedOn = d.SelectedOn,
+                         SelectionId = 0, RefStatus = (EnumCVRefStatus)d.RefStatus,
+                         Deploys = _mapper.Map<ICollection<Deploy>, ICollection<DeployDto>>(d.Deploys)
+                    };
+                    deployHeader.SelectedCandidates.Add(candidate);
+                    deployHeaders.Add(deployHeader);
+                    //candidates.Add(d.Candidates);
+                    //deployHeader.SelectedCandidates=candidates;
+               }
+               */
+
+               return new Pagination<CVRefAndDeployDto>(deployParams.PageIndex, deployParams.PageSize, count, data);
           }
 
+          
           public async Task<int> CountOfPendingDeployments()
           {
-               return await _context.CVRefs.Where(x => x.DeployStageId < EnumDeployStatus.Concluded).CountAsync();
+               return await _context.CVRefs.Where(x => x.DeployStageId < (int)EnumDeployStatus.Concluded).CountAsync();
           }
+
           public async Task<DeployAddedDto> AddDeploymentTransaction(int cvrefId, int loggedInEmployeeId, EnumDeployStatus stageId, DateTime? transDate)
           {
                // A - if transDate missing, make it current date
@@ -113,7 +155,7 @@ namespace infra.Services
 
                // E - update CVRef.Deploy fields
                var cvref = await _context.CVRefs.FindAsync(deploy.CVRefId);
-               cvref.DeployStageId = deploy.StageId;
+               cvref.DeployStageId = (int)deploy.StageId;
                cvref.DeployStageDate = deploy.TransactionDate;
                _unitOfWork.Repository<CVRef>().Update(cvref);
 
@@ -240,7 +282,7 @@ namespace infra.Services
                var deploys = new List<Deploy>();
                foreach(var post in deployPosts)
                {
-                    dt = post.TransDate;
+                    dt = post.TransactionDate;
 
                     // B -
                          var deploy = new Deploy(post.CVRefId, dt, post.StageId);
@@ -255,7 +297,7 @@ namespace infra.Services
 
                     // E - update CVRef.Deploy fields
                          var cvref = await _context.CVRefs.FindAsync(deploy.CVRefId);
-                         cvref.DeployStageId = deploy.StageId;
+                         cvref.DeployStageId = (int)deploy.StageId;
                          cvref.DeployStageDate = deploy.TransactionDate;
                          _unitOfWork.Repository<CVRef>().Update(cvref);
 
@@ -407,18 +449,50 @@ namespace infra.Services
                .Include(x => x.Deploys.OrderByDescending(x => x.TransactionDate)).FirstOrDefaultAsync();
           }
 
-          public async Task<ICollection<CVRef>> GetDeploymentsOfACandidate(int candidateId)
+          public async Task<CVReferredDto> GetDeploymentDto(int cvrefid)
           {
-               return await _context.CVRefs.Where(x => x.CandidateId == candidateId)
-               .Include(x => x.Deploys.OrderByDescending(x => x.TransactionDate)).ToListAsync();
-          }
+                var qry = (from r in _context.CVRefs where r.Id == cvrefid
+                    join c in _context.Candidates on r.CandidateId equals c.Id
+                    join i in _context.OrderItems on r.OrderItemId equals i.Id
+                    join o in _context.Orders on i.OrderId equals o.Id
+                    select new CVReferredDto {
+                         CvRefId = cvrefid, CustomerName = o.Customer.CustomerName,
+                         OrderId = o.Id, OrderDate = o.OrderDate, OrderItemId = i.Id,
+                         CategoryName = i.Category.Name, CategoryRef = o.OrderNo + "-" + i.SrNo,
+                         CustomerId = o.CustomerId, CandidateId = r.CandidateId, 
+                         ApplicationNo = r.Candidate.ApplicationNo, CandidateName = r.Candidate.FullName,
+                         ReferredOn = r.ReferredOn, SelectedOn = r.RefStatusDate,
+                    })
+                    .AsQueryable();
+               var cvref = await qry.FirstOrDefaultAsync();
+               var dep = await _context.Deploys.Where(x => x.CVRefId==cvrefid)
+                    .OrderByDescending(x => x.TransactionDate).ToListAsync();
 
-          public async Task<ICollection<CVRef>> GetDeploymentsOfOrderItemId(int orderItemId)
-          {
-               return await _context.CVRefs.Where(x => x.OrderItemId == orderItemId)
-               .Include(x => x.Deploys.OrderByDescending(x => x.TransactionDate)).ToListAsync();
-          }
+               var statuses = await _context.DeployStatus.OrderBy(x => x.StageId).Select(x => new {StageId = x.StageId, StatusName = x.StatusName}).OrderBy(x => x.StageId).ToListAsync();
 
+               var dtos = new List<DeployRefDto>();
+               foreach(var d in dep)
+               {
+                    dtos.Add(new DeployRefDto {CvRefId = d.CVRefId,TransactionDate = d.TransactionDate, 
+                         DeploymentStatusname = statuses.Find(x => x.StageId==(int)d.StageId).StatusName});
+               }
+               
+               var dto = new CVReferredDto();
+               dto = cvref;
+               dto.Deployments = dtos;
+               return dto;
+               
+               /*
+               var q = await _context.CVRefs.Where(x => x.Id == cvrefid)
+                    .Include(x => x.OrderItem).ThenInclude(y => y.Category)
+                    .Include(z => z.Candidate)
+                    .FirstOrDefaultAsync();
+                    
+               return q;
+               */
+               //return await qry.FirstOrDefaultAsync();
+                    
+          }
           private async Task<Deploy> VerifyModelStageInSeqAndUpdateNextStage(Deploy deploy)
           {
                //return deploy model if in sequence, else return null;
@@ -497,6 +571,7 @@ namespace infra.Services
                }
                return deploy;
           }
+          
           private async Task<string> ProcessName(EnumDeployStatus ProcessId)
           {
                return await _context.DeployStatus.Where(x => (EnumDeployStatus)x.Id == ProcessId).Select(x => x.ProcessName).FirstOrDefaultAsync();
@@ -508,11 +583,17 @@ namespace infra.Services
                .OrderByDescending(x => x.TransactionDate).Take(1).FirstOrDefaultAsync();
 
                var cvrefToUpdate = await _context.CVRefs.FindAsync(cvrefid);
-               cvrefToUpdate.DeployStageId = deployLastRecord.StageId;
+               cvrefToUpdate.DeployStageId = (int)deployLastRecord.StageId;
                cvrefToUpdate.DeployStageDate = deployLastRecord.TransactionDate;
 
                _unitOfWork.Repository<CVRef>().Update(cvrefToUpdate);
                return await _unitOfWork.Complete() > 0;
+          }
+
+          public async Task<ICollection<DeployStatusDto>> GetDeployStatuses()
+          {
+               var lst = await _context.DeployStatus.OrderBy(x => x.StageId).Select(x => new DeployStatusDto{StageId=x.StageId, StatusName=x.StatusName}).ToListAsync();
+               return lst;
           }
      }
 }

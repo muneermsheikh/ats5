@@ -42,14 +42,13 @@ export class ClientComponent implements OnInit {
     this.custType = this.activatedRouter.snapshot.paramMap.get('custType');
     this.cParams.custType=this.custType;
     this.cParams.custType = this.custType;
-    console.log('cust type', this.custType);
+
     this.getCustomers();
     this.getCities();
     this.getIndustryTypes();
   }
 
   getCustomers() {
-    console.log('getcustomers',this.cParams);
     this.service.getCustomers(this.cParams).subscribe(response => {
       this.customers = response.data;
       this.cParams.pageNumber = response.pageIndex;

@@ -34,6 +34,14 @@ namespace infra.Services
 
           }
 
+          public async Task<AssessmentStandardQ> CreateStandardAssessmentQ(AssessmentStandardQ stddQ)
+          {
+               _unitOfWork.Repository<AssessmentStandardQ>().Add(stddQ);
+               if (await _unitOfWork.Complete() > 0 ) return stddQ;
+
+               return null;
+          }
+
           public async Task<bool> DeleteStandardAssessmentQ(int id)
           {
                var q = await _context.AssessmentStandardQs.FindAsync(id);
@@ -50,6 +58,11 @@ namespace infra.Services
                     _unitOfWork.Repository<AssessmentStandardQ>().Update(q);
                 }
                 return await _unitOfWork.Complete() > 0;
+          }
+
+          public async Task<AssessmentStandardQ> GetStandardAssessmentQ(int id)
+          {
+               return await _context.AssessmentStandardQs.FindAsync(id);
           }
 
           public async Task<ICollection<AssessmentStandardQ>> GetStandardAssessmentQs()

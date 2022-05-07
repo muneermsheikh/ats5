@@ -1,9 +1,9 @@
 <div *ngIf="cv===null">
      No candidate detail available
 </div>
-<div *ngIf="cv!==null">
-     <div class="row mb-0" style="padding: 0px; display: inline-block;">
-          <div class="form-check" style="display: inline-block; margin-left: 2px; width: 10px;">
+<div *ngIf="cv!==null" class="col-12">
+     <div class="stdd row mb-0">
+          <div class="stdd form-check mx-1 w10" >
                <input type="checkbox"
                    class="form-check-input"
                    [checked]="cv.checked"
@@ -16,15 +16,17 @@
 
           <div class="stdd w50" title="click to edit" routerLink="/candidate/edit/{{cv.id}}" >  {{cv.applicationNo}}</div>
           <!-- <app-right-click-menu *ngIf="!isHidden" [x]="xPosTabMenu" [y]="yPosTabMenu" ></app-right-click-menu> -->
-          <div class="stdd w200" routerLink="/candidate/history/{{cv.id}}" title="contact history of the candidate" >{{cv.fullName}}</div>
-          <div class="stdd w70">{{cv.city}}</div>
-          <div class="stdd w200" >{{cv.referredByName}}</div>
-          <div class="stdd w200" >
+          <div class="stdd mx-1 w200" routerLink="/candidate/historyfromcvid/{{cv.id}}" title="contact history of the candidate" >{{cv.fullName}}</div> 
+          <!-- <div class="stdd mx-1 w200" routerLink="/candidate/history" title="contact history of the candidate" >{{cv.fullName}}</div> -->
+          <div class="stdd mx-1 w70">{{cv.city}}</div>
+          <div class="stdd mx-1 w200" >{{cv.referredByName}}</div>
+          <div class="stdd mx-1 w200" >
                <span style="white-space: normal;" *ngFor="let item of cv.userProfessions">
                     {{item.profession}} <div style="display: inline-block" *ngIf="cv.userProfessions.length>1">,</div>
                </span>
           </div> 
-          <tx-document-viewer width="800px"
+     <!-- 
+               <tx-document-viewer width="800px" class="stdd w100"
                height="800px"
                basePath="https://localhost:5001"
                dock="Fill"
@@ -32,13 +34,17 @@
                isSelectionActivated=true
                showThumbnailPane=true>
           </tx-document-viewer>
-          <div class="stdd w70" (click)="onClickLoadDocument(cv.id)">view document</div>
-          <div style="display: inline-block; width: 200px; vertical-align: top;">
+     
+          <div class="stdd mx-1 w100 fa fa-eye" (click)="onClickLoadDocument(cv.id)"></div>
+-->
+          <div class="stdd w200 mx-1">
                <!-- <button class="w30 fa fa-pencil" style="display: inline-block;" type="button" routerLink="/candidate/edit/{{cv.id}}" ></button> -->
-               <button class="w30 fa fa-eye mx-1" style="display:inline-block" type="button" routerLink="/candidate/view/{{cv.id}}" ></button>
-               <button class="w30 fa fa-trash red" style="display: inline-block;" type="button" routerLink="/candidate/delete/{{cv.id}}" ></button>
+               <button class="stdd w30 fa fa-eye mx-1" type="button" routerLink="/candidate/view/{{cv.id}}" ></button>
+               <button class="stdd w30 fa fa-trash red" type="button" routerLink="/candidate/delete/{{cv.id}}" ></button>
+               <button class="stdd btn fa fa-balance-scale-left mx-2" title="Assess this candidate" routerLink="/hr/cvassess/{{cv.id}}" >assess</button>
                <!-- <button class="w30 fa fa-upload ml-1" style="display: inline-block;" type="button" routerLink="/candidate/view/{{cv.id}}"></button> -->
           </div>
+          <!-- <app-cv-assess *ngIf="currentId===item.id" [header]="header" [candidateAssessment]="assessment" ></app-cv-assess> -->
      </div>
 </div>
 

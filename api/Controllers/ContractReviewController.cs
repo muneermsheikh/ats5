@@ -4,6 +4,7 @@ using api.Errors;
 using api.Extensions;
 using core.Entities.EmailandSMS;
 using core.Entities.Identity;
+using core.Entities.MasterEntities;
 using core.Entities.Orders;
 using core.Interfaces;
 using core.ParamsAndDtos;
@@ -57,11 +58,24 @@ namespace api.Controllers
             return obj;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ContractReview> GetContractReviews(int id)
+        [HttpGet("reviewdata")]
+        public async Task<ICollection<ReviewItemData>> GetReviewItemData()
         {
-            var obj = await _reviewService.GetContractReview(id);
-            return obj;
+            return await _reviewService.GetReviewData();
+        }
+        
+        [HttpGet("{id}")]
+        public async Task<ICollection<ContractReview>> GetContractReviews(int id)
+        {
+            //var loggedInAppUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+            var loggedInEmployeeId = 0;
+            var obj = await _reviewService.GetOrAddContractReview(id,loggedInEmployeeId);
+            if (obj != null) {
+                var rvws = new List<ContractReview>();
+                rvws.Add(obj);
+                return rvws;
+            }
+            return null;
         }
 
 

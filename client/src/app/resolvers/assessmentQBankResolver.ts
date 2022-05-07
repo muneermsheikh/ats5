@@ -12,7 +12,6 @@ import { IAssessmentQBank } from "../shared/models/assessmentQBank";
      constructor(private qBankService: HrService) {}
  
      resolve(): Observable<IAssessmentQBank[]> {
-         console.log('in assessmentQBankResolver');
         return this.qBankService.getAssessmentQBank();
      }
  

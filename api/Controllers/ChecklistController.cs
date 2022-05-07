@@ -37,9 +37,9 @@ namespace api.Controllers
           public async Task<ActionResult<bool>> AddNewChecklist(int candidateid, int orderitemid)
           {
                var loggedInUserDto = await GetLoggedInUserDto();
-               if (loggedInUserDto == null) return BadRequest(new ApiResponse(404, "this option requires log in"));
+               //if (loggedInUserDto == null) return BadRequest(new ApiResponse(404, "this option requires log in"));
 
-               var checklist = await _checklistService.AddNewChecklistHR(candidateid, orderitemid, loggedInUserDto);
+               var checklist = await _checklistService.AddNewChecklistHR(candidateid, orderitemid, loggedInUserDto.LoggedInEmployeeId);
                
                if (checklist == null) return BadRequest(new ApiResponse(404, "failed to save the checklist data"));
 
@@ -50,7 +50,7 @@ namespace api.Controllers
           public async Task<ActionResult<bool>> EditChecklistHRAsync(ChecklistHRDto checklistHR)
           {
                var loggedInUserDto = await GetLoggedInUserDto();
-               if (loggedInUserDto == null) return BadRequest(new ApiResponse(404, "User not logged in"));
+               //if (loggedInUserDto == null) return BadRequest(new ApiResponse(404, "User not logged in"));
                
                var edit = await _checklistService.EditChecklistHR(checklistHR, loggedInUserDto);
                if (edit) {
@@ -60,10 +60,14 @@ namespace api.Controllers
                }
           }
 
-          
+          [HttpGet("checklistid/{candidateid}/{orderitemid}")]
+          public async Task<int> GetChecklistHRId(int candidateid, int orderitemid)
+          {
+               return await _checklistService.GetChecklistHRId(candidateid, orderitemid);
+          }
           //[Authorize]
           [HttpGet("checklisthr/{candidateid}/{orderitemid}")]
-          public async Task<ActionResult<ChecklistDto>> GetChecklistHR(int candidateid, int orderitemid)
+          public async Task<ActionResult<ChecklistHRDto>> GetChecklistHR(int candidateid, int orderitemid)
           {
                var loggedInUserDto = await GetLoggedInUserDto();
                //if (loggedInUserDto == null) return BadRequest(new ApiResponse(404, "this option requires log in"));

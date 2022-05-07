@@ -52,6 +52,6 @@ namespace core.Entities
         public string Email { get; set; }
         public string ImageUrl { get; set; }
         public bool IsValid { get; set; }=true;
-        //public Customer Customer {get; set;}
+        public Customer Customer {get; set;}
     }
 }

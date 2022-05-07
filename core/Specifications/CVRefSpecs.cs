@@ -27,12 +27,24 @@ namespace core.Specifications
         {
             if(specParams.IncludeDeployments) AddInclude(x => x.Deploys);
             
+            if(specParams.Sort?.ToLower() == "orderid") {
+                AddOrderBy(x => x.OrderId);
+            } else if (specParams.Sort?.ToLower() == "orderitemid") {
+                AddOrderBy(x => x.OrderItemId);
+            } else if (specParams.Sort?.ToLower() == "applicationno") {
+                AddOrderBy(x => x.ApplicationNo);
+            } else if (specParams.Sort?.ToLower() == "categoryid") {
+                AddOrderBy(x => x.CategoryId);
+            } else {
+                AddOrderByDescending(x => x.ReferredOn);
+            }
+        
             ApplyPaging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
-            AddOrderBy(x => x.ReferredOn);
+        
         }
   
         public CVRefSpecs(int pageIndex, int pageSize)
-            : base(x => x.DeployStageId < EnumDeployStatus.Concluded)
+            : base(x => x.DeployStageId < (int)EnumDeployStatus.Concluded)
         {
             ApplyPaging(pageSize * (pageIndex - 1), pageSize);
             AddOrderBy(x => x.CustomerName);

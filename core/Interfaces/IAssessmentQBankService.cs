@@ -13,5 +13,7 @@ namespace core.Interfaces
         Task<ICollection<AssessmentQBank>> GetAssessmentQBanks();
         Task<AssessmentQBank> GetAssessmentQsOfACategoryByName(string categoryName);
         Task<AssessmentQBank> GetAssessmentQBankByCategoryId(int id);
+        Task<AssessmentQBank> UpdateAssessmentQBank(AssessmentQBank model);
+        Task<AssessmentQBank> InsertAssessmentQBank(AssessmentQBank model);
     }
 }

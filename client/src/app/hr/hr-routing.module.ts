@@ -1,36 +1,70 @@
 import { NgModule } from '@angular/core';
-import { AssessmentQBankComponent } from './assessment-q-bank/assessment-q-bank.component';
-import { AssessmentQBankResolver } from '../resolvers/assessmentQBankResolver';
-import { AssessmentQBankExistingCatsResolver } from '../resolvers/assessmentQBankExistingCatsResolver';
 import { RouterModule } from '@angular/router';
 import { AssessmentStddComponent } from './assessment-stdd/assessment-stdd.component';
+import { AssessmentStddQsResolver } from '../resolvers/assessmentStddQsResolver';
+import { HrchecklistComponent } from './hrchecklist/hrchecklist.component';
+import { HrindexComponent } from './hrindex/hrindex.component';
+import { StddqEditComponent } from './stddq-edit/stddq-edit.component';
 import { AssessmentStddQResolver } from '../resolvers/assessmentStddQResolver';
+import { AssessmentQBankComponent } from './assessment-q-bank/assessment-q-bank.component';
+import { AssessmentQBankResolver } from '../resolvers/assessmentQBankResolver';
+import { CategoriesResolver } from '../resolvers/categoriesResolver';
+import { AssessComponent } from './assess/assess.component';
+import { OrderResolver } from '../resolvers/orderResolver';
+import { AssessQComponent } from './assess-q/assess-q.component';
+import { OrderItemBriefResolver } from '../resolvers/orderItemBriefResolver';
+import { AssessmentQsResolver } from '../resolvers/assessmentQsResolver';
+import { CvAssessComponent } from './cv-assess/cv-assess.component';
+import { CandidateBriefResolver } from '../resolvers/candidateBriefResolver';
 import { OpenOrderItemsResolver } from '../resolvers/openOrderItemsResolver';
-import { CandidateViewComponent } from '../candidate/candidate-view/candidate-view.component';
-import { ChecklistComponent } from '../candidate/checklist/checklist.component';
-import { ChecklistResolver } from '../resolvers/checklistResolver';
+
+import { PreventUnsavedChangesGuard } from '../guards/prevent-unsaved-changes.guard';
+import { CvrefComponent } from '../admin/cvref/cvref.component';
+import { AssessedAndApprovedCVsResolver } from '../resolvers/assessedAndApprovedCVsResolver';
+
 
 const routes = [
-  {path: '', component: AssessmentQBankComponent,
-    resolve: {qs: AssessmentQBankResolver,
-        existingCats: AssessmentQBankExistingCatsResolver
-    },
-    data: {breadcrumb: {alias: 'QBankListing'}}
+  {path: '', component: HrindexComponent,  data: {breadcrumb: 'HR Division'}},
+  {path: 'stddqs', component: AssessmentStddComponent,
+    resolve: { stddqs: AssessmentStddQsResolver },data: {breadcrumb: {breadcrumb: 'Standard Assessment Questions'}}
   },
   
-  {path: 'edit/:id', component: AssessmentQBankComponent,
-    resolve: {qbank: AssessmentQBankResolver}
+  {path: 'editstdd/:id', component: StddqEditComponent,
+    resolve: {stddq: AssessmentStddQResolver}
   },
-  {path: 'stddqs', component: AssessmentStddComponent,
+  {path: 'checklist', component: HrchecklistComponent,
     resolve: {
-      stddqs: AssessmentStddQResolver
+      //stddqs: AssessmentStddQsResolver
     }},
-    /* {path: 'hrchecklist', component: ChecklistComponent, 
-      resolve: {
-        checklistdto: ChecklistResolver
-      },
-      data: {breadcrumb: 'HR Checklist'}},
-    */
+    {path: 'qs', component: AssessmentQBankComponent,
+    resolve: {
+      qs: AssessmentQBankResolver,
+      categories: CategoriesResolver
+    }},
+    {path: 'orderassess/:id', component: AssessComponent,
+    resolve: {
+      order: OrderResolver
+    }},
+    
+    {path: 'itemassess/:id', component: AssessQComponent,
+    resolve: {
+      itembrief: OrderItemBriefResolver,
+      assessment: AssessmentQsResolver
+    }}, 
+    
+    {path: 'cvassess/:id', component: CvAssessComponent,
+      canDeactivate: [PreventUnsavedChangesGuard],
+    resolve: {
+      candidateBrief: CandidateBriefResolver,
+      openOrderItemsBrief: OpenOrderItemsResolver
+    }},
+
+    {path: 'cvforward', component: CvrefComponent,
+    //canDeactivate: [PreventUnsavedChangesGuard],
+    resolve: {assessedcvs: AssessedAndApprovedCVsResolver},
+  }
+    
+    
 ]
 
 @NgModule({

@@ -56,18 +56,23 @@ namespace api.Controllers
           }
 
 
-          //[Authorize]
+          [Authorize]
           [HttpGet]
           public async Task<ActionResult<core.ParamsAndDtos.UserDto>> GetCurrentUser()
           {
-               var user = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               var email = HttpContext.User?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+               if (email==null) return BadRequest("User email not found");
+               var user = await _userManager.FindByEmailAsync(email);
                if (user==null) return BadRequest("User Claim not found");
+
                return new core.ParamsAndDtos.UserDto
                {
+                    loggedInEmployeeId = user.loggedInEmployeeId,
                     Email = user.Email,
                     Token = await _tokenService.CreateToken(user),
                     DisplayName = user.DisplayName
                };
+
           }
           
 
@@ -90,32 +95,7 @@ namespace api.Controllers
                return await _userService.CheckAadharNoExists(aadharno);
           }
 
-          /*
-          [Authorize]
-          [HttpGet("address")]
-          public async Task<ActionResult<AddressDto>> GetUserAddress()
-          {
-               var user = await _userManager.FindByEmailWithAddressAsync(User);
-
-               return _mapper.Map<AddressDto>(user.Address);
-          }
-     
-          [Authorize]
-          [HttpPut("address")]
-          public async Task<ActionResult<AddressDto>> UpdateUserAddress(AddressDto address)
-          {
-               var user = await _userManager.FindByEmailWithAddressAsync(User);
-
-               user.Address = _mapper.Map<Address>(address);
-
-               var result = await _userManager.UpdateAsync(user);
-
-               if (result.Succeeded) return Ok(_mapper.Map<AddressDto>(user.Address));
-
-               return BadRequest("Problem updating the user");
-          }
-          */
-
+          
           [HttpPost("login")]
           public async Task<ActionResult<core.ParamsAndDtos.UserDto>> Login(LoginDto loginDto)
           {
@@ -141,15 +121,20 @@ namespace api.Controllers
                }
                // Optionally add other app specific claims as needed
                //claims.Add(new Claim("UserState", UserState.ToString()));
+               var loggedInEmployeeId=user.loggedInEmployeeId;
+               if(user.loggedInEmployeeId == 0) {
+                    loggedInEmployeeId = await _empService.GetEmployeeIdFromAppUserIdAsync(user.Id);
+               }
           
-          
-               int loggedInEmployeeId = await _empService.GetEmployeeIdFromAppUserIdAsync(user.Id);
                //var taskParams = new TaskParams{TaskOwnerId = loggedInEmployeeId, AssignedToId = loggedInEmployeeId, TaskStatus = "Open"};
-
-               var tasksOfLoggedInUser = await _taskService.GetDashboardTasks(loggedInEmployeeId);
-
+               var tasksOfLoggedInUser = new List<TaskDashboardDto>();
+               if(loggedInEmployeeId != 0) {
+                    tasksOfLoggedInUser = (List<TaskDashboardDto>)await _taskService.GetDashboardTasks(loggedInEmployeeId);
+               }
+               
                var userdto = new core.ParamsAndDtos.UserDto
                {
+                    loggedInEmployeeId = loggedInEmployeeId,
                     dashboardTasks = tasksOfLoggedInUser,
                     Email = user.Email,
                     Token = await _tokenService.CreateToken(user),
@@ -159,6 +144,7 @@ namespace api.Controllers
                return userdto;
           }
 
+          [Authorize]
           [HttpGet("users")]
           public async Task<ActionResult<ICollection<UserDto>>> GetUsers (AppUserSpecParams userParams)
           {
@@ -239,9 +225,9 @@ namespace api.Controllers
                     if (!result.Succeeded) return BadRequest(result.Errors);
 
                     if (registerDto.UserRole != "") {
-                         var succeeded = await _roleManager.CreateAsync(new AppRole{Name="Candidate"});
+                         var succeeded = await _roleManager.CreateAsync(new AppRole{Name="Candidate"}); //do this if candidate role does not exist
                          var roleResult = await _userManager.AddToRoleAsync(user, registerDto.UserRole);
-                         if (!result.Succeeded) return BadRequest(result.Errors);
+                         if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
                     }
                     
                //the plain dto object to return, irrespective of type of user, i.e. whether candidate, employee or customer
@@ -299,26 +285,23 @@ namespace api.Controllers
                */
           }
 
+          [Authorize]
           [HttpPost("registeremployee")]
           public async Task<ActionResult<core.ParamsAndDtos.UserDto>> RegisterEmployee(RegisterEmployeeDto registerDto )
           {
+               if(string.IsNullOrEmpty(registerDto.Email) || string.IsNullOrEmpty(registerDto.AadharNo)) return BadRequest("Email ID and Aadhar Card both are mandatory to register an employee");
                
-               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
-               int loggedInEmployeeId = loggedInUser == null ? 0 : await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
-               
-               /* if (loggedInUser==null) {
-                    loggedInUser = await _userManager.FindByEmailAsync("sanjaypatil@agenterprises.com");
-               }
-               */
-               //populate loggedInUser
-               if (loggedInUser == null) return BadRequest(new ApiResponse(401, "Unauthorized"));
-               registerDto.LoggedInAppUserId = loggedInUser.Id;
-               
+               //var loggedInUser = await GetCurrentUser();   // _userManager.FindByEmailFromClaimsPrinciple(User);
+
+               //if (loggedInUser == null) return BadRequest(new ApiResponse(401, "Unauthorized"));
+               //registerDto.LoggedInAppUserId = loggedInUser.
+                          
+               //int loggedInEmployeeId = loggedInUser == null ? 0 : await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
                //check if user email already on record
-                    if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
-                    {
-                         return new BadRequestObjectResult(new ApiValidationErrorResponse { Errors = new[] { "Email address is in use" } });
-                    }
+               if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
+               {
+                    return new BadRequestObjectResult(new ApiValidationErrorResponse { Errors = new[] { "Email address is in use" } });
+               }
 
                //for customer and vendor official, customer Id is mandatory
                     if (string.IsNullOrEmpty(registerDto.AadharNo))
@@ -351,17 +334,11 @@ namespace api.Controllers
                     var result = await _userManager.CreateAsync(user, registerDto.Password);
                     if (!result.Succeeded) return BadRequest(result.Errors);
 
-                    
-                    var roleResult = await _userManager.AddToRoleAsync(user, registerDto.UserRole);
-                    if (!result.Succeeded) return BadRequest(result.Errors);
-                    
+                    if(!string.IsNullOrEmpty(registerDto.UserRole)) {
+                         var roleResult = await _userManager.AddToRoleAsync(user, registerDto.UserRole);
+                         if (!result.Succeeded) return BadRequest(result.Errors);
+                    }
                //the plain dto object to return, irrespective of type of user, i.e. whether candidate, employee or customer
-                    var userDtoToReturn = new core.ParamsAndDtos.UserDto
-                    {
-                         DisplayName = user.DisplayName,
-                         Token = await _tokenService.CreateToken(user),
-                         Email = user.Email
-                    };
 
                     //var userAdded = await _userManager.FindByEmailAsync(registerDto.Email);
                     //no need to retreive obj from DB - the object user can be used for the same
@@ -382,7 +359,14 @@ namespace api.Controllers
                     }
                     */
 
-                    await _userService.CreateEmployeeAsync(registerDto);
+                    var added = await _userService.CreateEmployeeAsync(registerDto);
+                    var userDtoToReturn = new core.ParamsAndDtos.UserDto
+                         {
+                              loggedInEmployeeId = added.Id,
+                              DisplayName = user.DisplayName,
+                              Token = await _tokenService.CreateToken(user),
+                              Email = user.Email
+                         };
                //return
                     return userDtoToReturn;
                /*
@@ -435,52 +419,6 @@ namespace api.Controllers
 
                return result.Succeeded;
           }
-//userRoles
-
-          /*
-          [Authorize]
-          [HttpGet("users-with-roles")]
-          public async Task<ActionResult<ICollection<AppUser>>> GetUsersWithRoles()
-          {
-               var users = await (from u in _identityContext.Users
-                    join r in _identityContext.UserRoles on u.Id equals r.UserId
-                    //join userroles in _identityContext.UserRoles on r.RoleId equals userroles.UserId
-                    //join rolenames in _identityContext.Roles on userroles.RoleId equals rolenames.Id
-                    orderby u.Address.FirstName
-                    select new {
-                         UserType = u.UserType,
-                         Roles = r.RoleId,
-                         Id = u.Id,
-                         FirstName = u.Address.FirstName,
-                         Username = u.UserName,
-                         Email = u.Email
-                    }).ToListAsync();
-               
-               
-               var users = await _userManager.Users
-                    //.Include(r =>r.UserRoles)
-                    //.ThenInclude(r => r.Role)
-                    .OrderBy(u => u.UserName)
-                    
-                    .Select(u => new
-                    {
-                         UserType = u.UserType,
-                         Roles = u.UserRoles,
-                         Id = u.Id,
-                         FirstName = u.Address.FirstName,
-                         Username = u.UserName,
-                         Email = u.Email
-                         
-                         //RoleName = u.UserRoles.Select(x => x.Role.Name).ToList()
-                         //, Roles = u.UserRoles.Select(r => r.Role.Name).ToList()
-                    })
-                    
-                    .ToListAsync();
-               
-               return Ok(users);
-          }
-
-         */
      
           private async Task<bool> UserExists(string username)
           {

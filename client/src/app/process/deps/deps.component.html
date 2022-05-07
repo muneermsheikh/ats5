@@ -1,0 +1,40 @@
+<div class="modal-header">
+     <button type="button" class="btn btn-success fa fa-save" (click)="updateDepTask()"></button>
+     <button type="button" (click)="addItem()" class="stdd alignR mx-5 fa fa-plus blue"></button>
+   </div>
+
+   <div class="stdd">
+    <form [formGroup] ="form" >
+
+     <div class="stdd mx-2 b w150">Date</div>
+     <div class="stdd mx-2 b w75">Transaction</div>
+     <hr class="noTopMargin" >
+          <div formArrayName="depItems" > 
+               <div *ngFor="let item of depItems.controls; let i=index">
+                    <div [formGroupName]="i">
+                         <input type="text"
+                         placeholder="transactionDate"
+                         bsDatepicker
+                         bindValue="transactionDate"
+                         [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                         class="stdd w125 ml-2"
+                         formControlName="transactionDate"
+                    >   
+                    <div class="stdd">{{item.stageId}}</div>
+                    <ng-select  
+                         [items]="depStatuses"
+                         bindLabel="statusName"
+                         bindValue="stageId"
+                         labelForId="stageId"
+                         placeholder="Select status"
+                         clearAllText="Clear"
+                         formControlName="stageId">
+                    </ng-select>
+               </div>
+          </div>
+          </div>
+     </form>
+   </div>
+<div>
+     {{form.value | json}}
+</div>

@@ -6,6 +6,7 @@ namespace core.ParamsAndDtos
 {
     public class SelectionsPendingDto
     {
+        public int Id {get; set;}
         public int CVRefId { get; set; }
         public int OrderItemId { get; set; }
         //public int CategoryId {get; set;}

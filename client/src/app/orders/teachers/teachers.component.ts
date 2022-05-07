@@ -16,7 +16,8 @@ export class TeachersComponent {
   constructor(private fb: FormBuilder) {
     this.teachersForm = this.fb.group({
       teachers: this.fb.array([]),
-    })
+    });
+    this.patchValue2();
   }
  
  
@@ -98,14 +99,20 @@ export class TeachersComponent {
             { name: 'Batch No 1', students: [{ name: 'Ramesh' }, { name: 'Suresh' }, { name: 'Naresh' }] },
             { name: 'Batch No 2', students: [{ name: 'Vikas' }, { name: 'Harish' }, { name: 'Lokesh' }] },
           ]
+        },
+        {
+          name: 'Teacher 2', batches: [
+            { name: 'Batch No 3', students: [{ name: 'Ramesh 2' }, { name: 'Suresh 3' }, { name: 'Naresh 4' }] },
+            { name: 'Batch No 4', students: [{ name: 'Vikas 3' }, { name: 'Harish 3' }, { name: 'Lokesh 4'  }] },
+          ]
         }
       ]
     }
     this.clearFormArray();
-   
+    
+    console.log('data', data);
    
     data.teachers.forEach(t => {
-   
       var teacher: FormGroup = this.newTeacher();
       this.teachers().push(teacher);
    

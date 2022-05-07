@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { first } from 'rxjs/operators';
 import { CandidateHistoryService } from 'src/app/candidate/candidate-history.service';
 import { IUserHistoryDto } from 'src/app/shared/models/userHistoryDto';
 import { IUserHistorySearch } from 'src/app/shared/models/userHistorySearch';
-import { userHistorySpecParams } from 'src/app/shared/models/userHistorySpecParams';
+import { userHistorySpecParams } from 'src/app/shared/params/userHistorySpecParams';
+
 
 @Component({
   selector: 'app-user-transaction',

@@ -1,0 +1,15 @@
+.stdd {
+     display: inline-block !important;
+     vertical-align: top;
+     margin-left: 3px;
+     margin-right:3px;
+     margin-top: 1px;
+     margin-bottom: 1px;
+     padding-right: 3px;
+
+}
+blue {color: blue;}
+
+.w75 {width: 75px;}
+.w150 {width: 150px;}
+.w300 {width: 300px;}

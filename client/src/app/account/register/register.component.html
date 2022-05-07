@@ -1,5 +1,5 @@
-<div style="font-size:medium; font-weight : bold;" *ngIf="isAddMode">Add User</div>
-<div style="font-size:medium; font-weight : bold;" *ngIf="!isAddMode">Edit User</div>
+<div style="font-size:medium; font-weight : bold;" *ngIf="isAddMode">Add a Candidate</div>
+<div style="font-size:medium; font-weight : bold;" *ngIf="!isAddMode">Edit Candidate</div>
 
 <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
      <div class="col-3 my-2" style="font-size: small; display: inline-block; border: blue;">
@@ -58,21 +58,22 @@
                     <div class="invalid-feedback" *ngIf="(!f.email?.valid && f.email?.touched)">
                     <span *ngIf="f.email.errors?.required">email As is required</span>
                </div> 
-
+               <br>
                <div class="stddmx2 w110"><span class="stdd b">Password</span></div>
-                    <input class="stddmx2 w200" type="password" placeholder="Password" formControlName="password"
-                    ngClass="f.password.touched ? !f.password.valid ? 'is-invalid' : 'is-valid' : null " >
-                    <div class="invalid-feedback" *ngIf="(!f.password?.valid && f.password?.touched)">
-                         <span *ngIf="f.password.errors?.required">password is required</span>
-                    </div> 
+               <input class="stddmx2 w200" type="password" placeholder="Password" formControlName="password"
+               ngClass="f.password.touched ? !f.password.valid ? 'is-invalid' : 'is-valid' : null " >
+               <div class="invalid-feedback" *ngIf="(!f.password?.valid && f.password?.touched)">
+                    <span *ngIf="f.password.errors?.required">password is required</span>
+               </div> 
+               <br>
                <div class="stddmx2 w110"><span class="stdd b">Confirm Password</span></div>
-                    <input class="stddmx2 w200" type="password" placeholder="Confirm Password" formControlName="confirmPassword"
-                    ngClass="f.cofirmPassword.touched ? !f.confirmPassword.valid ? 'is-invalid' : 'is-valid' : null " >
-                    <div class="invalid-feedback" *ngIf="(!f.confirmPassword?.valid && f.confirmPassword?.touched)">
-                         <span *ngIf="f.confirmPassword.errors?.required">Confirm Password is required</span>
-                         <div *ngIf="f.confirmPassword.errors?.mustMatch">Passwords do not match</div>
-                         <span *ngIf="!isAddMode" class="stdd">edit Password - leave password blank to retain existing password</span>
-                    </div> 
+               <input class="stddmx2 w200" type="password" placeholder="Confirm Password" formControlName="confirmPassword"
+               ngClass="f.cofirmPassword.touched ? !f.confirmPassword.valid ? 'is-invalid' : 'is-valid' : null " >
+               <div class="invalid-feedback" *ngIf="(!f.confirmPassword?.valid && f.confirmPassword?.touched)">
+                    <span *ngIf="f.confirmPassword.errors?.required">Confirm Password is required</span>
+                    <div *ngIf="f.confirmPassword.errors?.mustMatch">Passwords do not match</div>
+                    <span *ngIf="!isAddMode" class="stdd">edit Password - leave password blank to retain existing password</span>
+               </div> 
 
                <div class="vAlignTop w110"><span class="stdd b vAlignTop">Introduction</span></div>
                     <textarea placeholder="Introduction" class="stddmx2" rows="3" cols="45" formControlName="introduction"></textarea>

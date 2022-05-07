@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using core.Entities.HR;
-using core.Entities.Identity;
 using core.Entities.MasterEntities;
 using core.Entities.Orders;
 using core.Interfaces;
@@ -51,34 +50,28 @@ namespace infra.Services
             if (await _unitOfWork.Complete() == 0) throw new Exception("Failed to save the Checklist details");
             return hrTask;
         }
-        public async Task<ChecklistHR> AddNewChecklistHR(int candidateId, int orderItemId, LoggedInUserDto loggedInUserDto)
+        public async Task<ChecklistHR> AddNewChecklistHR(int candidateId, int orderItemId, int LoggedInEmployeeId)
         {
             //check if the candidate has aleady been checklisted for the order item
             var checkedOn = await _context.ChecklistHRs.Where(x => x.CandidateId == candidateId && x.OrderItemId == orderItemId)
                 .Select(x => x.CheckedOn.Date).FirstOrDefaultAsync();
             if (checkedOn.Year > 2000) throw new Exception("Checklist on the candidate for the same requirement has been done on " + checkedOn);
                 
-            //update loggerInUserDto.LoggedInEmployeeId
-            if(loggedInUserDto.LoggedInEmployeeId == 0) loggedInUserDto.LoggedInEmployeeId = await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUserDto.LoggedInAppUserId);
-
-            var hr = await AddChecklistHR(candidateId, orderItemId, loggedInUserDto.LoggedInEmployeeId);
+            var hr = await AddChecklistHR(candidateId, orderItemId, LoggedInEmployeeId);
             
             return hr;
         }
 
         public async Task<bool> EditChecklistHR(ChecklistHRDto model, LoggedInUserDto loggedInUserDto)
         {
-            var dto = await GetChecklistHRIfEditable(model, loggedInUserDto);     //returns ChecklistHR
-            if (!string.IsNullOrEmpty(dto.ErrorDesc)) throw new System.Exception(dto.ErrorDesc);
-
-            var existing = dto.ChecklistHR;
+            var existing = await GetChecklistHRIfEditable(model, loggedInUserDto);     //returns ChecklistHR
             _context.Entry(existing).CurrentValues.SetValues(model);   //saves only the parent, not children
 
             //the children 
             //Delete children that exist in existing record, but not in the new model order
             foreach (var existingItem in existing.ChecklistHRItems.ToList())
             {
-                if (!model.ChecklistHR.ChecklistHRItems.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
+                if (!model.ChecklistHRItems.Any(c => c.Id == existingItem.Id && c.Id != default(int)))
                 {
                     _context.ChecklistHRItems.Remove(existingItem);
                     _context.Entry(existingItem).State = EntityState.Deleted;
@@ -86,7 +79,7 @@ namespace infra.Services
             }
 
             //children that are not deleted, are either updated or new ones to be added
-            foreach (var modelItem in model.ChecklistHR.ChecklistHRItems)
+            foreach (var modelItem in model.ChecklistHRItems)
             {
                 var existingItem = existing.ChecklistHRItems.Where(c => c.Id == modelItem.Id && c.Id != default(int)).SingleOrDefault();
                 if (existingItem != null)       // Update child
@@ -108,41 +101,51 @@ namespace infra.Services
 
         public async Task<bool> DeleteChecklistHR(ChecklistHRDto checklistHR, LoggedInUserDto loggedInDto)
         {
-            var obj = await GetChecklistHRIfEditable(checklistHR, loggedInDto);
-            if (!string.IsNullOrEmpty(obj.ErrorDesc)) throw new System.Exception(obj.ErrorDesc);
-
-            _unitOfWork.Repository<ChecklistHR>().Delete(checklistHR.ChecklistHR);
+            var obj = await _context.ChecklistHRs.FindAsync(checklistHR.Id);
+            if (obj==null) return false;
+            _unitOfWork.Repository<ChecklistHR>().Delete(obj);
 
             return await _unitOfWork.Complete() > 0;
         }
 
-        public async Task<ChecklistDto> GetChecklistHR(int candidateId, int orderItemId, LoggedInUserDto loggedInUserDto)
+        public async Task<int> GetChecklistHRId(int candidateid, int orderitemid)
         {
-            var lst = await _context.ChecklistHRs.Where(x => x.CandidateId == candidateId &&
-                x.OrderItemId == orderItemId)       //  && x.UserId == loggedInUserDto.LoggedInEmployeeId)
-                .Include(x => x.ChecklistHRItems).FirstOrDefaultAsync();
-            
-            if (lst == null) {
-                lst = await AddChecklistHR(candidateId, orderItemId, loggedInUserDto?.LoggedInEmployeeId ?? 0);
-            }
-            var cv = await _userService.GetCandidateBriefById(candidateId);
-            var item = await _commonService.CategoryRefFromOrderItemId(orderItemId);
-                    
-            var dto = new ChecklistDto{
-                Id = lst.Id, ApplicationNo = cv.ApplicationNo, OrderItemId = orderItemId,
-                CategoryRef = item, CandidateName = cv.FullName, CandidateId = cv.Id,
-                OrderRef =  item, UserLoggedIn = "Not defined",
-                CheckedOn = lst.CheckedOn, HrExecComments = lst.HrExecComments,
-                ChecklistHRItems = lst.ChecklistHRItems
-            };
+            var checklist = await _context.ChecklistHRs.Where(x => x.CandidateId == candidateid && x.OrderItemId==orderitemid)
+                .Select(x => x.Id).FirstOrDefaultAsync();
+            return checklist;
+        }
+        public async Task<ChecklistHRDto> GetChecklistHR(int candidateId, int orderItemId, LoggedInUserDto loggedInUserDto)
+        {
+            var lst = await(from checklist in _context.ChecklistHRs 
+                    where checklist.CandidateId == candidateId && checklist.OrderItemId == orderItemId
+                join orderitem in _context.OrderItems on checklist.OrderItemId equals orderitem.Id
+                join candidate in _context.Candidates on checklist.CandidateId equals candidate.Id
+                join order in _context.Orders on orderitem.OrderId equals order.Id
+                join customer in _context.Customers on order.CustomerId equals customer.Id
+                join cat in _context.Categories on orderitem.CategoryId equals cat.Id
+                select new ChecklistHRDto {
+                    Id = checklist.Id, ApplicationNo = candidate.ApplicationNo, OrderItemId = orderItemId,
+                    CandidateName = candidate.FullName, CandidateId = candidate.Id,
+                    OrderRef =  order.OrderNo + "-" + orderitem.SrNo + "-" + cat.Name,
+                    UserLoggedId = loggedInUserDto == null ? 0 : loggedInUserDto.LoggedInEmployeeId, 
+                    CheckedOn = checklist.CheckedOn, 
+                    HrExecComments = checklist.HrExecComments,
+                    ChecklistHRItems = checklist.ChecklistHRItems,
+                    Charges = orderitem.Charges,
+                    ChargesAgreed = checklist.ChargesAgreed,
+                    ExceptionApproved = checklist.ExceptionApproved,
+                    ExceptionApprovedBy = checklist.ExceptionApprovedBy,
+                    ExceptionApprovedOn = checklist.ExceptionApprovedOn
+                })
+                .FirstOrDefaultAsync();
 
-            return dto;
+            return lst;
         }
         
-        private async Task<ChecklistHRDto> GetChecklistHRIfEditable(ChecklistHRDto model, LoggedInUserDto loggedInDto)
+        private async Task<ChecklistHR> GetChecklistHRIfEditable(ChecklistHRDto model, LoggedInUserDto loggedInDto)
         {
             //if cv already forwarded to Sup, then changes not allowed
-            var existing = _context.ChecklistHRs.Where(p => p.Id == model.ChecklistHR.Id)
+            var existing = _context.ChecklistHRs.Where(p => p.Id == model.Id)
                 .Include(p => p.ChecklistHRItems)
                 .AsNoTracking()
                 .SingleOrDefault();
@@ -159,35 +162,22 @@ namespace infra.Services
                 */
             }
 
-            var dto = new ChecklistHRDto();
+            //var dto = new ChecklistHRDto();
 
             var submitted = await _context.CVReviews
-                .Where(x => x.CandidateId == model.ChecklistHR.CandidateId && x.OrderItemId == model.ChecklistHR.OrderItemId 
+                .Where(x => x.CandidateId == model.CandidateId && x.OrderItemId == model.OrderItemId 
                     && x.SubmittedByHRExecOn.Year > 2000)
                 .Select(x => x.SubmittedByHRExecOn)
                 .FirstOrDefaultAsync();
 
             if (submitted.Year > 2000)
             {
-                dto.ErrorDesc = "This Checklist is referred by the HR Executive on " + submitted.Date + " and cannot be edited now";
-                return dto;
+                throw new System.Exception("This Checklist is referred by the HR Executive on " + submitted.Date + " and cannot be edited now");
+
             }
             
-            /*if (existing.UserId != model.UserId)
-            {
-                dto.ErrorDesc = "Only the user that conducted the checklist can edit it";
-            }
-            else */
-            if (existing == null)
-            {
-                dto.ErrorDesc = "No such record exist in database";
-            }
-            else
-            {
-                dto.ChecklistHR = existing;
-            }
-
-            return dto;
+            
+            return existing;
         }
 
 

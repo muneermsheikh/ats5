@@ -1,6 +1,7 @@
 <div class="mt-2" *ngIf="member">
      <div class="col-3 py-0 my-0" style="display: inline-block;">
          <h3>Your profile</h3>
+
      </div>
      <div class="col-9 py-0 my-0" style="display: inline-block;" >
          <div class="alert alert-info" *ngIf="form.dirty">
@@ -37,6 +38,7 @@
                     <button [disabled]="!form.dirty" type="submit" class="btn btn-success btn-block fa fa-save" (click)="onSubmit()" >
                         <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1">Update</span>
                     </button>
+                    <button class="btn btn-primary fa fa-scale-balance" type="button" routerLink="/hr/cvassess/{{member.id}}" ></button>
                     <button type="button" class="btn btn-success btn-block fa fa-save" (click)="TransactionHistory()" >Transaction History</button>
              </div>
          </div>
@@ -48,15 +50,15 @@
             <tabset class="member-tabset">
                 <tab heading='About {{member.knownAs}}' (selectTab)="onTabActivated($event)">
                     <div class="my-2" style="font-size: small;">
-                        <div class="stdd b w50">Gender</div>
+                        <div class="stdd b w50 alignR">Gender</div>
                             <input class="stdd w30" type="text" formControlName="gender">
-                        <div class="stddL50 b w75">First Name</div>
+                        <div class="stdd w50 b w75 alignR">First Name</div>
                             <input class="stdd w150" type="text" formControlName="firstName" >
-                        <div class="stddmx2 b w100">Second Name</div>
+                        <div class="stddmx2 b w100 alignR">Second Name</div>
                             <input class="stddmx2 w150" type="text" formControlName="secondName" >
-                        <div class="stddmx2 b w100">Family Name</div>
+                        <div class="stddmx2 b w100 alignR">Family Name</div>
                             <input class="stddmx2 w150" type="text" formControlName="familyName" >
-                        <div class="stddmx2 b w100">Known As</div>
+                        <div class="stddmx2 b w100 alignR">Known As</div>
                             <input class="stddmx2 w100" type="text" formControlName="knownAs">
                         <br>
                         <div class="stdd b w100">Date of Birth</div>
@@ -70,36 +72,34 @@
                             >   
                         <div class="stddmx2 b w100">Birth Place</div>
                             <input class="stddmx2 w150" type="text" formControlName="placeOfBirth">
-                        <div class="stddmx2 b w100">Notification Desired</div>
+                        <div class="stddmx2 b w150">Notification Desired</div>
                             <input class="stddmx2 w50" type="checkbox" formControlName="notificationDesired" >
                         <br>
                         <div class="stdd b w100">Email</div>
                             <input class="stddmx2 w350" type="text" formControlName="email" >
-                        <div class="stdd b w100">Password</div>
-                            <input class="stddmx2 w150" type="password" formControlName="password" >
                         <hr>
-                        <div class="col-6" style="display: inline-block;">
+                        <div class="stdd col-6" >
                             <div class="w100 b">Introduction</div>
-                            <textarea class="form-control" formControlName="introduction" rows="2" style="margin-left: 10px;"></textarea>
+                            <textarea class="form-control ml-10" formControlName="introduction" rows="2" ></textarea>
                         </div>
-                        <div class="col-6" style="display: inline-block;">
-                            <div style="width: 100px; font-weight: bold;" >Interests</div>
-                            <textarea class="form-control" formControlName="interests" rows="2" style="margin-left: 10px;"></textarea>
+                        <div class="stdd col-6" >
+                            <div class="stdd b w100"  >Interests</div>
+                            <textarea class="form-control ml-10" formControlName="interests" rows="2" ></textarea>
                         </div>
                          <hr>
-                        <div style="display: inline-block; width: 100px; font-weight: bold; ">Aadhar No</div>
-                        <input type="text" formControlName="aadharNo" style="display: inline-block; width: 150px; line-height: 12px;" class="py-0 my-0">
+                        <div class="stdd w100 b" >Aadhar No</div>
+                        <input type="text" formControlName="aadharNo" class="stdd w150 py-0 my-0">
                         <hr>
                         <div style="font-weight: bold;">
                             <label style="width: 35px;" >Sr#</label>
-                            <label class="mx-2 px-2" style="width: 100px;">PP No</label>
-                            <label class="mx-2 px-2" style="width: 100px;">Nationality</label>
-                            <label class="mx-2 px-2" style="width: 50px;">ECNR</label>
-                            <label class="mx-2 px-1" style="width: 125px;">Issued On</label>
-                            <label class="mx-2 px-1" style="width: 135px;">Valid Upto</label>
-                            <label class="mx-2 px-2" style="width: 75px; ">Is Valid</label>
-                            <div style="width: 200px; display: inline-block;">
-                                <button type="button" (click)="addUserPP()" class="px-15 fa fa-plus" style="color: blue; float: right;"></button>
+                            <label class="stddmx2 w100" >PP No</label>
+                            <label class="stddmx2 w100" >Nationality</label>
+                            <label class="stddmx2 w50" >ECNR</label>
+                            <label class="stddmx2 w125" >Issued On</label>
+                            <label class="stddmx2  w135" >Valid Upto</label>
+                            <label class="stddmx2 w75" >Is Valid</label>
+                            <div class="stdd w200" >
+                                <button type="button" (click)="addUserPP()" class="stdd px-15 fa fa-plus" style="color: blue; float: right;"></button>
                             </div>
                         </div>
                         
@@ -107,23 +107,32 @@
                     <div formArrayName="userPassports" class="my-1 px-0" style="height: 10px; font-size: small;" >
                         <div *ngFor="let q of userPassports.controls; let i=index">
                             <div [formGroupName]="i" >
-                                <div style="display: inline-block; width: 35px;">{{i+1}}</div>
-                                <input type="text" formControlName="passportNo" class="mx-2 px-2" style="display: inline-block; width: 100px" >
-                                <input type="text" formControlName="nationality" class="mx-2 px-2" style="display: inline-block; width: 100px" >
-                                <input type="checkbox" formControlName="ecnr" class="mx-2 px-2" style="display: inline-block; width: 50px" >
-                                <!--
-                                <div class="col-2" style="display: inline-block;">
-                                    <app-date-input [formControl]='userPassports.controls["issuedOn"]' [label]='"Issued On"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
-                                </div>
-                                <div class="col-2" style="display: inline-block;">
-                                    <app-date-input [formControl]='userPassports.controls["validity"]' [label]='"Valid Upto"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
-                                </div>
-                                -->
-                                <input type="text" formControlName="issuedOn" class="mx-2 px-2" style="display: inline-block; width: 100px" >
-                                <input type="text" formControlName="validity" class="mx-2 px-2" style="display: inline-block; width: 100px" >
-                                <input type="checkbox" formControlName="isValid" class="mx-2 px-1" style="display: inline-block; width: 50px" >
-                                <div style="width: 50px; display: inline-block;">
-                                    <button (click)="removeUserPP(i)" class="fa fa-trash" style="color:red; float: right;"></button>
+                                <div class="stdd w35" >{{i+1}}</div>
+                                <input type="text" formControlName="passportNo" class="stddmx2 w100"  >
+                                <input type="text" formControlName="nationality" class="stddmx2 w100" >
+                                <input type="checkbox" formControlName="ecnr" class="stddmx2 w50"  >
+                                <div class="stdd b w100">Issued On</div>
+                                <input class="stddmx2 w100"
+                                    type="text"
+                                    placeholder="Issued On"
+                                    formControlName="issuedOn"
+                                    bsDatepicker
+                                    [bsValue]="bsValueDate"
+                                    [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                                >   
+
+                                <div class="stdd b w100">Validity</div>
+                                <input class="stddmx2 w100"
+                                    type="text"
+                                    placeholder="Valid upto"
+                                    formControlName="valdiity"
+                                    bsDatepicker
+                                    [bsValue]="bsValueDate"
+                                    [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                                >   
+                                <input type="checkbox" formControlName="isValid" class="stddmx2 w50" >
+                                <div class="stdd w50" >
+                                    <button (click)="removeUserPP(i)" class="stdd fa fa-trash" style="color:red; float: right;"></button>
                                 </div>
                             </div>
                         </div>
@@ -185,27 +194,27 @@
                         <div formArrayName="entityAddresses" style="height: 10px; font-size: small; " class="my-1 px-0"> 
                             <div *ngFor="let ph of entityAddresses.controls; let i=index"> 
                                 <div [formGroupName]="i">
-                                   <div style="display: inline-block; width: 40px; text-align: right; font-weight: bold; ">Sr.No.</div>
-                                   <div style="display: inline-block; width: 40px; ">{{i+1}}</div>
-                                   <div style="display: inline-block; width: 40px; text-align: right; font-weight: bold; ">Type</div>
-                                   <input type="text" formControlName="addressType" style="display: inline-block; width: 30px;" class="mx-2">
-                                   <div style="display: inline-block; width: 175px; text-align: right;  font-weight: bold;">Is Main Address</div> 
-                                   <input type="checkbox" formControlName="isMain" style="display: inline-block;" class="mx-20">
-                                   <br><div style="display: inline-block; width: 100px; text-align: right; font-weight: bold; ">Address</div> 
-                                   <input type="text" formControlName="add" style="width: 400px; display: inline-block;" class="mx-2">
-                                   <br><div style="display: inline-block; width: 100px; text-align: right;  font-weight: bold;">Street Address</div> 
-                                   <input type="text" formControlName="streetAdd" style="width: 400px; display: inline-block;" class="mx-2">
-                                   <br><div style="display: inline-block; width: 100px; text-align: right;  font-weight: bold;">City</div> 
-                                   <input type="text" formControlName="city" style="width: 100px; display: inline-block;" class="mx-2">
-                                   <div style="display: inline-block; width: 40px; text-align: right;  font-weight: bold;">PIN</div> 
-                                   <input type="text" formControlName="pin" style="width: 60px; display: inline-block;" class="mx-2">
-                                   <br><div style="display: inline-block; width: 100px; text-align: right;  font-weight: bold;">District</div>
-                                   <input type="text" formControlName="district" style="width: 100px; display: inline-block;" class="mx-2">
-                                   <div style="display: inline-block; width: 40px; text-align: right; font-weight: bold; ">State</div>
-                                   <input type="text" formControlName="state" style="width: 100px; display: inline-block;" class="mx-2">
-                                   <div style="display: inline-block; width: 50px; text-align: right; font-weight: bold; ">Country</div>
-                                   <input type="text" formControlName="country" style="width: 100px; display: inline-block;" class="ml-2">
-                                   <div style="width: 50px; display: inline-block;">
+                                   <div class="stdd w40 b alignR" >Sr.No.</div>
+                                   <div class="stdd w40" >{{i+1}}</div>
+                                   <div class="stdd w40 alignR b" >Type</div>
+                                   <input type="text" formControlName="addressType" class="stddmx2 w30">
+                                   <div class="stdd w175 alignR b">Is Main Address</div> 
+                                   <input class="stdd mx-20" type="checkbox" formControlName="isMain" >
+                                   <br><div class="stdd w100 alignR b" >Address</div> 
+                                   <input class="stddmx2 w400" type="text" formControlName="add" >
+                                   <br><div class="stdd alignR b w100" >Street Address</div> 
+                                   <input class="stddmx2 w400" type="text" formControlName="streetAdd" >
+                                   <br><div class="stdd w100 alignR b">City</div> 
+                                   <input class="stddmx2 w100" type="text" formControlName="city" >
+                                   <div class="stdd w40 alignR b" >PIN</div> 
+                                   <input class="stddmx2 w60" type="text" formControlName="pin" >
+                                   <br><div class="stdd w100 alignR b" >District</div>
+                                   <input class="stddmx2 w100"  type="text" formControlName="district" >
+                                   <div class="stdd w40 alignR b" >State</div>
+                                   <input class="stddmx2 w100" type="text" formControlName="state" >
+                                   <div class="stdd w50 alignR b" >Country</div>
+                                   <input class="stdd ml-2 w100" type="text" formControlName="country" >
+                                   <div class="stdd w50">
                                         <button (click)="removeAddress(i)" class="fa fa-trash" style="float: right; color:red; "></button>
                                     </div>    
                                 </div>
@@ -215,21 +224,21 @@
                     </div>
                     <div style="display: inline-block; font-size: small; vertical-align: top;" class="col-5">
                         <div style="font-weight: bold;">Phones</div>
-                        <label class="mx-1" style="width: 40px;">Sr#</label>
-                        <label class="mx-1" style="width: 100px;">Mobile No</label>
-                        <label class="mx-1" style="width: 50px;">Is Main</label>
-                        <label class="mx-1" style="width: 150px;">Remarks</label>
-                        <div style="width: 50px; display: inline-block;">
+                        <label class="stdd mx-1 w40" >Sr#</label>
+                        <label class="stdd mx-1 w100" >Mobile No</label>
+                        <label class="stdd w50 mx-1" >Is Main</label>
+                        <label class="stdd w150 mx-1" >Remarks</label>
+                        <div class="stdd w50" >
                             <button type="button" (click)="addPhone()" class="px-15 fa fa-plus" style="color: blue; float: right;"></button>
                         </div>
-                        <div formArrayName="userPhones" class="my-1 px-0" style="height: 10px; font-size: small;" >
+                        <div formArrayName="userPhones" class="my-1 px-0" style="font-size: small;" >
                             <div *ngFor="let q of userPhones.controls; let j=index">
                                 <div [formGroupName]="j" >
-                                    <div style="display: inline-block; width: 40px;" class="mx-1">{{j+1}}</div>
-                                    <input type="text" formControlName="mobileNo" class="mx-1" style="display: inline-block; width: 100px" >
-                                    <input type="checkbox" formControlName="isMain" class="mx-1" style= "display: inline-block; width: 50px" >
-                                    <input type="text" formControlName="remarks" class="mx-1" style="display: inline-block; width: 150px" >
-                                    <div style="width: 40px; display: inline-block;">
+                                    <div class="stdd w40 mx-1" >{{j+1}}</div>
+                                    <input class="stdd w100 mx-1" type="text" formControlName="mobileNo" >
+                                    <input clss="stdd w50 mx-1" type="checkbox" formControlName="isMain" >
+                                    <input class="stdd w150 mx-1" type="text" formControlName="remarks" >
+                                    <div class="stdd w40" >
                                         <button (click)="removeUserPhone(j)" class="fa fa-trash" style="color:red; float: right;"></button>
                                     </div>
                                 </div>
@@ -241,21 +250,21 @@
                 <tab heading='Experiences' (selectTab)="onTabActivated($event)">
                     <div style="font-weight: bold; font-size: small;">
                         <label style="width: 35px;" >Sr#</label>
-                        <label class="mx-2 px-0" style="width: 125px;">Date From</label>
-                        <label class="mx-2 px-0" style="width: 125px;">Date Upto</label>
-                        <label class="mx-2 px-2" style="width: 150px;">Company</label>
-                        <label class="mx-2 px-2" style="width: 150px;">Position </label>
-                        <label class="mx-2 px-1" style="width: 150px;">Salary drawn</label>
-                        <div style="width: 40px; display: inline-block;">
+                        <label class="w125 mx-2 px-0" >Date From</label>
+                        <label class="w125 mx-2 px-0" >Date Upto</label>
+                        <label class="w150 mx-2 px-2" >Company</label>
+                        <label class="w150 mx-2 px-2" >Position </label>
+                        <label class="w150 mx-2 px-1" >Salary drawn</label>
+                        <div class="stdd w40" >
                             <button type="button" (click)="addUserExperience()" class="fa fa-plus" style="color: blue; float: right;"></button>
                         </div>
                     </div>
                     <div formArrayName="userExperiences" class="my-1 px-0" style="height: 10px; font-size: small;" >
                         <div *ngFor="let q of userExperiences.controls; let i=index">
                             <div [formGroupName]="i" >
-                                <div style="display: inline-block; width: 35px;">{{i+1}}</div>
-                                <input type="text" formControlName="workedFrom" class="mx-2 px-0" style="display: inline-block; width: 125px" >
-                                <input type="text" formControlName="workedUpto" class="mx-2 px-0" style="display: inline-block; width: 125px" >
+                                <div class="stdd w35" >{{i+1}}</div>
+                                <input class="stdd w125 mx-2" type="text" formControlName="workedFrom"  >
+                                <input class="stddmx2 w125" type="text" formControlName="workedUpto" >
                                 <!--`
                                 <div class="col-2" style="display: inline-block;">
                                     <app-date-input [formControl]='form.userExperiences.controls["workedFrom"]' [label]='"Worked From"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
@@ -264,11 +273,11 @@
                                     <app-date-input [formControl]='form.userExperiences.controls["workedUpto"]' [label]='"Worked Upto"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
                                 </div>
                                 -->
-                                <input type="text" formControlName="employer" class="mx-2 px-2" style="display: inline-block; width: 150px" >
-                                <input type="text" formControlName="position" class="mx-2 px-2" style="display: inline-block; width: 150px" >
-                                <input type="text" formControlName="salaryCurrency" class="mx-2 px-1" style="display: inline-block; width: 50px" >
-                                <input type="number" formControlName="monthlySalaryDrawn" class="mx-2 px-0" style="display: inline-block; width: 100px" >
-                                <div style="width: 50px; display: inline-block;">
+                                <input class="stddmx2 w150 px-2" type="text" formControlName="employer"  >
+                                <input class="stddmx2 w150 px-2" type="text" formControlName="position"  >
+                                <input type="text" formControlName="salaryCurrency" class="stddmx2 w50 px-1"  >
+                                <input type="number" formControlName="monthlySalaryDrawn" class="stddmx2 w100 " >
+                                <div class="stdd w50" >
                                     <button (click)="removeUserExperience(i)" class="fa fa-trash" style="color:red; float: right;"></button>
                                 </div>
                             </div>

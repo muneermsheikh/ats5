@@ -7,7 +7,8 @@ export interface IUser {
      photoUrl: string;
      gender: string;
      */
-    username: string;
+     loggedinEmployeeId: number;
+     username: string;
      email: string;
      displayName: string;
      token: string;

@@ -1,0 +1,161 @@
+<div class="stdd col-4">
+    <div class="mb-4">
+        <div class="btn-group" name='container'>
+            <button class="btn btn-primary" btnRadio='Unread'  
+                (click)="getMessages()">
+                <i class="fa fa-envelope"></i> Unread
+            </button>
+            <button class="btn btn-primary" btnRadio='Inbox' 
+                (click)="getInboxMessages()">
+                <i class="fa fa-envelope-open"></i> Inbox
+            </button>
+            <button class="btn btn-primary" btnRadio='Sent' 
+                (click)="getOutboxMessages()">
+                <i class="fa fa-paper-plane"></i> Outbox
+            </button>
+        </div>
+        <br>
+        <div class="d-flex mt-2" *ngIf="totalCount > 0">
+           <app-pager 
+                [pageSize]="mParams.pageSize" 
+                [totalCount]="totalCount" 
+                [pageNumber]="mParams.pageIndex" 
+                (pageChanged)="onPageChanged($event)"  >
+           </app-pager>
+       </div>
+       <div class="stdd w100">Sender</div>
+       <div class="stdd w75">Sent On</div>
+       <div class="stdd w150">Recipient</div>
+        <div class="stdd w200">Subject</div>       
+       <div *ngFor="let msg of messages">
+            <div class="stdd w100">{{msg.senderUsername}}</div>
+            <div class="stdd w75" title="click to display the message" >{{msg.messageSentOn | date: 'd-MMM-yy' }}</div>  
+            <div class="stdd w150 my-1" title="click to display the message" (click)="setMessageFromUsername(msg)"  >{{msg.recipientUserName}}</div>
+            <div class="stdd w200">{{msg.subject.substr(1,150)}}</div>
+            <button (click)="$event.stopPropagation()" (click)="deleteMessage(message.id)" class='stdd btn btn-danger fa fa-trash '></button>
+            <button [disabled]=" !message || msg.messageSentOn===null" (click)="saveMessage(message.id)" class='stdd btn mx-1 fa fa-save '></button>
+            <button [disabled]=" !message || msg.messageSentOn!==null" (click)="saveandsend()" class='stdd btn fa fa-paper-plane '></button>
+
+       </div>
+    </div>
+</div>
+
+<div class="stdd col-8" style="vertical-align: top;" >
+        <div class="row" *ngIf="messages?.length === 0">
+            <div *ngIf="mParams.container==='Inbox'">
+               No Inbox messages for the logged in user
+            </div>
+        </div>
+        <div class="row" *ngIf="messages?.length === 0">
+          <div *ngIf="mParams.container==='sent'">
+             No Sent messages for the logged in user
+          </div>
+      </div>
+      <div class="row" *ngIf="messages?.length === 0">
+          <div *ngIf="mParams.container==='Unread'">
+             No Unread messages for the logged in user
+          </div>
+      </div>
+        <div class="row container" *ngIf="messages?.length > 0">
+            <table class="table table-hover" style="cursor: pointer">
+                <thead>
+                    <tr>
+                        <th style="width: 80%">Message</th>
+                        <th>  </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr [hidden]="loading" *ngIf="message" >    <!-- *ngFor="let message of messages" > -->
+                            <td>
+                                <angular-editor [placeholder]="'Message contents'" [(ngModel)]="message.content"></angular-editor>
+                            </td>
+                            <td>
+                              <div class="fa fa-upload"></div>  
+                              <app-upload></app-upload>
+                            </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+</div>
+ 
+ <!--
+
+<div class="row">
+     <div class="col-2">
+          <ng-container>
+               <div class="stdd b w50 blue">Sort</div>
+                    <select name="" id="" class="custom-select mb-2" (change)="onSortSelected($event.target.value)">
+                         <option *ngFor="let sort of sortOptions"
+                              [value] = "sort.value"
+                         >{{sort.name}}</option>
+                    </select>
+                    <ul class="list-group mb-3">
+                         <li class="list-group-item" *ngFor="let message of emails"
+                             [class.active]="message.id === mParams.id" [value]="message.id"
+                             (click)="onMsgSelected(message.id)">
+                             {{message.senderUsername + ' dt ' + message.messageSent || date}}
+                         </li>
+                     </ul>
+          </ng-container>
+     </div>
+
+     <div class="col-10">
+          <app-paging-header 
+               [totalCount]="totalCount" 
+               [pageNumber]="mParams.pageNumber" 
+               [pageSize]="mParams.pageSize">
+          </app-paging-header>
+
+          <div class="d-flex justify-contents-between align-items-center">
+               <div class="form-inline mt-2" *ngIf="emails">
+                    <input (keyup.enter)="onSearch()" type="text" class="stdd form-control w300" #search placeholder="Search">
+                    <button (click)="onSearch()" class="btn btn-outline-primary my-1">Search</button>
+                    <button (click)="onReset()" class="btn btn-outline-success mx-2 my-1">Reset</button>
+                    <button class="btn btn-outline-success ml-2 my-1 fa fa-plus" routerLink="/messages/add"></button>
+               </div>
+          </div>
+     </div>
+     <div *ngFor="let message of emails; let i=index;">
+          <div class="col-6">
+               <label class="stdd w100">Date</label>
+               <input type="text" class="stdd w100" [(ngModel)]="messageSent" [name]="messageSent" + i >
+               <input class="stdd w125"
+                    type="text"
+                    placeholder="Order Date"
+                    bsDatepicker
+                    [bsValue]="bsValueDate"
+                    [(ngModel)]="messageSent"
+                    [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+               >
+               <br>
+               <label class="stdd w100">From</label>
+               <input type="text" class="stdd w100" [(ngModel)]="senderUsername" [name]="senderUsername" + i >
+          </div>
+          <div class="col-6">
+               <label class="stdd w100">To</label>
+               <input type="text" class="stdd w100" [(ngModel)]="recipientUsername" + i [name]="recipientUsername" + i >
+               <br>
+               <label class="stdd w100">Subject</label>
+               <input type="text" class="stdd w100" [(ngModel)]="subject" [name]="subject" + i >
+          </div>
+          <div>
+               <label class="stdd w100">Message</label>
+               <textarea name="content" id="" cols="60" rows="10" [(ngModel)]="content" [name]="content" + i ></textarea>
+          </div>
+     
+     </div>
+
+     <div class="d-flex justify-content-between align-items-center mt-2" *ngIf="totalCount > 0">
+          <app-pager 
+               [pageSize]="mParams.pageSize" 
+               [totalCount]="totalCount" 
+               [pageNumber]="mParams.pageNumber" 
+               (pageChanged)="onPageChanged($event)"  >
+          </app-pager>
+     </div>
+
+     <button class="stdd mx-2 btn btn-success fa fa-save" (click)="saveandclose()" >Save & Close</button>
+     <button class="stdd mx-2 btn btn-success fa fa-sendmail" (click)="saveandsend()">Save & Send</button>
+</div>
+-->

@@ -142,7 +142,7 @@ namespace infra.Data
             
 
                 if(!context.AssessmentStandardQs.Any()) {
-                    var jsonData = File.ReadAllText("../infra/data/SeedData/AssessmentQBankSeedData.json");
+                    var jsonData = File.ReadAllText("../infra/data/SeedData/AssessmentStddQsSeedData.json");
                     var fileData = JsonSerializer.Deserialize<List<AssessmentStandardQ>>(jsonData);
                     foreach(var item in fileData) {
                         context.AssessmentStandardQs.Add(item);

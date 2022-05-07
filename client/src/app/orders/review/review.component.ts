@@ -1,12 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TabDirective, TabsetComponent } from 'ngx-bootstrap/tabs';
 import { take } from 'rxjs/operators';
 import { AccountService } from 'src/app/account/account.service';
 import { IContractReview } from 'src/app/shared/models/contractReview';
-import { IContractReviewItem } from 'src/app/shared/models/contractReviewItem';
-import { IReviewItem } from 'src/app/shared/models/reviewItem';
 import { IUser } from 'src/app/shared/models/user';
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { BreadcrumbService } from 'xng-breadcrumb';
@@ -17,12 +14,9 @@ import { ReviewService } from '../review.service';
   templateUrl: './review.component.html',
   styleUrls: ['./review.component.css']
 })
-export class ReviewComponent implements OnInit {
-  //@ViewChild('memberTabs', {static: true}) memberTabs: TabsetComponent;
-  //activeTab: TabDirective;
-  routeId: string;
-
-  review: IContractReview;
+export class ReviewComponent {
+  
+  data: IContractReview[];
   user: IUser;
   
   form: FormGroup;
@@ -39,177 +33,110 @@ export class ReviewComponent implements OnInit {
       private activatedRoute: ActivatedRoute, private router: Router, private sharedService: SharedService,
       private accountService: AccountService, private fb: FormBuilder) {
     this.bcService.set('@contractReview',' ');
-    this.routeId = this.activatedRoute.snapshot.params['id'];
     this.accountService.currentUser$.pipe(take(1)).subscribe(user => this.user = user);
+    this.activatedRoute.data.subscribe(response => {
+      this.data = response.review
+    })
+      this.form = this.fb.group({
+        reviews: this.fb.array([]),
+      });
+      this.patchForm();
    }
 
-  ngOnInit(): void {
-      //this.routeId = this.activatedRoute.snapshot.params['id'];
 
-      this.createForm();
-      this.getReview(+this.routeId);
-  
-  }
+   patchForm() {
+     /* var tempdata = { 
+       reviews: [ 
+         { id: 1, orderId: 3, orderNo: 1000, OrderDate: '2020-10-10T10:00:00', customerId: 5, reviewedBy: 0, reviewedOn: '2022-03-24T21:54:33', rvwStatusId: 0, releasedForProduction: 0, 
+            "reviewItems": [] }, 
+          { "id": 0, "orderId": 0, "orderNo": 0, "OrderDate": "", "customerId": 0, "reviewedBy": 0, "reviewedOn": "", "rvwStatusId": 0, "releasedForProduction": 0, "reviewItems": [ { "id": 0, "contractReviewId": 0, "orderId": 0, "orderItemId": 0, "categoryName": "", "quantity": 0, "ecnr": false, "requireAssess": false, "sourceFrom": "", "reviewItemStatus": 0, "reviewQs": [ { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" } ] }, { "id": 0, "contractReviewId": 0, "orderId": 0, "orderItemId": 0, "categoryName": "", "quantity": 0, "ecnr": false, "requireAssess": false, "sourceFrom": "", "reviewItemStatus": 0, "reviewQs": [ { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" }, { "id": 0, "orderItemId": 0, "contractReviewItemId": 0, "srNo": 0, "reviewParameter": "", "response": false, "isMandatoryTrue": false, "remarks": "" } ] } ] } ] }
+    */
+    this.reviews().clear();
+    var review: FormGroup = this.newReview();
+    this.reviews().push(review);
 
-  createForm() {
-    this.form = this.fb.group({
-        id: [null], 
-        orderId: 0,  
-        orderNo: 0, 
-        OrderDate: '', 
-        customerId: 0, 
-        reviewedBy: 0, 
-        reviewedOn: '', 
-        rvwStatusId: 0, 
-        releasedForProduction: 0,
-        contractReviewItems: this.fb.array([])
-    } 
-    );
-
-    this.loadReview();
-  }
-
-  
-  loadReview() {
-    this.service.getReview(+this.routeId).subscribe( response => {
-      this.review = response;
-      this.form.patchValue(this.review);
-      if(this.review.contractReviewItems != null) {
-        for(const p of this.review.contractReviewItems) {
-          this.contractReviewItems.push(new FormControl(p));
-        }
-      }
-    })
-  }
-
-  setExistingReviews(rvws: IReviewItem[]): FormArray {
-      const formArray = new FormArray([]);
-      rvws.forEach(q => {
-        formArray.push(this.fb.group({
-          id: q.id, orderItemId: q.orderItemId, contractReviewItemId: q.contractReviewItemId, 
-          srNo: q.srNo, reviewParameter: q.reviewParameter, response: q.response,
-          isMandatoryTrue: q.isMandatoryTrue, remarks: q.remarks
-        }))
-      });
-      return formArray;
-  }
-
-  getReview(id: number) {
-    this.service.getReview(id).subscribe( response => {
-      this.review = response;
-      this.editReview(this.review);
-    })
-  }
-  
-  editReview(rvw: IContractReview) {
-      this.form.patchValue( {
-        id: rvw.id, orderId: rvw.orderId, orderNo: rvw.orderNo, OrderDate: rvw.orderDate, 
-        customerId: rvw.customerId, reviewedBy: rvw.reviewedBy, reviewedOn: rvw.reviewedOn, 
-        rvwStatusId: rvw.rvwStatusId, releasedForProduction: rvw.releasedForProduction,
+     this.data.forEach(r => {
+      var review: FormGroup = this.newReview();
+      this.reviews().push(review);
+ 
+      r.contractReviewItems.forEach(i => {
+        var item = this.newReviewItem();
+        (review.get("reviewItems") as FormArray).push(item);
+        
+        i.reviewItems.forEach(q => {
+          (item.get("reviewQs") as FormArray).push(this.newReviewQ())
+        })
+ 
     });
-
-    if (rvw.contractReviewItems != null) {
-      console.log('updating contractreviewitems');
-      this.form.setControl('contractReviewItems', this.setExistingItems(rvw.contractReviewItems));
-    }
+  });
+  
+  console.log(this.data);
+  this.form.patchValue(this.data);
   }
-    
-  setExistingItems(items: IContractReviewItem[]): FormArray {
-    const formArray = new FormArray([]);
-    items.forEach(ph => {
-      formArray.push(this.fb.group({
-          id: ph.id, contractReviewId: ph.contractReviewId, orderId: ph.orderId, orderItemId: ph.orderItemId,
-          categoryName: ph.categoryName, quantity: ph.quantity, ecnr: ph.ecnr, requireAssess: ph.requireAssess,
-          sourceFrom: ph.sourceFrom, reviewItemStatus: ph.reviewItemStatus
-      }));
-      
-      //if (ph.reviewItems !=null) this.form.setControl('reviewItems', this.setExistingReviews(ph.reviewItems));
-    });
-    return formArray;
-  }
-
-   
-
-  //userPhones
-      get contractReviewItems() : FormArray {
-        return this.form.get("contractReviewItems") as FormArray
+  
+  //reviews
+      reviews(): FormArray {
+        return this.form.get("reviews") as FormArray
       }
-      
-      newContractReviewItem(): FormGroup {
+
+      newReview(): FormGroup {
         return this.fb.group({
-            id: 0, contractReviewId: 0, orderId: 0, orderItemId: 0, categoryName: '', quantity: 0, ecnr: false, 
-            requireAssess: false, sourceFrom: '', reviewItemStatus: 0
+          id: 0,  orderId: 0,  orderNo: 0, OrderDate: '', customerId: 0, reviewedBy: 0, 
+          reviewedOn: '', rvwStatusId: 0, releasedForProduction: 0, reviewItems: this.fb.array([])
         })
       }
-      
-      addContractReviewItem() {
-        this.contractReviewItems.push(this.newContractReviewItem());
-      }
-      
-      removeContractReviewItem(i:number) {
-        this.contractReviewItems.removeAt(i);
-        this.contractReviewItems.markAsDirty();
-        this.contractReviewItems.markAsTouched();
+
+      addNewReview() {
+        this.reviews().push(this.newReview());
       }
 
   //reviewItems
-      reviewItems(i: number) : FormArray {
-        return this.contractReviewItems.at(i).get("reviewItems") as FormArray
-        //return this.contractReviews().at(ti).get("contractReviewItems") as FormArray
+      reviewItems(i: number): FormArray {
+        return this.reviews().at(i).get("reviewItems") as FormArray
       }
 
       newReviewItem(): FormGroup {
         return this.fb.group({
-          id: 0, orderItemId: 0, contractReviewItemId: 0, srNo: 0, reviewParameter: '', response: false,
+            id: 0, contractReviewId: 0, orderId: 0, orderItemId: 0, categoryName: '', quantity: 0, ecnr: false, 
+            requireAssess: false, sourceFrom: '', reviewItemStatus: 0,
+            reviewQs: this.fb.array([])
+        })
+      }
+
+      addNewReviewItem(i: number) {
+        this.reviewItems(i).push(this.newReviewItem());
+      }
+
+  //Questions
+      reviewQs(i: number, j: number) : FormArray {
+        return this.reviewItems(i).at(j).get("reviewQs") as FormArray
+      }
+
+      newReviewQ(): FormGroup {
+        return this.fb.group({
+          id: 0, orderItemId: 0, contractReviewItemId: 0, srNo: 0, reviewParameter: ['', Validators.required], response: false,
             isMandatoryTrue: false, remarks: ''
         })
       }
 
-      addReviewItem() {
-        this.contractReviewItems.push(this.newReviewItem());
-        //this.contractReviewItems(ti).push(this.newContractReviewItem());
+      addReviewQ(i: number, j: number) {
+        this.reviewQs(i, j).push(this.newReviewQ());
       }
 
-      removeReviewItem(i:number, j: number) {
-        this.reviewItems(i).removeAt(j);
-        this.reviewItems(i).markAsDirty();
-        this.reviewItems(i).markAsTouched();
+      removeReviewQ(i:number, j: number, k: number) {
+        this.reviewQs(i, j).removeAt(k);
+        this.reviewQs(i, j).markAsDirty();
+        this.reviewQs(i, j).markAsTouched();
       }
 
-
-  // various gets
-/*
-      loadMember() {
-        this.service.getCandidate(+this.routeId).subscribe(
-          response => {
-              this.reviews = response;  
-              console.log('load reviews', this.reviews);
-              this.form.patchValue(this.reviews);
-              if(this.reviews.userPassports != null) {for(const p of this.reviews.userPassports) {this.userPassports.push(new FormControl(p));}}
-              if(this.reviews.userPhones !=null){for(const ph of this.reviews.userPhones) { this.userPhones.push(new FormControl(ph)); }}
-              if (this.reviews.userQualifications != null) {for(const q of this.reviews.userQualifications) { this.userQualifications.push(new FormControl(q)); }}
-              if (this.reviews.userProfessions != null) {for(const p of this.reviews.userProfessions) { this.userProfessions.push(new FormControl(p)); }}
-              if (this.reviews.userExperiences != null) {for(const e of this.reviews.userExperiences) { this.userExperiences.push(new FormControl(e)); }}
-              if (this.reviews.userAttachments != null) {for(const a of this.reviews.userAttachments) { this.userAttachments.push(new FormControl(a)); }}
-            }
-        )} 
-*/
-      onSubmit() {
-        if (+this.routeId ===0) {
-          this.CreateCV();
-        } else {
-          //this.UpdateCandidate();
-        }
-      }
-
-      private CreateCV() {
-        this.service.register(this.form.value).subscribe(response => {
-        }, error => {
-          console.log(error);
-          this.errors = error.errors;
-        })
-      }
-
+  onSubmit() {
+    this.service.register(this.form.value).subscribe(response => {
+    }, error => {
+      console.log(error);
+      this.errors = error.errors;
+    })
+  }
+ 
       
 
 }

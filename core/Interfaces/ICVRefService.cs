@@ -13,7 +13,7 @@ namespace core.Interfaces
         Task<ICollection<CustomerReferralsPendingDto>> CustomerReferralsPending(int userId);
         Task<CVRef> GetReferralById(int cvrefid);
         Task<CVRef> GetReferralByCandidateAndOrderItem(int candidateId, int orderItemId);
-        Task<ICollection<EmailMessage>> MakeReferralsAndCreateTask (ICollection<int> CVReviewIds, LoggedInUserDto loggedInUserDto);
+        Task<MessagesDto> MakeReferralsAndCreateTask (ICollection<int> CVReviewIds, LoggedInUserDto loggedInUserDto);
         Task<bool> EditReferral (CVRef cvref);
         Task<bool> DeleteReferral (CVRef cvref);
     }

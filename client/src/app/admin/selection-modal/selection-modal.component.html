@@ -1,0 +1,84 @@
+<div class="mx-2 mt-2">
+     {{title}}
+</div>
+
+<button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+     <span aria-hidden="true">&times;</span>
+ </button>
+
+<hr>
+<div class="modal-body">
+     <form #form="ngForm" id="form">
+          <label class="stdd b">Salary Currency: </label>
+          <input type="text" style="margin-left: 10px;"
+               class="form-text-input"
+               [(ngModel)]="emp.salaryCurrency"
+          >
+          <label class="stdd b mx-2">Salary: </label>
+          <input type="text" class="form-text-input mx-2 stdd" [(ngModel)]="emp.salary">
+          <br>
+          <label class="stdd b mx-2">Contract Period (in months): </label>
+          <input type="text" class="form-text-input mx-2 stdd" [(ngModel)]="emp.contractPeriodInMonths">
+          <br>
+          <label class="stdd b mx-2">Leave after months: </label>
+          <input type="text" class="form-text-input mx-2 stdd" [(ngModel)]="emp.leaveAirfareEntitlementAfterMonths">
+          <br><br>
+          <label class="stdd b ml-150">Provided<br>Free</label>
+          <label class="stdd b">Allowance</label>
+          <label class="stdd">Accommodation: </label>
+          <input type="checkbox" style="margin-left: 50px;"
+               class="form-check-input"
+               [checked]="emp.housingProvidedFree"
+          >
+          <input style="margin-left: 50px; width: 200px; display: inline-block;" 
+               type="text"  [name]="'accomodationallowance'" 
+               [(ngModel)]="emp.housingAllowance"
+          >     
+          
+          <label class="stdd">Food: </label>
+          <input type="checkbox" style="margin-left: 50px;"
+               class="form-check-input"
+               [checked]="emp.foodProvidedFree"
+               [(ngModel)]="emp.foodProvidedFree"
+          >
+          <input style="margin-left: 50px; width: 200px; display: inline-block;" 
+               type="text"  [name]="'foodallowance'" 
+               [(ngModel)]="emp.foodAlowance"
+          >     
+
+          <label class="stdd">Transport: </label>
+          <input type="checkbox" style="margin-left: 50px;"
+               class="form-check-input"
+               [checked]="emp.transportAllowance"
+          >
+          <input style="margin-left: 50px; width: 200px; display: inline-block;" 
+               type="text"  [name]="'transportallowance'" 
+               [(ngModel)]="emp.transportAllowance"
+          >     
+
+          <label class="stdd">Other Allowance: </label>
+          <input style="margin-left: 250px; width: 200px; display: inline-block;" 
+               type="text"  [name]="'otherallowance'" 
+               [(ngModel)]="emp.otherAllowance"
+          >     
+
+          <br><br>
+          <label class="stdd b mx-2">Offer Accepted On: </label>
+          <input class="stddmx2 w150"
+               type="text"
+               placeholder="Date of birth"
+               formControlName="dOB"
+               bsDatepicker
+               [bsValue]="emp.offerAcceptedOn"
+               [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+          >  
+          <label class="stdd b mx-2">Remarks: </label>
+          <input type="text" class="form-text-input mx-2 stdd" [(ngModel)]="emp.remarks">
+
+     </form>
+</div>
+
+<div class="modal-footer">
+     <button type="button" class="btn btn-default fa fa-cancel" (click)="bsModalRef.hide()"></button>
+     <button type="button" class="btn btn-success fa fa-save" (click)="emitEmployment()"></button>
+</div>

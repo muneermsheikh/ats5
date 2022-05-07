@@ -316,13 +316,13 @@ namespace infra.Services
                throw new NotImplementedException();
           }
 
-          public async Task<ICollection<ChooseAgentDto>> GetOfficialDetails()
+          public async Task<ICollection<CustomerOfficialDto>> GetOfficialDetails()
           {
                var offs = await (from c in _context.Customers
                          .Where(x => x.CustomerType == "associate" && x.CustomerStatus==EnumCustomerStatus.Active )
                          join o in _context.CustomerOfficials on c.Id equals o.CustomerId where o.IsValid
-                         select new ChooseAgentDto(c.Id, c.CustomerName, o.Id, o.OfficialName, c.City, 
-                              o.Designation, o.Title, o.Email, o.PhoneNo, o.Mobile)
+                         select new CustomerOfficialDto(o.Id, c.Id,  c.CustomerName, c.City, o.Title, 
+                              o.OfficialName, o.Designation, o.Email, o.Mobile)
                     ).ToListAsync();
                
                return offs;

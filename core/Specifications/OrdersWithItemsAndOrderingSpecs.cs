@@ -11,7 +11,8 @@ namespace core.Specifications
             : base(x =>
                 (!specParams.Id.HasValue || x.Id == specParams.Id) &&
                 (!specParams.CustomerId.HasValue || x.CustomerId  == specParams.CustomerId) &&
-                (!specParams.Status.HasValue || (int)x.Status == specParams.Status) 
+                (!specParams.Status.HasValue || (int)x.Status == specParams.Status) &&
+                (string.IsNullOrEmpty(specParams.CityOfWorking) || x.CityOfWorking.ToLower() == specParams.CityOfWorking.ToLower() )
                 /* &&
                 (!specParams.OrderDateFrom.HasValue && specParams.OrderDateUpto.HasValue || 
                     x.OrderDate.Date ==specParams.OrderDateFrom) &&

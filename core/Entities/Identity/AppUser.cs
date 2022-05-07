@@ -12,6 +12,7 @@ namespace core.Entities.Identity
         public DateTime LastActive { get; set; } = DateTime.Now;
         public string Gender { get; set; }
         public string DisplayName { get; set; }
+        public int loggedInEmployeeId {get; set;}
         //public Address Address { get; set; }
         
         //public int UserPassportId { get; set; }

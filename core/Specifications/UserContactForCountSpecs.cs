@@ -6,16 +6,13 @@ namespace core.Specifications
 {
      public class UserContactForCountSpecs : BaseSpecification<UserHistory>
      {
-          public UserContactForCountSpecs(UserHistorySpecParams specParams)
+          public UserContactForCountSpecs(UserHistoryParams specParams)
             : base(x => 
-                (string.IsNullOrEmpty(specParams.PartyName) || (x.PartyName.ToLower().Contains(specParams.PartyName.ToLower())) &&
-                (string.IsNullOrEmpty(specParams.AadharNo) || x.AadharNo == specParams.AadharNo) &&
+                (string.IsNullOrEmpty(specParams.PersonName) || (x.PersonName.ToLower().Contains(specParams.PersonName.ToLower())) &&
                 (string.IsNullOrEmpty(specParams.EmailId) || x.EmailId == specParams.EmailId) &&
-                (string.IsNullOrEmpty(specParams.PhoneNo) || x .AadharNo == specParams.PhoneNo) &&
+                (string.IsNullOrEmpty(specParams.MobileNo) || x .PhoneNo == specParams.MobileNo) &&
                 (!specParams.Id.HasValue || x.Id == (int)specParams.Id) &&
-                (!specParams.CandidateId.HasValue || x.CandidateId == (int)specParams.CandidateId) &&
-                (!specParams.CustomerOfficialId.HasValue || x.CustomerOfficialId == (int)specParams.CustomerOfficialId) &&
-                (!specParams.ApplicationNo.HasValue || x.ApplicationNo == (int)specParams.ApplicationNo))
+                (!specParams.PersonId.HasValue || x.PersonId == (int)specParams.PersonId)) 
             )
           {
           }

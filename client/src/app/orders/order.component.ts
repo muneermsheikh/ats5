@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ICustomerNameAndCity } from '../shared/models/customernameandcity';
 import { IOrderBrief } from '../shared/models/orderBrief';
 import { IOrderCity } from '../shared/models/orderCity';
-import { orderParams } from '../shared/models/orderParams';
+import { orderParams } from '../shared/params/orderParams';
 import { IProfession } from '../shared/models/profession';
 import { SharedService } from '../shared/services/shared.service';
 import { OrderService } from './order.service';
@@ -47,7 +47,6 @@ export class OrderComponent implements OnInit {
     
   }
 
-  
   getOrders(useCache=false) {
     this.service.getOrders(useCache).subscribe(response => {
       this.orders = response.data;
@@ -100,6 +99,7 @@ export class OrderComponent implements OnInit {
   }
   
   onCitySelected(citySelected: string) {
+    console.log('cityseleceted', citySelected);
     const prms = this.service.getOParams();
     prms.city = citySelected;
     prms.pageNumber=1;

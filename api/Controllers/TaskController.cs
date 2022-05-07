@@ -43,13 +43,13 @@ namespace api.Controllers
                     LoggedInAppUserId = 1026 //     User.GetIdentityUserId()
                };
 
-               var emailMessages = await _taskService.CreateNewApplicationTask(task, loggedIn);
+               var emailMessages = await _taskService.CreateNewApplicationTask(task, loggedIn.LoggedInEmployeeId);
                var AttachmentFilePaths = new List<string>();
                if (emailMessages != null &&
                    task.PostTaskAction != EnumPostTaskAction.OnlyComposeEmailAndSMSMessages
                    && task.PostTaskAction != EnumPostTaskAction.OnlyComposeEmailMessage)   //Send involed
                {
-                    foreach (var msg in emailMessages)
+                    foreach (var msg in emailMessages.emailMessages)
                     {
                         _emailService.SendEmail(msg, AttachmentFilePaths);
                     }
@@ -60,9 +60,11 @@ namespace api.Controllers
           }
 
           [HttpPut]
-          public async Task<ActionResult<ApplicationTask>> EditApplicationTask(ApplicationTask task)
+          public async Task<ActionResult<MessagesDto>> EditApplicationTask(ApplicationTask task)
           {
-               return await _taskService.EditApplicationTask(task);
+               var employeeId = User.GetUserIdentityUserEmployeeId();
+
+               return await _taskService.EditApplicationTask(task, employeeId);
           }
 
           [HttpDelete]

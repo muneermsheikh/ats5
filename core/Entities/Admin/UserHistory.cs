@@ -10,27 +10,24 @@ namespace core.Entities.Admin
         {
         }
 
-        public UserHistory(int candidateid, string aadharno, string partyname, int applicationno, ICollection<UserHistoryItem> items)
+        public UserHistory(int personid, string personname, ICollection<UserHistoryItem> items)
         {
-            CandidateId = candidateid;
-            ApplicationNo = applicationno;
-            PartyName = partyname;
-            AadharNo = aadharno;
+            PersonId = personid;
+            PersonName = personname;
             UserHistoryItems = items;
         }
-        public UserHistory(int officialid, string partyname)
+        public UserHistory(int personid, string personname)
         {
-            CustomerOfficialId = officialid;
-            PartyName = partyname;
+            PersonId = personid;
+            PersonName = personname;
         }
 
-        public string PartyName {get; set;}
-        public int CustomerOfficialId {get; set;}
-        public int CandidateId {get; set;}
-        public string AadharNo {get; set;}
+        public string PersonType {get; set;}
+        public int PersonId {get; set;}
+        public int? ApplicationNo {get; set;}
+        public string PersonName {get; set;}
         public string PhoneNo {get; set;}
         public string EmailId {get; set;}
-        public int ApplicationNo {get; set;}
         public DateTime CreatedOn {get; set;}
         public ICollection<UserHistoryItem> UserHistoryItems {get; set;}
     }

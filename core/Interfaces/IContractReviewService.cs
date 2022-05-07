@@ -11,7 +11,7 @@ namespace core.Interfaces
     public interface IContractReviewService
     {
         Task<Pagination<ContractReview>> GetContractReviews(ContractReviewSpecParams cParams);
-        Task<ContractReview> GetContractReview(int id);
+        Task<ContractReview> GetOrAddContractReview(int id, int loggedInEmployeeid);
         Task<ContractReview> CreateContractReviewObject(int orderId, int AppUserId);
         //Task<bool> UpdateContractReview(ContractReview cReview);
         Task<ContractReview> GetContractReviewDtoByOrderIdAsync(int orderId);
@@ -25,6 +25,7 @@ namespace core.Interfaces
 
         //Task<ContractReview> GetContractReview(int orderId);
         //void EditContractReview (ContractReview review);
+        Task<ICollection<ReviewItemData>> GetReviewData();
         void AddReviewStatus (string reviewStatusName);
         void AddReviewItemStatus (string reviewItemStatusName);
         Task<ICollection<ReviewStatus>> GetReviewStatus();

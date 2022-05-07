@@ -1,0 +1,19 @@
+.stdd {
+     display: inline-block;
+}
+.stddmx2 {
+     display: inline-block;
+     margin-left: 2px;
+     margin-right: 2px;
+}
+.b {font-weight: bold;}
+.alignR {text-align: right;}
+.w30 {width: 30px;}
+.w50 {width: 50px;}
+.w60 {width: 60px;}
+.w75 {width: 75px;}
+.w100 {width: 100px;}
+.w125 {width: 125px;}
+.w135{width: 135px;}
+.w150 {width: 150px;}
+.w350 {width: 350px;}

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { IPaginationCandidate } from '../shared/models/paginationCandidate';
+import { IPaginationCandidate } from '../shared/pagination/paginationCandidate';
 import { IUserHistoryDto } from '../shared/models/userHistoryDto';
 import { IUserHistorySearch } from '../shared/models/userHistorySearch';
 import { userHistorySpecParams } from '../shared/models/userHistorySpecParams';

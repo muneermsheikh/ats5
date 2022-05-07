@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -12,6 +12,8 @@ import { IEmployeeIdAndKnownAs } from 'src/app/shared/models/employeeIdAndKnownA
 import { IUser } from 'src/app/shared/models/user';
 import { IUserHistory } from 'src/app/shared/models/userHistory';
 import { IUserHistoryItem } from 'src/app/shared/models/userHistoryItem';
+import { userHistoryParams } from 'src/app/shared/params/userHistoryParams';
+import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { TaskReminderModalComponent } from 'src/app/userTask/task-reminder-modal/task-reminder-modal.component';
 import { UserTaskService } from 'src/app/userTask/user-task.service';
 import { BreadcrumbService } from 'xng-breadcrumb';
@@ -23,9 +25,9 @@ import { CandidateHistoryService } from '../candidate-history.service';
   styleUrls: ['./candidate-history.component.css']
 })
 export class CandidateHistoryComponent implements OnInit {
-
   routeId: string;
   member: IUserHistory;
+  
   user: IUser;
   
   form: FormGroup;
@@ -44,12 +46,18 @@ export class CandidateHistoryComponent implements OnInit {
   bsRangeValue: Date[];
   maxDate = new Date();
   minDate = new Date();
+  //cvParams: candidateParams;
+  histParams: userHistoryParams;
+
+  candidateFromDb: boolean=false;
+  err: string;
 
   constructor(private service: CandidateHistoryService, 
     private bcService: BreadcrumbService, 
     private activatedRoute: ActivatedRoute, 
     private accountService: AccountService, 
     private toastr: ToastrService, 
+    private confirmService: ConfirmService,
     private router: Router, 
     private modalService: BsModalService,
     private userTaskService: UserTaskService,
@@ -66,30 +74,37 @@ export class CandidateHistoryComponent implements OnInit {
     this.activatedRoute.data.subscribe(data => { this.member= data.history;})
     this.activatedRoute.data.subscribe(data => { this.contactResults = data.results;})
     this.activatedRoute.data.subscribe(data => { this.employees = data.employees;})
+    this.histParams = new userHistoryParams();
+    
     this.createForm();
   }
 
   createForm() {
     this.form = this.fb.group({
       id: 0,
-      partyName: '', 
-      candidateId: 0,
-      aadharNo: '', 
+      personName: '', 
+      personId: 0,
+      personType: '', 
       applicationNo: 0, 
+      phoneNo: '',
+      emailId: '',
       createdOn: '',
       userHistoryItems: this.fb.array([]),
     } 
     );
 
-     this.patchMember(this.member);
+    if(this.member != null) this.patchMember(this.member);
+    //this.patchMember(this.member);
   }
 
     patchMember(m: IUserHistory) {
       this.form.patchValue( {
         id: m.id, 
-        candidateId: m.candidateId,
-        partyName: m.partyName,
-        aadharNo: m.aadharNo, 
+        personType: m.personType,
+        personId: m.personId,
+        personName: m.personName,
+        phoneNo: m.phoneNo,
+        emailId: m.emailId,
         applicationNo: m.applicationNo,
         createdOn: m.createdOn
       });
@@ -157,10 +172,10 @@ export class CandidateHistoryComponent implements OnInit {
     this.userHistoryItems.markAsTouched();
   }
 
-  onSubmit() {
+  update() {
     this.service.updateCandidateHistory(this.form.value).subscribe(() => {
-      this.toastr.success('candidate updated');
-      //this.router.navigateByUrl('/candidate');
+      this.toastr.success('candidate history updated');
+      this.router.navigateByUrl('');
 
     }, error => {
       this.toastr.error(error);
@@ -180,7 +195,6 @@ export class CandidateHistoryComponent implements OnInit {
     
     this.bsModalRef.content.updatedRemidner.subscribe(values => {
       taskDto = values;
-      console.log('returned from task reminder modal', taskDto);
       if(taskDto ===undefined) {
         this.toastr.warning('failed to retrieve the emitted object');
         return;
@@ -196,22 +210,27 @@ export class CandidateHistoryComponent implements OnInit {
       appTask.taskStatus=taskDto.taskStatus;
       appTask.taskTypeId=taskDto.taskTypeId;
 
+      this.toastr.info('calling userTaskService to create task');
       this.userTaskService.createTaskFromAppTask(appTask).subscribe(response => {
-        this.toastr.success('task created');
-      }, error => {
-        this.toastr.warning('failed to create the task');
-      })
+        if (response) this.toastr.success('task created');
+        }, error => {
+          this.toastr.warning('failed to create the task');
+        })
     }, error => {
-      this.toastr.warning('failed to create task', error);
+      this.toastr.warning('failed to retrieve the task', error);
     })
   }
 
-  private getReminderObject(i: number): IApplicationTaskInBrief {
+    private getReminderObject(i: number): IApplicationTaskInBrief {
     const dt= new Date().toISOString();
     const dt1 = new Date(dt);
     //var arrayControl = this.form.get('userHistoryItems') as FormArray;
     //const disc = arrayControl.at(i).get('gistOfDiscussions').value;
-    
+    const user: IUser = JSON.parse(localStorage.getItem('user'));
+    if(user.loggedinEmployeeId === 0) {
+      this.toastr.error('cannot get logged in user employee id');
+      return null;
+    }
     let obj = new ApplicationTaskInBrief();
     obj.id=0, obj.taskTypeId = 0, obj.taskTypeName ='',
     obj.taskDate = new Date(); obj.taskOwnerId=0,
@@ -219,8 +238,49 @@ export class CandidateHistoryComponent implements OnInit {
     obj.assignedToName='', obj.completeBy=new Date(dt1.setDate(dt1.getDate()+ 7)),
     obj.taskStatus='not started'
     obj.taskDescription='reminder for ';
+    obj.taskOwnerName=user.username;
+    obj.taskOwnerId=user.loggedinEmployeeId;
 
     return obj;
     };
 
+    routeChange() {
+      if (this.form.dirty) {
+          this.confirmService.confirm('Confirm move to another page', 
+          'This form has data that is not saved; moving to another page will not commit the save. ' + 
+          'Do you want to move to another page without saving the data?')
+          .subscribe(result => {
+            if (result) {
+              this.router.navigateByUrl('');
+            }
+          })
+      } else {
+        this.router.navigateByUrl('');
+      }
+    }
+    
+
+    getCandidate() {
+      this.err='';
+        this.histParams.createNewIfNull=this.candidateFromDb;
+        if (this.histParams.mobileNo==='' && this.histParams.emailId ==='' && this.histParams.applicationNo === 0 ) {
+          this.toastr.warning('no inputs');
+          return;
+        }
+  
+        return this.service.getHistory(this.histParams)
+            .subscribe(response => {
+              this.member = response.body;
+              if(this.member===null || this.member ===undefined) {
+                this.toastr.info('no such history transaction on record');
+                return;
+              }
+              console.log('get candidate got', this.member);
+              this.patchMember(this.member);
+        }, error => {
+          this.err = error;
+          this.toastr.error(error);
+        })
+ 
+  }
 }

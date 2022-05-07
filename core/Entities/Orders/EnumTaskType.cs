@@ -21,16 +21,16 @@ namespace core.Entities.Orders
         [EnumMember(Value="Emigration Application Lodging, by Emig Executive")] EmigrationAppLodging,           //14
         [EnumMember(Value="Travel tickets booking, by Ticketing Exec")] TravelTicketBooking,        //15
         [EnumMember(Value ="Order edited advise")]  OrderEditedAdvise,           //16
-        [EnumMember(Value ="Forward CV to Customer")] CVForwardToCustomers,
-        [EnumMember(Value ="Offer Letter Acceptance by candidate")] OfferLetterAcceptance,
-        [EnumMember(Value ="Medically Fit")] MedicallyFit,
-        [EnumMember(Value = "None")] None,
-        [EnumMember(Value = "Visa Docs submission")] VisaDocSubmission,
-        [EnumMember(Value = "Visa Received")] VisaReceived,
-        [EnumMember(Value = "Emigration Granted")] EmigrationGranted,
-        [EnumMember(Value = "Emigration Docs Submitted")] EmigrationDocsSubmitted,
-        [EnumMember(Value = "Traveled")] Traveled,
-        [EnumMember(Value = "Arrival acknowledged by Client")] ArrivalAcknowledgedByClient
+        [EnumMember(Value ="Forward CV to Customer")] CVForwardToCustomers, //17
+        [EnumMember(Value ="Offer Letter Acceptance by candidate")] OfferLetterAcceptance,      //18
+        [EnumMember(Value ="Medically Fit")] MedicallyFit,      //19
+        [EnumMember(Value = "None")] None,      //20
+        [EnumMember(Value = "Visa Docs submission")] VisaDocSubmission,     //21
+        [EnumMember(Value = "Visa Received")] VisaReceived,         //22
+        [EnumMember(Value = "Emigration Granted")] EmigrationGranted,       //23
+        [EnumMember(Value = "Emigration Docs Submitted")] EmigrationDocsSubmitted,      //24
+        [EnumMember(Value = "Traveled")] Traveled,      //25
+        [EnumMember(Value = "Arrival acknowledged by Client")] ArrivalAcknowledgedByClient      //26
 
     }
 }

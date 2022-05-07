@@ -3,9 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { AccountService } from 'src/app/account/account.service';
 import { IApplicationTaskInBrief } from 'src/app/shared/models/applicationTaskInBrief';
-import { PaginationTask } from 'src/app/shared/models/paginationTask';
 import { IUser } from 'src/app/shared/models/user';
-import { userTaskParams } from 'src/app/shared/models/userTaskParams';
+import { PaginationTask } from 'src/app/shared/pagination/paginationTask';
+import { userTaskParams } from 'src/app/shared/params/userTaskParams';
 import { UserTaskService } from '../user-task.service';
 
 
