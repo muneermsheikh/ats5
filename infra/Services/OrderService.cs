@@ -356,7 +356,7 @@ namespace infra.Services
                                         _unitOfWork.Repository<ApplicationTask>().Update(existingTask);
                                         
                                         var newTaskItem = new TaskItem((int)EnumTaskType.OrderEditedAdvise, existingTask.Id, DateTime.Now,
-                                        "started", "Order Item changed advise to admin and other HR Officials", (int)item.HrExecId, order.Id,
+                                        "started", "Order Item changed advise to admin and other HR Officials", order.Id,
                                              item.Id, order.OrderNo, loggedInUserId, DateTime.Now.AddDays(7), 0, 0, 0//, existingTask
                                         );
                                         _unitOfWork.Repository<TaskItem>().Add(newTaskItem);

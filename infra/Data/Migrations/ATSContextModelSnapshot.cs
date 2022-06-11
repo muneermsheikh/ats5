@@ -52,15 +52,22 @@ namespace infra.Data.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<int>("EnumNo")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("PersonType")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name", "PersonType")
+                        .IsUnique()
+                        .HasFilter("[PersonType] IS NOT NULL");
 
                     b.ToTable("ContactResults");
                 });
@@ -339,11 +346,8 @@ namespace infra.Data.Migrations
                     b.HasIndex("PersonType");
 
                     b.HasIndex("PhoneNo")
-                        .IsUnique();
-
-                    b.HasIndex("PersonId", "PersonType")
                         .IsUnique()
-                        .HasFilter("PersonId > 0");
+                        .HasFilter("PhoneNo != ''");
 
                     b.ToTable("UserHistories");
                 });
@@ -358,8 +362,11 @@ namespace infra.Data.Migrations
                     b.Property<string>("CategoryRef")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ContactResult")
+                    b.Property<int>("ContactResultId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ContactResultName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DateOfContact")
                         .HasColumnType("datetime2");
@@ -369,6 +376,15 @@ namespace infra.Data.Migrations
 
                     b.Property<int>("LoggedInUserId")
                         .HasColumnType("int");
+
+                    b.Property<string>("LoggedInUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PersonType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNo")
                         .HasColumnType("nvarchar(max)");
@@ -1155,6 +1171,9 @@ namespace infra.Data.Migrations
                     b.Property<DateTime>("CheckedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("ChecklistedOk")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("ExceptionApproved")
                         .HasColumnType("bit");
 
@@ -1463,7 +1482,7 @@ namespace infra.Data.Migrations
                     b.Property<int>("ApplicationNo")
                         .HasColumnType("int");
 
-                    b.Property<int>("AttendanceStatusId")
+                    b.Property<int?>("AttendanceStatusId")
                         .HasColumnType("int");
 
                     b.Property<int>("CandidateId")
@@ -1481,13 +1500,13 @@ namespace infra.Data.Migrations
                     b.Property<string>("InterviewMode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("InterviewedDateTime")
+                    b.Property<DateTime?>("InterviewedDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PassportNo")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ReportedDateTime")
+                    b.Property<DateTime?>("ReportedDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ScheduledFrom")
@@ -1496,7 +1515,7 @@ namespace infra.Data.Migrations
                     b.Property<DateTime>("ScheduledUpto")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SelectionStatusId")
+                    b.Property<int?>("SelectionStatusId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -1542,6 +1561,104 @@ namespace infra.Data.Migrations
                     b.HasIndex("InterviewItemCandidateId");
 
                     b.ToTable("InterviewItemCandidatesFollowup");
+                });
+
+            modelBuilder.Entity("core.Entities.HR.ProspectiveCandidate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Age")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("AlternateEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AlternatePhoneNo")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("CandidateName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CategoryRef")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ctc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CurrentLocation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Education")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Natioality")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhoneNo")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("ResumeId")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("ResumeTitle")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StatusByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StatusDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WorkExperience")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ResumeId", "Source")
+                        .IsUnique();
+
+                    b.ToTable("ProspectiveCandidates");
                 });
 
             modelBuilder.Entity("core.Entities.HR.SelectionDecision", b =>
@@ -2686,6 +2803,9 @@ namespace infra.Data.Migrations
                     b.Property<int>("AssignedToId")
                         .HasColumnType("int");
 
+                    b.Property<string>("AssignedToName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CVReviewId")
                         .HasColumnType("int");
 
@@ -2698,6 +2818,9 @@ namespace infra.Data.Migrations
                     b.Property<DateTime>("CompletedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("HistoryItemId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("OrderId")
                         .HasColumnType("int");
 
@@ -2706,6 +2829,9 @@ namespace infra.Data.Migrations
 
                     b.Property<int?>("OrderNo")
                         .HasColumnType("int");
+
+                    b.Property<string>("PersonType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PostTaskAction")
                         .HasColumnType("int");
@@ -2720,6 +2846,9 @@ namespace infra.Data.Migrations
 
                     b.Property<int>("TaskOwnerId")
                         .HasColumnType("int");
+
+                    b.Property<string>("TaskOwnerName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TaskStatus")
                         .IsRequired()
@@ -2756,9 +2885,6 @@ namespace infra.Data.Migrations
                     b.Property<int>("CandidateId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("NextFollowupById")
                         .HasColumnType("int");
 
@@ -2789,11 +2915,17 @@ namespace infra.Data.Migrations
                     b.Property<int>("TaskTypeId")
                         .HasColumnType("int");
 
+                    b.Property<string>("TaskTypeName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -2916,6 +3048,9 @@ namespace infra.Data.Migrations
                         .HasMaxLength(75)
                         .IsUnicode(false)
                         .HasColumnType("VARCHAR(75)");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -3200,9 +3335,6 @@ namespace infra.Data.Migrations
                     b.Property<int>("CandidateId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CandidateId1")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsMain")
                         .HasColumnType("bit");
 
@@ -3211,8 +3343,8 @@ namespace infra.Data.Migrations
 
                     b.Property<string>("MobileNo")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
@@ -3220,8 +3352,6 @@ namespace infra.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CandidateId");
-
-                    b.HasIndex("CandidateId1");
 
                     b.ToTable("UserPhones");
                 });
@@ -3715,17 +3845,11 @@ namespace infra.Data.Migrations
 
             modelBuilder.Entity("core.Entities.Users.UserPhone", b =>
                 {
-                    b.HasOne("core.Entities.Users.Candidate", "Candidate")
-                        .WithMany()
+                    b.HasOne("core.Entities.Users.Candidate", null)
+                        .WithMany("UserPhones")
                         .HasForeignKey("CandidateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("core.Entities.Users.Candidate", null)
-                        .WithMany("UserPhones")
-                        .HasForeignKey("CandidateId1");
-
-                    b.Navigation("Candidate");
                 });
 
             modelBuilder.Entity("core.Entities.Users.UserProfession", b =>

@@ -29,7 +29,7 @@ namespace api.Controllers
                _userManager = userManager;
           }
 
-          [Authorize]
+          [Authorize(Roles ="HRManager, HRSupervisor, HRExecutive, HRTrainee")]
           [HttpPost("newCVReviews")]
           public async Task<ActionResult<CVRvw>> AddNewCVReview(ICollection<CVReviewSubmitByHRExecDto> cvsSubmitted)
           {
@@ -43,7 +43,8 @@ namespace api.Controllers
                    
                return Ok(rvws);
           }
-          [Authorize]
+          
+          [Authorize(Roles ="HRSupervisor, HRManager, HRExecutive, HRTrainee, DocumentControllerAdmin")]
           [HttpGet("{candidateid}/{orderitemid}")]
           public async Task<ActionResult<CVRvw>> GetCVReview(int candidateid, int orderitemid)
           {
@@ -58,7 +59,7 @@ namespace api.Controllers
                return Ok(rvw);
           }
 
-          [Authorize]
+          [Authorize(Roles = "HRExecutive, HRTrainee")]
           [HttpPost("submitToSup")]
           public async Task<ActionResult<ICollection<EmailMessage>>> SubmitCVToSupervisorForReview(ICollection<CVReviewSubmitByHRExecDto> cvsSubmittedDto)
           {
@@ -70,7 +71,7 @@ namespace api.Controllers
                return Ok(msgs);
           }
 
-          [Authorize]
+          [Authorize(Roles ="HRExecutive, HRTrainee")]
           [HttpDelete("hrsup/{id}")]
           public async Task<ActionResult<bool>> DeleteCVSubmittedToHRSup(int id)
           {
@@ -81,7 +82,7 @@ namespace api.Controllers
                return await _cvreviewService.DeleteCVSubmittedToHRSupForReview(id);
           }
 
-          [Authorize]
+          [Authorize(Roles = "HRSupervisor")]
           [HttpPost("sup")]
           public async Task<ActionResult<ICollection<EmailMessage>>> CVReviewByHRSup(ICollection<CVReviewBySupDto> cvsSubmittedDto)
           {
@@ -95,7 +96,7 @@ namespace api.Controllers
           }
 
 
-          [Authorize]
+          [Authorize(Roles ="HRManager")]
           [HttpPost("hrm")]
           public async Task<ActionResult<ICollection<EmailMessage>>> CVsReviewByHRM(ICollection<CVReviewByHRMDto> cvsReviewed)
           {
@@ -108,7 +109,7 @@ namespace api.Controllers
                return Ok(msgs);
           }
 
-          [Authorize]
+          [Authorize(Roles = "HRSupervisor")]
           [HttpDelete("submittedtohrm/{id}")]
           public async Task<ActionResult<bool>> DeleteCVSubmittedToHRM(int id)
           {
@@ -125,6 +126,7 @@ namespace api.Controllers
                return await _cvreviewService.GetCVReviews(orderitemid);
           }
 
+          [Authorize]
           [HttpGet("PendingRvwsOfLoggedInUser")]
           public async Task<ActionResult<ICollection<CVReviewsPendingDto>>> GetPendingReviewsOfLoggedInUser()
           {
@@ -135,6 +137,7 @@ namespace api.Controllers
                return Ok(pendings);
           }
 
+          [Authorize]
           [HttpGet("PendingRvws")]
           public async Task<ActionResult<ICollection<CVReviewsPendingDto>>> GetPendingReviews()
           {

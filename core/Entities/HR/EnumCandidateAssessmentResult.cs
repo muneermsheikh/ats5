@@ -15,6 +15,7 @@ namespace core.Entities.HR
         [EnumMember(Value="Grade D - Very Poor - 49%-")]
         VeryPoor=49,
         [EnumMember(Value ="Not Assessed")]
-        NotAssessed=0
+        NotAssessed=0,
+        [EnumMember(Value ="Not Required")] NotRequired=-1
     }
 }

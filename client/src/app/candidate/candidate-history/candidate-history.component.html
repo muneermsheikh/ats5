@@ -1,4 +1,5 @@
-<div class="stdd col-2 borderBlue" >
+<div *ngIf="member===null || member===undefined" class="stdd col-2 borderBlue" >
+    <!--
     <div class="form-check">
         <label class="stdd">Create new History record</label>
         <input type="checkbox"
@@ -8,9 +9,10 @@
             (change)="candidateFromDb = !candidateFromDb"
         >
     </div>
+-->
 
     <form #frm="ngForm" id="frm">
-        <div class="form-check" style="font-size: medium;">
+        <div class="form-check mt-2" style="font-size: medium;">
             <label class="stdd w150">Application No.</label>
             <input class="stdd w200" type="text" name="applicationNo" 
                  ngModel id="mobileNo" [(ngModel)]="histParams.applicationNo" >
@@ -29,15 +31,18 @@
             <label>Person Type</label>
             <div class="w200 form-group">
                 <input type="radio" name="personType" value="candidate"
-                ngModel [(ngModel)]="histParams.personType" > candidate
-            <input type="radio" name="personType" value="customer"
-                ngModel [(ngModel)]="histParams.personType" > customer
-            <br>
-            <input type="radio" name="personType" value="associate"
-                ngModel [(ngModel)]="histParams.personType" > associate
-            <input type="radio" name="personType" value="vendor" 
-                ngModel [(ngModel)]="histParams.personType" > vendor
-
+                    ngModel [(ngModel)]="histParams.personType" > candidate
+                <br>
+                <input type="radio" name="personType" value="prospectivecandidate"
+                    ngModel [(ngModel)]="histParams.personType" > Prospective candidates
+                <br>
+                <input type="radio" name="personType" value="customer"
+                    ngModel [(ngModel)]="histParams.personType" > customer
+                <input type="radio" name="personType" value="associate"
+                    ngModel [(ngModel)]="histParams.personType" > associate
+                <br>
+                <input type="radio" name="personType" value="vendor" 
+                    ngModel [(ngModel)]="histParams.personType" > vendor
             </div>
         </div>
    
@@ -46,7 +51,7 @@
              <input class="stdd w200" type="text" name="personName" 
                   ngModel id="passportNo" [(ngModel)]="histParams.personName" >
         </div>
-        <button type="button" title="retrieve entity from Database based upon above inputs" class="btn btn-default pull-right" (click)="getCandidate()">Get Caller History"</button>
+        <button type="button" title="retrieve entity from Database based upon above inputs" class="mb-2 btn btn-default pull-right" (click)="getCandidate()">Get Caller History"</button>
         
         <div class="stdd red" style="vertical-align: bottom;">{{err}}</div>
     </form>
@@ -55,44 +60,59 @@
 <div class="stdd col-10 vAlignT" >
         <form [formGroup]="form" >  <!-- (ngSubmit)="onSubmit()"> -->
             <div *ngIf="member">
-                <div class="stdd b blue" >User Name:</div>
+                <div class="stdd b blue" >Person:</div>
                 <div class="stdd mx-2">{{member.personName}}</div>
+                <div class="stdd b blue" >Person Type:</div>
+                <div class="stdd mx-2">{{member.personType}}</div>
                 
                 <div class="stdd b blue">Phone No.:</div>
                 <div class="stdd mx-2" >{{member.phoneNo}}</div>
                 <div class="stdd b blue">Email:</div>
                 <div class="stdd mx-2">{{member.emailId}}</div>
-                <div class="stdd b blue">App No.:</div>
-                <div class="stdd mx-2">{{member.applicationNo}}</div>
+                
+                <div class="stdd"s *ngIf="member.personType==='candidate'">
+                    <div class="stdd b blue">App No.:</div>
+                    <div class="stdd mx-2">{{member.applicationNo}}</div>
+                </div>
+                
                 <div class="stdd b blue">Created on:</div>
                 <div class="stdd mx-2">{{member.createdOn | date}}</div>
-                <div class="stdd alignR w400">
-                    <button [disabled]="!form.dirty" title="save the transactions" type="submit" class="stdd btn btn-success pull-right fa fa-save" (click)="Update()" >
+                
+                <div class="stdd alignR w350">
+                    <button [disabled]="!form.dirty" title="save the transactions" type="submit" 
+                        class="stdd btn btn-success pull-right fa fa-save" (click)="update()" >
                         <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
                     </button>
-                    <button type="button" class="stdd btn btn-primary fa fa-home alignR" title="go back to home" (click)="routeChange()"></button>
+                    <button type="button" class="stdd mx-1 btn btn-primary fa fa-refresh" title="Refresh form" (click)="clearMember()"></button>
+                    <button type="button" class="stdd btn btn-primary fa fa-home" title="go back" (click)="goBackTo()"></button>
+                    <button type="button" class="stdd mx-1 btn btn-primary fa fa-home" title="go back to home" (click)="routeChange()"></button>
+                    <button type="button" class="stdd btn btn-primary fa fa-envelope fa-check" title="compose email - thank you for your consent" (click)="composeEmailOfConsent()"></button>
                 </div>            
     
             </div>
-            <hr>
+            <hr class="mt-0 mb-0">
 
             <div class="my-2">
             <div style="font-weight: bold;">
-                    <div class="stddmx2 w175" >Contacted On</div>
-                    <div class="stddmx2 w175 mx-1">Subject</div>
-                    <div class="stddmx2 w125" >Category Ref</div>
-                    <div class="stddmx2 w125 mx-1" >Phone No</div>
-                    <div class="stddmx2 w400" >discussion</div>
-                    <div class="stddmx2smaller w300" >Result</div>
-                    <div class="stdd">
-                        <button type="button" (click)="addUserHistoryItem()" title="add a new transaction" [disabled]="!member" class="stddmx2 btn btn-success alignR fa fa-plus blue"></button>
+                    <div class="lbl w115" >Contacted On</div>
+                    <div class="lbl w175 ml-1 b">Subject</div>
+                    <div class="lbl" *ngIf="member !== null && member !== undefined && (member.personType==='candidate' || member.personType==='prospective')" >
+                        <div class="lbl w90" >Category Ref</div>
                     </div>
-                </div>
+                    <div class="lbl w125" >Phone No</div>
+                    <div class="lbl w350" >Result</div>
+                    <div class="lbl w55" >Compose<br>Message</div>
+                    <div class="lbl w345" >Remarks</div>
+                    <div class="lbl w75" >User</div>
+                    <button type="button" (click)="addUserHistoryItem()" title="add a new transaction" 
+                        [disabled]="!member" class="stdd mx-1 btn btn-success alignR fa fa-plus"></button>
+            </div>
         </div>
-        <div formArrayName="userHistoryItems" class="my-1 mx-1">
+        <div formArrayName="userHistoryItems" class="my-1">
             <div *ngFor="let item of userHistoryItems.controls; let i=index">
                 <div [formGroupName]="i" >
-                    <input class="stddmx2 w150 input"
+
+                    <input class="stdd w115 input"
                         type="text"
                         placeholder="Contacted On"
                         formControlName="dateOfContact"
@@ -100,37 +120,47 @@
                         [bsValue]="bsValueDate"
                         [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
                     >   
-                    <input type="text" formControlName="subject" class="input stddmx2 w175 mx-1" (dblclick)="subjectDblClick(i)" >
-                    <input type="text" formControlName="categoryRef" class="input stddmx2 w125" (dblclick)="categoryDblClick(i)" >
-                    <input type="text" formControlName="phoneNo" class="input stddmx2 w125 mx-1" >
-                    <textarea cols="41" rows="2" formControlName="gistOfDiscussions" class="input stddmx2"></textarea>
+                    <input type="text" formControlName="subject" class="stdd input w175 mx-1" (dblclick)="subjectDblClick(i)" >
                     
-                    <ng-select *ngIf="contactResults" class="stddmx2smaller w300"
-                        [items]="contactResults"
+                    <div class="stdd" *ngIf="member.personType.toLowerCase()==='candidate' || member.personType.toLowerCase()==='prospective'">
+                        <input type="text" formControlName="categoryRef" class="stdd input w90 fontSmall hvr cell status-cell" (dblclick)="categoryDblClick(i)" >
+                            <!-- 
+                            <span [style.backgroundColor]="getCategoryRef(working_period)"></span>
+                            <p>{{hoverText}}</p>
+                            -->
+                    </div>
+                    <input type="text" formControlName="hoverText" id="hovertext"+i>
+
+                    <input type="text" formControlName="phoneNo" class="stdd mx-1 input w125" >
+                    
+                    <ng-select *ngIf="contactResultData" class="stdd fontSmall w350"
+                        [items]="contactResultData"
                             bindLabel="name"
                             bindValue="id"
                             labelForId="id"
                             placeholder="Result"
                             clearAllText="Clear"
-                            formControlName="contactResult">
-                        </ng-select>
+                            formControlName="contactResultId">
+                    </ng-select>
                     
-                    <!-- <label class="stdd w150">{{member.loggedInUserName}}</label> -->
-                    <button (click)="displayModalReminder()" class="stdd btn ml-1 blue fa fa-bell" title="Create a reminder task"> </button>
-                    <button (click)="removeUserHistoryItem(i)" class="stdd btn ml-1 red fa fa-trash" title="Remove the transaction record"> </button>
+                    <input type="checkbox" class="stdd mx-1 w50" formControlName="composeEmailMessage">
+                    <textarea cols="45" rows="2" formControlName="gistOfDiscussions" class="input stdd fontSmall"></textarea>
+                    <input type="text" class="stdd mx-1 w75" readonly formControlName="loggedInUserName" >
+
+                    <button (click)="displayPersonTasksModal(item)" class="stdd btn blue fa fa-bell" title="display tasks for the person"> </button>
+                    <button (click)="removeUserHistoryItem(i)" class="stdd ml-1 btn red fa fa-trash" title="Remove the transaction record"> </button>
                 </div>
             </div>
         </div>
         </form>            
     </div>
 
-<ul class="text-danger list-unstyled" *ngIf="errors">
-    <li *ngFor="let error of errors">
-            {{error}}
-    </li>
-</ul>
+    <ul class="text-danger list-unstyled" *ngIf="errors">
+        <li *ngFor="let error of errors">
+                {{error}}
+        </li>
+    </ul>
     <div>
         {{this.form.value | json}}
     </div>
  
-

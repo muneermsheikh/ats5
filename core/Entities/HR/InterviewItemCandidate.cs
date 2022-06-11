@@ -30,10 +30,10 @@ namespace core.Entities.HR
         public DateTime ScheduledFrom { get; set; }
         public DateTime ScheduledUpto { get; set; }
         public string InterviewMode { get; set; }
-        public DateTime ReportedDateTime { get; set; }
-        public DateTime InterviewedDateTime { get; set; }
-        public int AttendanceStatusId {get; set;}  //update when candidate attendance/selection concluded
-        public int SelectionStatusId { get; set; }
+        public DateTime? ReportedDateTime { get; set; }
+        public DateTime? InterviewedDateTime { get; set; }
+        public int? AttendanceStatusId {get; set;}  //update when candidate attendance/selection concluded
+        public int? SelectionStatusId { get; set; }
         public string ConcludingRemarks { get; set; }
         public ICollection<InterviewItemCandidateFollowup> InterviewFollowups { get; set; }
     }

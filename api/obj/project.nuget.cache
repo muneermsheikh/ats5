@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "MeAofKCjDZvfucSMBLZoQyEWdmzpDkx+nGLKBLNpKSn4YaSNIQd5C2eZFATyv7UiZJx+3gJmbMmdkCz4mhCNRg==",
+  "dgSpecHash": "B5rwQXuhJ3cSGtQGf9yyv9AmHanRXuLVn8Nt1veO9l+syC22D2V8FLoOoph9rC2/bVxJiRRbcjMLgFKkF6baAQ==",
   "success": true,
   "projectFilePath": "D:\\ats8\\api\\api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hp\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\8.1.1\\automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\exceldatareader\\3.6.0\\exceldatareader.3.6.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\exceldatareader.dataset\\3.6.0\\exceldatareader.dataset.3.6.0.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\mailkit\\2.14.0\\mailkit.2.14.0.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication\\2.1.0\\microsoft.aspnetcore.authentication.2.1.0.nupkg.sha512",

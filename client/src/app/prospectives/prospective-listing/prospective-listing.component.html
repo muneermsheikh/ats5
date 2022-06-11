@@ -1,0 +1,63 @@
+<div *ngIf="cvs === undefined || cvs?.length===0">
+     No relevant Prospective candidates on record
+</div>
+<div class="stdd">
+     <div class="d-flex justify-contents-between align-items-center">
+          <app-paging-header [totalCount]="totalCount" [pageNumber]="cvParams.pageNumber" [pageSize]="cvParams.pageSize"></app-paging-header>
+
+          <div class="d-flex justify-contents-between align-items-center">
+               <div class="form-inline mt-2" *ngIf="cvs && cvs !== undefined">
+                    <input (keyup.enter)="onSearch()" type="text" class="form-control ml-5 w300" #search placeholder="Search">
+                    <button type="button" (click)="onSearch()" class="btn btn-outline-primary mx-1 my-1" style="font-size: small;">Search</button>
+                    <button type="button" (click)="onReset()" class="btn btn-outline-success mx-1 my-1" style="font-size: small;">Reset</button>
+                    <button type="button" (click)="onCategoryRefChange()   " class="btn btn-outline-success mx-1 my-1" style="font-size: small;">Category Ref</button>
+                    <input class="form-check-input" type="radio" value="pending" [(ngModel)]="listStatus" name="listStatus" (change)="onItemChange($event.target.value)"/>  pending 
+                    <input class="form-check-input ml-4" type="radio" value="all" [(ngModel)]="listStatus" name="listStatus" (change)="onItemChange($event.target.value)"/>  all
+               </div>
+          </div>
+     </div>
+     <!-- <div>left margin starts from here</div> -->
+     <div>
+          <div class="stddFontSmall w60 b">Checked</div>
+          <div class="stddFontSmall mx-2 w80 b">Category Ref</div>
+          <div class="stddFontSmall w80 mx-1 b">Source</div>
+          <div class="stddFontSmall w90 mx-1 b">Date added</div>
+          <div class="stddFontSmall w150 mx-1 b">Candidate Name</div>
+          <div class="stddFontSmall w80 mx-1 b">Age</div>
+          <div class="stddFontSmall w130 mx-1 b">Phone</div>
+          <div class="stddFontSmall w145 mx-1 b">Email</div>
+          <div class="stddFontSmall w200 mx-1 b">Status</div>
+          <div class="stddFontSmall w80 mx-1 b">Username</div>
+          <div class="stddFontSmall w80 mx-1 b">Status Date</div>
+     </div>
+     <div class="row" *ngFor="let cv of cvs" >
+          <app-prospective-item [cv]="cv" 
+               (checkedEvent)="checked($event)"
+               (prospectiveIdEmitEvent)="showUserContact($event)"
+               (convertToCVEvent)="transferProfileToCV($event)"
+          ></app-prospective-item>
+          <hr style="padding:0px; margin-top:0px; margin-bottom: 0px;">
+     </div>
+     <div class="d-flex justify-content-between align-items-center mt-2" *ngIf="totalCount > 0">
+          <app-pager 
+               [pageSize]="cvParams.pageSize" [totalCount]="totalCount" [pageNumber]="cvParams.pageNumber" (pageChanged)="onPageChanged($event)"  >
+          </app-pager>
+     </div>
+
+</div>
+<!--
+<div class="stdd col-6">
+     
+     <div *ngIf="member">
+          <app-user-history
+               [member]="member"
+               [employees]="employees"
+               [contactResultData]="contactResultData"
+               [contactResults]="contactResults"
+               [user]="user"
+               (emitItems)="updateItems($event)"
+          ></app-user-history>
+     </div>
+     
+</div>
+-->

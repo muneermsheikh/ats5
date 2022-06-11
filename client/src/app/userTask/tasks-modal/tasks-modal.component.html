@@ -1,0 +1,46 @@
+<div *ngIf="objs.length === 0">
+     No data available
+</div>
+<div *ngIf="objs.length > 0">
+     <div class="modal-header">
+          <div class="modal-title pull-left">active tasks for  {{title}}</div>
+          <br class="mb-0">
+          <button type="button" class="ml-5 btn btn-success fa fa-plus" title="create a new task" (click)="displayModalReminder()"></button>
+          <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+     <div class="modal-body">
+          <label class="stdd mx-1 w100">Task Dated</label>
+          <label class="stdd mx-1 w100">Assigned To</label>
+          <label class="stdd mx-1 w100">Task Owner</label>
+          <label class="stdd mx-1 w75" aria-readonly="">Task Description</label>
+          <label class="stdd mx-1 w100">Complete by</label>
+          <label class="stdd mx-1 w100">Task status</label>
+
+          <form #taskForm="ngForm" id="taskForm">
+               <div *ngFor="let obj of objs">
+                    <label class="stdd mx-1 w100" >{{obj.id}}</label>
+                    <label class="stdd mx-1 w100">{{obj.taskDate | date: 'd-MMM-yy'}}</label>
+                    <label class="stdd mx-1 w100">{{obj.assignedToName}}</label>
+                    <label class="stdd mx-1 w100">{{obj.taskOwnerName}}</label>
+
+                    <textarea class="stdd mx-1" name="obj.taskDescription" id="obj.taskDescription" 
+                         cols="25" rows="2" [ngModel]="obj.taskDescription" >
+                    </textarea> 
+                    <label class="stdd mx-1 w100">{{obj.completeBy | date: 'd-MMM-yy'}}</label>
+                    <label class="stdd mx-1 w100">{{obj.taskStatus}}</label>
+               </div>     
+          </form>
+     </div>
+     <div class="modal-footer">
+          <button type="button" class="btn btn-default fa fa-cancel" (click)="bsModalRef.hide()"></button>
+     </div>
+     <!-- <div class="d-flex justify-content-between align-items-center mt-2" *ngIf="totalCount > 0">
+          <app-pager 
+               [pageSize]="oParams.pageSize" [totalCount]="totalCount" [pageNumber]="oParams.pageNumber" (pageChanged)="onPageChanged($event)"  >
+          </app-pager>
+     </div>
+-->
+</div>
+

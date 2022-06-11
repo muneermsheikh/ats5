@@ -6,6 +6,7 @@ using core.Entities.HR;
 using core.Interfaces;
 using core.ParamsAndDtos;
 using infra.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -20,6 +21,7 @@ namespace api.Controllers
                _followupService = followupService;
           }
 
+          [Authorize(Roles = "HRManager, HRSupervisor, HRExecutive, Receptionist")]
           [HttpPost]
           public async Task<ActionResult<ICollection<InterviewItemCandidateFollowup>>> AddNewFollowupToInterviewCandidate(InterviewCandidateFollowupToAddDto followups)
           {
@@ -29,6 +31,7 @@ namespace api.Controllers
                return Ok(fups);
           }
 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive, Receptionist")]
           [HttpPut]
           public async Task<ActionResult<ICollection<InterviewItemCandidateFollowup>>> EditFollowupToInterviewCandidate(ICollection<InterviewItemCandidateFollowup> followups)
           {
@@ -39,6 +42,7 @@ namespace api.Controllers
           }
 
 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive, Receptionist")]
           [HttpDelete]
           public async Task<ActionResult<bool>> DeleteCandidateFollowups(ICollection<InterviewItemCandidateFollowup> followups)
           {

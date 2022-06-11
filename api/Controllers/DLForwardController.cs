@@ -7,6 +7,7 @@ using api.Extensions;
 using core.Entities.Identity;
 using core.Interfaces;
 using core.ParamsAndDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,6 +26,7 @@ namespace api.Controllers
                _dlfwdService = dlfwdService;
           }
 
+          [Authorize(Roles = "DocumentControllerAdmin, HRSupervisor, HRExecutive, HRTrainee" )]
           [HttpPost]
           public async Task<ActionResult<bool>> ForwardDLToAgents(OrderItemsAndAgentsToFwdDto ItemsAndAgents)
           {

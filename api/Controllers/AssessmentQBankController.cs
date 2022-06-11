@@ -7,6 +7,7 @@ using api.Errors;
 using core.Entities;
 using core.Entities.MasterEntities;
 using core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -50,13 +51,16 @@ namespace api.Controllers
             return q;
         }
 
+        
         [HttpPost]
+        [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
         public async Task<ActionResult<AssessmentQBank>> InsertAssessmentQ(AssessmentQBank qbank)
         {
             var q = await _service.InsertAssessmentQBank(qbank);
             if (q == null) return BadRequest(new ApiResponse(400, "Bad Request - this probably means the Assessment Question for the chosen category already exists"));
             return Ok(q);
         }
+        [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
         [HttpPut]
         public async Task<AssessmentQBank> UpdateAssessmentQ(AssessmentQBank qBank)
         {

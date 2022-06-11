@@ -44,7 +44,7 @@ export class OrderService {
     }
     if (this.cacheBrief.size > 0 && useCache === true) {
       if (this.cacheBrief.has(Object.values(this.bParams).join('-'))) {
-        this.paginationBrief.data = this.cache.get(Object.values(this.bParams).join('-'));
+        this.paginationBrief.data = this.cacheBrief.get(Object.values(this.bParams).join('-'));
         return of(this.paginationBrief);
       }
     }
@@ -61,7 +61,6 @@ export class OrderService {
     params = params.append('sort', this.bParams.sort);
     params = params.append('pageIndex', this.bParams.pageNumber.toString());
     params = params.append('pageSize', this.bParams.pageSize.toString());
-    console.log('orders.service.getOrdersBrief, params is:', params);
     return this.http.get<IPaginationOrderBrief>(this.apiUrl + 'orders/ordersbriefpaginated', {observe: 'response', params})
       .pipe(
         map(response => {

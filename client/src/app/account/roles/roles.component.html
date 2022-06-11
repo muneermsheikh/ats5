@@ -1,0 +1,15 @@
+<div class="container">
+     <div class="stdd">Add a new Role: 
+          <input type="text" [(ngModel)]="newRoleAdded">
+     </div>
+     <button class="stdd fa fa-plus" (click)="addNewRole()" >Add new role</button>
+     <hr>
+     <div *ngFor="let item of identityRoles">
+          <div class="stdd my-1 w450">{{item}}</div>
+          <button class="stdd btn btn-primary fa fa-trash" title="Delete this role" (click)="deleteRole(item)"></button>
+         <!-- <button class="stdd btn btn-primary fa fa-pencil" [ngClass]="editing === true ? 'fa-save' : 'fa-pencil'" title="Edit this role" (click)="editRole(item)"></button>
+          <input type="text" class="stdd ml-10 w150" [(ngModel)]="roleEdited" *ngIf="editing" >
+         -->
+     </div>
+
+</div>

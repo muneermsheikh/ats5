@@ -4,12 +4,12 @@ import { ToastrService } from 'ngx-toastr';
 import { of, ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { IApplicationTask } from '../shared/models/applicationTask';
+import { ApplicationTask, IApplicationTask } from '../shared/models/applicationTask';
 import { IApplicationTaskInBrief } from '../shared/models/applicationTaskInBrief';
 import { IOrderAssignmentDto } from '../shared/models/orderAssignmentDto';
 import { ITaskItem } from '../shared/models/taskItem';
 import { IUser } from '../shared/models/user';
-import { IPaginationTask, PaginationTask } from '../shared/pagination/paginationTask';
+import { IPaginationAppTask, PaginationAppTask } from '../shared/pagination/paginationAppTask';
 import { userTaskParams } from '../shared/params/userTaskParams';
 
 
@@ -23,8 +23,10 @@ export class UserTaskService {
   currentUser$ = this.currentUserSource.asObservable();
   
   oParams: userTaskParams;
-  pagination = new PaginationTask();
+  pagination = new PaginationAppTask();
+  tasks: IApplicationTask[];
   cache = new Map();
+  cacheTasks = new Map();
 
     constructor(private http: HttpClient, private toastr:ToastrService) { }
 
@@ -34,8 +36,7 @@ export class UserTaskService {
 
     createTaskFromAppTask(task: IApplicationTask)
     {
-      this.toastr.info('entered createTAskFromAppTask');
-      return this.http.post(this.apiUrl + 'task', task);
+      return this.http.post<ApplicationTask>(this.apiUrl + 'task/getorcreate', task);
     }
 
     getPendingTasksOfUser(userid: number, pageindex: number, pagesize: number) {
@@ -50,11 +51,9 @@ export class UserTaskService {
       return this.oParams;
     }
 
-    getTasks(useCache: boolean) { 
+    getTasks(useCache: boolean, woPagination: boolean=false): any {     //returns IPaginationAppTask
 
-      if (useCache === false) {
-        this.cache = new Map();
-      }
+      if (useCache === false)  this.cache = new Map();
 
       if (this.cache.size > 0 && useCache === true) {
         if (this.cache.has(Object.values(this.oParams).join('-'))) {
@@ -62,14 +61,18 @@ export class UserTaskService {
           return of(this.pagination);
         }
       }
-
+      
       let params = new HttpParams();
-      if (this.oParams.taskStatus !== "") {params = params.append('taskStatus', this.oParams.taskStatus); }
-      if (this.oParams.orderId !== 0) {params = params.append('orderId', this.oParams.orderId.toString()); }
-      if (this.oParams.assignedToId !== 0) {params = params.append('assignedToId', this.oParams.assignedToId.toString()); }
-      if (this.oParams.assignedToNameLike !== '') {params = params.append('assignedToNameLike', this.oParams.assignedToNameLike); }
-      if (this.oParams.taskDate.getFullYear() > 2000) {params = params.append('taskDate', this.oParams.taskDate.toString()); }
-
+      if (this.oParams.taskStatus !== "" && this.oParams.taskStatus !== undefined ) params = params.append('taskStatus', this.oParams.taskStatus); 
+      if (this.oParams.orderId !== 0 && this.oParams.orderId !== undefined) params = params.append('orderId', this.oParams.orderId.toString()); 
+      if (this.oParams.assignedToId !== 0 && this.oParams.assignedToId !== undefined) params = params.append('assignedToId', this.oParams.assignedToId?.toString()); 
+      if (this.oParams.assignedToNameLike !== '' && this.oParams.assignedToNameLike !== undefined ) params = params.append('assignedToNameLike', this.oParams.assignedToNameLike); 
+      if (new Date(this.oParams.taskDate).getFullYear() > 2000) params = params.append('taskDate', this.oParams.taskDate.toString()); 
+      if(this.oParams.candidateId !==0 && this.oParams.candidateId !== undefined) {
+        params = params.append('candidateId', this.oParams.candidateId.toString());
+        params = params.append('personType', 'candidate');
+      }
+      
       if (this.oParams.search) {
         params = params.append('search', this.oParams.search);
       }
@@ -78,7 +81,18 @@ export class UserTaskService {
       params = params.append('pageIndex', this.oParams.pageNumber.toString());
       params = params.append('pageSize', this.oParams.pageSize.toString());
 
-      return this.http.get<IPaginationTask>(this.apiUrl + 'task/tasksbriefpaginated', {observe: 'response', params})
+      if(woPagination) {
+        //return this.http.get<IApplicationTask[]>(this.apiUrl + 'task/wopagination', {observe: 'response', params})
+        return this.http.get<IApplicationTask[]>(this.apiUrl + 'task/wopagination', {params})
+        .pipe(
+          map(response => {
+            this.cache.set(Object.values(this.oParams).join('-'), response);
+            this.tasks = response;
+            return response;
+          })
+        )  
+      } else {
+        return this.http.get<IPaginationAppTask>(this.apiUrl + 'task', {observe: 'response', params})
         .pipe(
           map(response => {
             this.cache.set(Object.values(this.oParams).join('-'), response.body.data);
@@ -86,6 +100,7 @@ export class UserTaskService {
             return response.body;
           })
         )
+      }
     }
     
     getTask(id: number) {

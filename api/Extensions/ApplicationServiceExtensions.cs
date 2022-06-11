@@ -52,11 +52,13 @@ namespace api.Extensions
                 services.AddScoped<IDLForwardService, DLForwardService>();
                 services.AddScoped<IAssessmentQBankService, AssessmentQBankService>();
                 services.AddScoped<IAssessmentStandardQService, AssessmentStandardQService>();
-                /*
-                services.AddScoped<IPaymentService, PaymentService>();
-                
-                services.AddScoped<IBasketRepository, BasketRepository>();
-                */
+                services.AddScoped<IProspectiveCandidateService, ProspectiveCandidateService>();
+                services.AddScoped<IValidateTaskService, ValidateTaskService>();
+                services.AddScoped<IComposeMessageForCandidates, ComposeMessageForProspectiveCandidateService>();
+                services.AddScoped<IComposeMessagesForInternalReviewHR, ComposeMessagesForInternalReviewHR>();
+                services.AddScoped<ITaskControlledService, TaskControlledServices>();
+                services.AddScoped<IComposeOrderAssessment, ComposeOrderAssessment>();
+
                 services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
             
                 services.Configure<ApiBehaviorOptions>(options =>
@@ -85,6 +87,7 @@ namespace api.Extensions
                     opt.AddPolicy("RequireRegisterSelectionRole", policy => policy.RequireRole("AddEditSelection"));
                 });
 
+                
                 return services;
             }
     }

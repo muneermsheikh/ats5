@@ -18,6 +18,7 @@ export interface IChecklistHRDto{
      exceptionApproved: boolean;
      exceptionApprovedBy: string;
      exceptionApprovedOn: Date;
+     checklistedOk: boolean;
      checklistHRItems: IChecklistHRItem[];
 }
 
@@ -39,5 +40,6 @@ export class ChecklistHRDto implements IChecklistHRDto{
      exceptionApproved: boolean;
      exceptionApprovedBy: string;
      exceptionApprovedOn: Date;
+     checklistedOk: boolean;
      checklistHRItems: IChecklistHRItem[];
 }

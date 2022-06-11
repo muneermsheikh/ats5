@@ -11,6 +11,8 @@ import { CandidateHistoryComponent } from './candidate-history/candidate-history
 import { ChecklistModalComponent } from './checklist-modal/checklist-modal.component';
 import { CallModalComponent } from '../shared/call-modal/call-modal.component';
 import { CallrecordsComponent } from '../shared/callrecords/callrecords.component';
+import { EditorComponent } from '../shared/components/editor/editor.component';
+
 
 
 @NgModule({
@@ -21,7 +23,8 @@ import { CallrecordsComponent } from '../shared/callrecords/callrecords.componen
     CandidateHistoryComponent,
     ChecklistModalComponent,
     CallModalComponent,
-    CallrecordsComponent
+    CallrecordsComponent,
+    EditorComponent
   ],
   imports: [
     CommonModule,
@@ -29,7 +32,7 @@ import { CallrecordsComponent } from '../shared/callrecords/callrecords.componen
     SharedModule,
     ReactiveFormsModule,
     FormsModule,
-    TabsModule
+    TabsModule,
   ]
 })
 export class CandidateModule { }

@@ -14,6 +14,7 @@ namespace core.Interfaces
      public interface IUserService
     {
         //Task<Candidate> CreateCandidateAsync(RegisterDto registerDto, ICollection<IFormFile> UserFormFiles, int loggedInEmployeeId);
+        Task<Candidate> CreateCandidateObject(RegisterDto registerDto, int loggedInEmployeeId);
         Task<Candidate> CreateCandidateAsync(RegisterDto registerDto, int loggedInEmployeeId);
         Task<Employee> CreateEmployeeAsync(RegisterEmployeeDto registerDto);
         Task<CustomerOfficial> CreateCustomerOfficialAsync(RegisterDto registerDto);
@@ -25,7 +26,7 @@ namespace core.Interfaces
         Task<string> GetCategoryNameFromCategoryId(int id);
         Task<string> GetCustomerNameFromCustomerId(int id);
         //Task<Candidate> GetCandidateByIdAsync(int id);
-        Task<Candidate> UpdateCandidateAsync(Candidate candidate, ICollection<IFormFile> UserFormFiles);
+        Task<Candidate> UpdateCandidateAsync(Candidate candidate);
         //Task<Candidate> GetCandidateBySpecsUserIdAsync(int userId);
         //Task<Candidate> GetCandidateBySpecsIdentityIdAsync(int identityUserId);
         Task<ICollection<UserProfession>> EditUserProfessions(UserAndProfessions userProfessions);

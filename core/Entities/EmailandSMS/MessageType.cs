@@ -32,6 +32,7 @@ namespace core.Entities.EmailandSMS
         TravelBookingAdviseByEmail,
         TravelBookingAdviseBySMS,
         RequirementForwardToHRDept,
-        DLForwardToAgents
+        DLForwardToAgents,
+        CandidateFollowup
     }
 }

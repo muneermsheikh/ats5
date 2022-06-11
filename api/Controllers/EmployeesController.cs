@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace api.Controllers
 {
      
+     
      public class EmployeesController : BaseApiController
      {
           private readonly IGenericRepository<Employee> _empRepo;
@@ -35,6 +36,7 @@ namespace api.Controllers
                _empRepo = empRepo;
           }
 
+          [Authorize]
           [HttpGet("employeepages")]
           public async Task<ActionResult<Pagination<EmployeeBriefDto>>> GetEmployees([FromQuery]EmployeeSpecParams empParams)
           {
@@ -46,7 +48,7 @@ namespace api.Controllers
                return Ok(emps);
           }
 
-          [Authorize(Policy = "AdminRole")]
+          [Authorize]
           [HttpGet("byId/{id}")]
           public async Task<ActionResult<Employee>> GetEmployeeById(int id)
           {
@@ -63,6 +65,7 @@ namespace api.Controllers
 
                return Ok(emps);
           }
+          [Authorize(Roles = "Admin, HRManager")]
           [HttpPut]
           public async Task<ActionResult<bool>> EditEmployee(Employee employee)
           {
@@ -85,6 +88,7 @@ namespace api.Controllers
 
           }
 
+          [Authorize(Roles = "Admin, HRManager")]
           [HttpDelete]
           public async Task<ActionResult<bool>> DeleteEmployee(Employee employee)
           {
@@ -100,6 +104,7 @@ namespace api.Controllers
                return BadRequest(new ApiResponse(400, "Failed to delete the employee"));
           }
 
+          [Authorize(Roles = "Admin, HRManager")]
           [HttpPost("employees")]
           public async Task<ActionResult<ICollection<UserDto>>> AddNewEmployees(ICollection<EmployeeToAddDto> employees)
           {
@@ -124,7 +129,8 @@ namespace api.Controllers
 
                return users;
           }
-     
+
+          [Authorize]
           [HttpGet("employeepositions")]
           public async Task<ActionResult<ICollection<EmployeePosition>>> GetEmployeePositions()
           {

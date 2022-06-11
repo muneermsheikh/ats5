@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using core.Entities.Admin;
 using core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -19,6 +20,7 @@ namespace api.Controllers
                _customerReviewService = customerReviewService;
           }
 
+          [Authorize(Roles="Admin, DocumentControllerAdmin, DocumentControllerProcess, HRManager, HRSupervisor, HRExecutive")]
           [HttpGet("{customerId}")]
           public async Task<CustomerReview> GetCustomerReview (int customerId)
           {
@@ -26,7 +28,8 @@ namespace api.Controllers
                if (string.IsNullOrEmpty(rvw.CustomerName)) rvw.CustomerName = await _commonService.CustomerNameFromCustomerId(rvw.CustomerId);
                return rvw;
           } 
-
+          
+          [Authorize(Roles="Admin, DocumentControllerAdmin, DocumentControllerProcess, HRManager, HRSupervisor, HRExecutive")]
           [HttpGet("customerReviewData")]
           public async Task<ICollection<CustomerReviewData>> GetCustomerReviewStatusData()
           {
@@ -34,6 +37,7 @@ namespace api.Controllers
                return data;
           }
           
+          [Authorize(Roles="Admin, DocumentControllerAdmin, DocumentControllerProcess, HRManager")]
           [HttpPut]
           public async Task<bool> UpdateCustomerReview(CustomerReview customerReview)
           {

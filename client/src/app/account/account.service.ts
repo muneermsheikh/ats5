@@ -81,15 +81,14 @@ export class AccountService {
   }
 
   loadCurrentUser(token: string) {
+    
     if (token === null || token === '') {
-      this.toastr.info('no user loaded');
       this.currentUserSource.next(null);
       return of(null);
     }
 
     return this.http.get(this.baseUrl + 'account').pipe(
       map((user: IUser) => {
-        console.log('returned from api');
         if (user) {
           this.toastr.info('current user retrieved');
           localStorage.setItem('token', user.token);

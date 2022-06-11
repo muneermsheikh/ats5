@@ -1,0 +1,19 @@
+<div [hidden]="loading" *ngIf="message" >    <!-- *ngFor="let message of messages" > -->
+     <div>
+          <div class="stdd w100">{{message.senderUsername}}</div>
+            <div class="stdd w75" title="click to display the message" >{{message.messageSentOn | date: 'd-MMM-yy' }}</div>  
+            <div class="stdd w150 my-1" title="click to display the message" (click)="setMessageFromUsername(message)"  >{{message.recipientUserName}}</div>
+            <div class="stdd w200">{{message.subject.substr(1,150)}}</div>
+            <button (click)="$event.stopPropagation()" (click)="deleteMessage(message.id)" class='stdd btn btn-danger fa fa-trash '></button>
+            <button [disabled]=" !message || msg.messageSentOn===null" (click)="saveMessage(message.id)" class='stdd btn mx-1 fa fa-save '></button>
+            <button [disabled]=" !message || msg.messageSentOn!==null" (click)="saveandsend()" class='stdd btn fa fa-paper-plane '></button>
+     </div>
+
+     <div>
+         <angular-editor [placeholder]="'Message contents'" [(ngModel)]="message.content"></angular-editor>
+     </div>
+     <div>
+       <div class="fa fa-upload"></div>  
+       <app-upload></app-upload>
+     </div>
+</div>

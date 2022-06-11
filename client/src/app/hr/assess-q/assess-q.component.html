@@ -1,8 +1,8 @@
 <div class="container" *ngIf="orderitem" >
      <form [formGroup]="form" >
-          <div class="stdd b">Define Assessment Questions for Order Category for Order No. </div>
-          <div class="stdd mx-2"><strong>{{orderitem.orderNo}}</strong></div>
-          <div class="stdd ml-2">Category Name <strong>{{orderitem.categoryName}}</strong></div>
+          <div class="stdd b">Assessment Questions for Order No. </div>
+          <div class="stdd mx-2"><strong>{{assess.orderNo}}</strong></div>
+          <div class="stdd ml-2">Category Name <strong>{{assess.categoryName}}</strong></div>
           <button class="stdd btn btn-success fa fa-save" style="margin-left: 15px;" (click)="update()" ></button>
           <button class="stdd btn btn-secondary fa fa-home" style="margin-left: 15px;" routerLink=""  ></button>
           <br>

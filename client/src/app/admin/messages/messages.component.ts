@@ -16,7 +16,7 @@ export class MessagesComponent implements OnInit {
   messages: IMessage[];
   message: IMessage;
   
-  container = 'Sent';
+  container = 'sent';
   
   pageIndex = 1;
   pageSize = 3;
@@ -44,11 +44,14 @@ export class MessagesComponent implements OnInit {
     this.getMessages();
   }
 
-  getMessages(useCache=false) {
 
+  getMessages(useCache=false) {
+    this.message=null;    //refresh the message panel
+    this.mParams.pageSize=6;
     this.service.setParams(this.mParams);
     this.service.getMessages(useCache).subscribe(response => {
       this.messages=response.data;
+      console.log(this.messages);
       this.totalCount = response.count;
     }, error => {
       console.log(error);
@@ -57,13 +60,21 @@ export class MessagesComponent implements OnInit {
 
   getInboxMessages() {
     this.mParams=new EmailMessageSpecParams();
-    this.mParams.container="Inbox";
-//    this.service.setContainer(this.container);
+    this.mParams.container="inbox";
+    this.service.setContainer(this.container);
     this.getMessages(true);
+    this.toastr.info('inbox');
   }
 
   getOutboxMessages() {
-    this.mParams.container="Sent";
+    this.mParams.container="sent";
+    this.service.setContainer(this.container);
+    
+    this.getMessages(true);
+  }
+
+  getDraftMessages() {
+    this.mParams.container="draft";
     this.service.setContainer(this.container);
     this.getMessages(true);
   }
@@ -95,12 +106,12 @@ export class MessagesComponent implements OnInit {
 
   }
 
-  saveandsend() {
+  sendMessage() {
 
     this.service.sendMessage(this.message).subscribe(response => {
       this.toastr.success('message sent');
     }, error => {
-      console.log('save and send error', error);
+      console.log('send message error', error);
       this.toastr.error('failed to send the email message', error);
     })
   }
@@ -126,11 +137,9 @@ export class MessagesComponent implements OnInit {
   }
 
   onPageChanged(event: any) {
-    console.log('onpage changed', event);
     if (this.pageIndex !== event) {
       this.pageIndex = event;
       this.mParams.pageIndex=event;
-      console.log('params', this.mParams);
       this.getMessages(true);
     }
   }

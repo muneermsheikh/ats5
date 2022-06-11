@@ -1,0 +1,12 @@
+<div *ngIf="!interviews || interviews===undefined">
+     No data available
+</div>
+<div *ngIf="interviews">
+     <div *ngFor="let item of interviews">
+          <div class="stdd w150">{{item.companyName}}</div>
+          <div class="stdd w75">{{item.orderno}}</div>
+          <div class="stdd w125">{{item.orderDate | date:'d-MMM-yy'}}</div>
+          <div class="stdd w100">{{item.interviewDateFrom | date :'d-MMM'}}</div>
+          <div class="stdd w100">{{item.interviewDateUpto | date: 'd-MMM'}}</div>
+     </div>
+</div>

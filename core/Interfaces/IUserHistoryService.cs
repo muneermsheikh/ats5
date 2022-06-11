@@ -15,10 +15,12 @@ namespace core.Interfaces
         Task<bool> DeleteUserContact(UserHistory userHistory);
         Task<bool> DeleteUserContactById(int userContactId);
         Task<ICollection<ContactResult>> GetContactResults();
-        Task<bool> EditContactHistory(UserHistory model, AppUser appuser);
-        Task<UserHistoryDto> GetHistoryByCandidateId(int candidateid);
-        Task<UserHistoryDto> GetOrAddUserHistoryByParams(UserHistoryParams historyParams);
+        Task<UserHistoryReturnDto> EditContactHistory(UserHistory model, LoggedInUserDto loggedInUserDto);
+        Task<bool> EditContactHistoryItems(ICollection<UserHistoryItem> items, int LoggedinEmpId);
+        Task<UserHistory> GetHistoryByCandidateId(int candidateid);
+        Task<UserHistory> GetOrAddUserHistoryByParams(UserHistoryParams historyParams);
         //Task<UserHistoryDto> GetOrAddUserHistoryByNamePhone(string callerame, string mobileno);
-        Task<UserHistoryDto> GetHistoryFromHistoryId(int historyId);
+        Task<UserHistory> GetHistoryFromHistoryId(int historyId);
+        Task<ICollection<CategoryRefDto>> GetCategoryRefDetails();
     }
 }

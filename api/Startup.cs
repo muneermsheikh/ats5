@@ -1,5 +1,6 @@
 using api.Extensions;
 using api.Helpers;
+using api.Middleware;
 using core.Entities.Identity;
 using infra.Data;
 using infra.Identity;
@@ -85,9 +86,10 @@ namespace api
                //, RoleManager<IdentityRole<int>> roleManager
                )
           {
+                app.UseMiddleware<ExceptionMiddleware>();
                if (env.IsDevelopment())
                {
-                    app.UseDeveloperExceptionPage();
+                    //app.UseDeveloperExceptionPage();
                     app.UseSwagger();
                     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "api v1"));
                }

@@ -2,8 +2,10 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { AccountService } from 'src/app/account/account.service';
+import { IApplicationTask } from 'src/app/shared/models/applicationTask';
 import { IApplicationTaskInBrief } from 'src/app/shared/models/applicationTaskInBrief';
 import { IUser } from 'src/app/shared/models/user';
+import { IPaginationAppTask } from 'src/app/shared/pagination/paginationAppTask';
 import { PaginationTask } from 'src/app/shared/pagination/paginationTask';
 import { userTaskParams } from 'src/app/shared/params/userTaskParams';
 import { UserTaskService } from '../user-task.service';
@@ -18,11 +20,11 @@ import { UserTaskService } from '../user-task.service';
 export class UserTaskComponent implements OnInit {
   routeId: string;
   user: IUser;
-  tasks: IApplicationTaskInBrief[];
+  tasks: IApplicationTask[];
   cache = new Map();
   
   @ViewChild('search', {static: false}) searchTerm: ElementRef;
-  userTasks: IApplicationTaskInBrief[];
+  userTasks: IPaginationAppTask;
   oParams = new userTaskParams();
   pagination = new PaginationTask();
   totalCount: number;

@@ -11,6 +11,8 @@ import { ICvAssessmentHeader } from 'src/app/shared/models/cvAssessmentHeader';
 export class CandidateItemComponent implements OnInit {
   @Input() cv: ICandidateBriefDto;
   @Output() msgEvent = new EventEmitter<number>();
+  @Output() downloadEvent = new EventEmitter<number>();
+
   currentId=0;
   header: ICvAssessmentHeader;
   assessment: ICandidateAssessment;
@@ -39,6 +41,10 @@ export class CandidateItemComponent implements OnInit {
     this.isHidden = true;
   }
 
+  download(id: number) {
+    this.downloadEvent.emit(id);
+  }
+
   async onClickLoadDocument(cvid: number) {
     // get a document from the Web API endpoint 'LoadDocument'
     this.msgEvent.emit(cvid);
@@ -48,7 +54,7 @@ export class CandidateItemComponent implements OnInit {
     this.currentId = id;
   }
 
-  //
-  
-
+  showhistory(cvid: number) {
+    this.msgEvent.emit(cvid);
+  }
 }

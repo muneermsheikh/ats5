@@ -33,6 +33,7 @@ namespace api.Controllers
 
           }
 
+           [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRTrainee")]
           [HttpPost("{candidateid}/{orderitemid}")]
           public async Task<ActionResult<bool>> AddNewChecklist(int candidateid, int orderitemid)
           {
@@ -46,26 +47,27 @@ namespace api.Controllers
                return Ok();
           }
 
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRTrainee")]
           [HttpPut("checklisthr")]
-          public async Task<ActionResult<bool>> EditChecklistHRAsync(ChecklistHRDto checklistHR)
+          public async Task<ActionResult<List<string>>> EditChecklistHRAsync(ChecklistHRDto checklistHR)
           {
                var loggedInUserDto = await GetLoggedInUserDto();
                //if (loggedInUserDto == null) return BadRequest(new ApiResponse(404, "User not logged in"));
                
-               var edit = await _checklistService.EditChecklistHR(checklistHR, loggedInUserDto);
-               if (edit) {
-                    return Ok();} 
-               else {
-                    return BadRequest(new ApiResponse(404, "Failed to edit the checklist"));
-               }
+               var errorLists = await _checklistService.EditChecklistHR(checklistHR, loggedInUserDto);
+
+               if (errorLists.Count==0 || errorLists==null) return Ok(errorLists);
+               return BadRequest(errorLists);
           }
 
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRTrainee")]
           [HttpGet("checklistid/{candidateid}/{orderitemid}")]
           public async Task<int> GetChecklistHRId(int candidateid, int orderitemid)
           {
                return await _checklistService.GetChecklistHRId(candidateid, orderitemid);
           }
-          //[Authorize]
+          
+          [Authorize]
           [HttpGet("checklisthr/{candidateid}/{orderitemid}")]
           public async Task<ActionResult<ChecklistHRDto>> GetChecklistHR(int candidateid, int orderitemid)
           {
@@ -78,6 +80,7 @@ namespace api.Controllers
                return Ok(checklist);
           }
           
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
           [HttpDelete("hrchecklist")]
           public async Task<ActionResult<bool>> DeleteChecklistHRAsync(ChecklistHRDto checklistHR)
           {
@@ -86,7 +89,7 @@ namespace api.Controllers
           }
 
      //master data
-          
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
           [HttpDelete("hrparameter")]
           public async Task<bool> DeleteChecklistHRDataAsync(ChecklistHRData checklistHRData)
           {
@@ -94,18 +97,21 @@ namespace api.Controllers
           }
 
           //checklistHR - job card for HR Executives
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
           [HttpPost("newhrparameter/{checklist}")]
           public async Task<ChecklistHRData> AddChecklistHRParameter(string checklist)
           {
                return await _checklistService.AddChecklistHRParameter(checklist);
           }
 
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpDelete]
           public async Task<bool> DeleteChecklistHRData(ChecklistHRData checklistHRData)
           {
                return await _checklistService.DeleteChecklistHRDataAsync(checklistHRData);
           }
           
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
           [HttpPut("hrchecklistdata")]
           public async Task<bool> EditChecklistHRDataAsync(ChecklistHRData checklistHRData)
           {

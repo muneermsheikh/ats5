@@ -33,6 +33,7 @@ namespace api.Controllers
                _deployService = deployService;
           }
 
+          [Authorize(Roles = "Admin, DocumentControllerAdmin, DocumentControllerProcess, EmigrationExecutive, MedicalExecutive, MedicalExecutiveGAMMCA, ProcessExecutive, VisaExecutiveDubai, VisaExecutiveKSA, VisaExecutiveQatar, VisaExecutiveBahrain")]
           [HttpGet("pending")]
           public async Task<ActionResult<Pagination<DeploymentPendingDto>>> GetPendingDeployments([FromQuery]DeployParams depParam)
           {
@@ -43,6 +44,7 @@ namespace api.Controllers
           }
 
 
+          [Authorize(Roles = "DocumentControllerProcess, EmigrationExecutive, MedicalExecutive, MedicalExecutiveGAMMCA, ProcessExecutive, VisaExecutiveDubai, VisaExecutiveKSA, VisaExecutiveQatar, VisaExecutiveBahrain")]
           [HttpPost("posts")]
           public async Task<ActionResult<ICollection<DeployAddedDto>>> AddDeploymentTransactions(ICollection<DeployPostDto> deployPostsDto)
           {
@@ -62,12 +64,14 @@ namespace api.Controllers
                return Ok(dep);
           }
 
+          [Authorize(Roles = "DocumentControllerProcess, EmigrationExecutive, MedicalExecutive, MedicalExecutiveGAMMCA, ProcessExecutive, VisaExecutiveDubai, VisaExecutiveKSA, VisaExecutiveQatar, VisaExecutiveBahrain")]
           [HttpPut]
           public async Task<ActionResult<bool>> EditDeploymentTransaction(Deploy deploy)
           {
                return await _deployService.EditDeploymentTransaction(deploy);
           }
 
+          [Authorize(Roles = "DocumentControllerProcess, EmigrationExecutive, MedicalExecutive, MedicalExecutiveGAMMCA, ProcessExecutive, VisaExecutiveDubai, VisaExecutiveKSA, VisaExecutiveQatar, VisaExecutiveBahrain")]          
           [HttpDelete]
           public async Task<ActionResult<bool>> DeleteDeploymentTransactions(Deploy deploy)
           {
@@ -91,6 +95,7 @@ namespace api.Controllers
                return loggedInUserDto;
           }
 
+          [Authorize]
           [HttpGet("depStatus")]
           public async Task<ActionResult<ICollection<DeployStatusDto>>> GetDeploymentStatus()
           {

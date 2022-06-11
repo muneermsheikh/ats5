@@ -6,7 +6,7 @@ import {
   HttpInterceptor
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { catchError, delay } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
@@ -21,25 +21,29 @@ export class ErrorInterceptor implements HttpInterceptor {
         if (error) {
           if (error.status === 400) {
             if (error.error.errors) {
-              throw error.error;
+              const modalStateErrors=[];
+              for(const key in error.error.errors) {
+                if(error.error.errors[key]) {
+                  modalStateErrors.push(error.error.errors[key]);
+                }
+              }
+              throw modalStateErrors.flat();
             } else {
               this.toastr.error(error.error.message, error.error.statusCode);
             }
-          }
-          if (error.status === 401) {
+          } else if (error.status === 401) {
             if (error.error?.message !==null && error.error?.message !== undefined) {
               this.toastr.error(error.error.message, error.error.statusCode);
             } else {
               //this.toastr.error(error.message, error.error.statusCode);
               this.toastr.error(error.message, error.statusCode);
             }
-          }
-          if (error.status === 404) {
-            this.toastr.error(error.error.message, error.error.statusCode);
-            this.router.navigateByUrl('/not-found');
-          }
-          if (error.status === 500) {
-            this.router.navigateByUrl('/server-error');
+          } else if (error.status === 404) {
+            this.toastr.error(error.error?.message, error.error?.statusCode);
+            this.router.navigateByUrl('/notfound');
+          } else if (error.status === 500) {
+            const navigationExtras: NavigationExtras = {state: {error: error.error}}
+            this.router.navigateByUrl('/servererror', navigationExtras);
           }
         }
         return throwError(error);

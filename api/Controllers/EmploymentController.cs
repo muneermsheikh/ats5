@@ -6,6 +6,7 @@ using core.Interfaces;
 using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -20,6 +21,7 @@ namespace api.Controllers
                _unitOfWork = unitOfWork;
           }
 
+          [Authorize(Roles = "Admn, HRManager, HRSupervisor, HRExecutive, DocumentControllerAdmin, DocumentControllerProcess")]
           [HttpGet]
           public async Task<ActionResult<Pagination<Employment>>> GetEmployments(EmploymentParams employmentParams)
           {
@@ -32,6 +34,7 @@ namespace api.Controllers
                     employmentParams.PageSize, ct, emps));
           }
 
+          [Authorize(Roles = "Admn, HRManager, HRSupervisor, DocumentControllerAdmin")]
           [HttpPost]
           public async Task<ActionResult<Employment>> AddEmployment(Employment employment)
           {
@@ -50,41 +53,48 @@ namespace api.Controllers
               }
           }
 
-            [HttpGet("employment/{cvrefid}")]
-            public async Task<Employment> GetEmployment (int cvrefid)
-            {
-                return await _employmentService.GetEmployment(cvrefid);
-            }
+        [Authorize]
+        [HttpGet("employment/{cvrefid}")]
+        public async Task<Employment> GetEmployment (int cvrefid)
+        {
+            return await _employmentService.GetEmployment(cvrefid);
+        }
 
-            [HttpGet("employmentsbyorderno/{orderno}")]
-            public async Task<ICollection<EmploymentDto>> GetEmploymentsFromOrderNo(int orderno)
-            {
-                return await _employmentService.GetEmploymentDtoFromOrderNo(orderno);
-            }
-            [HttpGet("employmentsbydates/{datefrom}/{dateupto}")]
-            public async Task<ICollection<EmploymentDto>> GetEmploymentsFromOrderNo(DateTime dateform, DateTime dateupto)
-            {
-                return await _employmentService.GetEmploymentDtoBetwenDates(dateform, dateupto);
-            }
+        [Authorize]
+        [HttpGet("employmentsbyorderno/{orderno}")]
+        public async Task<ICollection<EmploymentDto>> GetEmploymentsFromOrderNo(int orderno)
+        {
+            return await _employmentService.GetEmploymentDtoFromOrderNo(orderno);
+        }
+        
+        [Authorize]
+        [HttpGet("employmentsbydates/{datefrom}/{dateupto}")]
+        public async Task<ICollection<EmploymentDto>> GetEmploymentsFromOrderNo(DateTime dateform, DateTime dateupto)
+        {
+            return await _employmentService.GetEmploymentDtoBetwenDates(dateform, dateupto);
+        }
 
-            [HttpGet("employmentsbycvref/{cvref}")]
-            public async Task<ICollection<EmploymentDto>> GetEmploymentsFromCVRef(int cvref)
-            {
-                return await _employmentService.GetEmploymentDtoFromCVRefId(cvref);
-            }
+        [Authorize]
+        [HttpGet("employmentsbycvref/{cvref}")]
+        public async Task<ICollection<EmploymentDto>> GetEmploymentsFromCVRef(int cvref)
+        {
+            return await _employmentService.GetEmploymentDtoFromCVRefId(cvref);
+        }
 
 
-            [HttpGet("employmentfromselid/{id}")]
-            public async Task<Employment> GetEmploymentFromSelId (int id)
-            {
-                return await _employmentService.GetEmploymentFromSelId(id);
-            }
+        [Authorize]
+        [HttpGet("employmentfromselid/{id}")]
+        public async Task<Employment> GetEmploymentFromSelId (int id)
+        {
+            return await _employmentService.GetEmploymentFromSelId(id);
+        }
 
-            [HttpPut("employment")]
-            public async Task<bool> UpdateEmployment(Employment employment)
-            {
-                return await _employmentService.EditEmployment(employment);
-            }
+        [Authorize(Roles = "Admn, HRManager, HRSupervisor, DocumentControllerAdmin")]
+        [HttpPut("employment")]
+        public async Task<bool> UpdateEmployment(Employment employment)
+        {
+            return await _employmentService.EditEmployment(employment);
+        }
 
 
 

@@ -51,7 +51,7 @@ namespace api.Controllers
      */
      
 
-          [Authorize]
+          [Authorize(Roles="Admin, HRManager" )]
           [HttpPost("edit-roles/{useremail}")]
           public async Task<ActionResult> EditRoles(string useremail, [FromQuery] string roles)
           {
@@ -81,7 +81,7 @@ namespace api.Controllers
                return Ok(await _userManager.GetRolesAsync(user));
           }
 
-          [Authorize]
+          [Authorize(Roles ="Admin, HRManager")]
           [HttpPut("userrole/{userEmail}/{oldRoleName}/{newRoleName}")]
           public async Task<ActionResult<bool>> EditUserRole(string userEmail, string oldRoleName, string newRoleName)
           {
@@ -99,7 +99,7 @@ namespace api.Controllers
                return roleAdded.Succeeded;
           }
 
-          [Authorize]
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor")]
           [HttpGet("userswithgivenrole/{rolename}")]
           public async Task<ActionResult<IReadOnlyList<AppUser>>> GetIdentityUsersWithARole(string roleName)
           {
@@ -108,7 +108,7 @@ namespace api.Controllers
                return Ok(users);
           }
 
-          [Authorize]
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
           [HttpGet("userwithroles/{useremail}")]
           public async Task<ActionResult<IReadOnlyList<AppUserRole>>> GetIdentityUserWithRoles(string useremail)
           {
@@ -128,6 +128,7 @@ namespace api.Controllers
                return await _userManager.IsInRoleAsync(user, roleName);
           }
 
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
           [HttpGet("deleteuserrole/{useremail}/{rolename}")]
           public async Task<ActionResult<bool>> DeleteUserRole(string useremail, string roleName)
           {
@@ -147,6 +148,7 @@ namespace api.Controllers
                return iroles;
           }
 
+          [Authorize(Roles ="Admin, HRManager")]
           [HttpPut("role/{existingRoleName}/{newRoleName}")]
           public async Task<ActionResult<bool>> EditRole(string existingRoleName, string newRoleName)
           {
@@ -160,6 +162,7 @@ namespace api.Controllers
                }
           }
 
+          [Authorize(Roles ="Admin, HRManager")]
           [HttpPost("role/{newRole}")]
           public async Task<ActionResult<bool>> AddNewRole(string newRole)
           {
@@ -175,6 +178,7 @@ namespace api.Controllers
                 }
           }
 
+          [Authorize(Roles ="Admin, HRManager")]
           [HttpDelete("role/{rolename}")]
           public async Task<ActionResult<bool>> DeleteIdentityRole(string rolename)
           {
@@ -207,7 +211,7 @@ namespace api.Controllers
                return Ok(users);
           }
 
-        //[Authorize(Roles= "Admin")]
+        [Authorize(Roles= "Admin")]
         [HttpPost("edit-roles")]
         public async Task<ActionResult> EditUserRoles([FromQuery]string roles)
         {

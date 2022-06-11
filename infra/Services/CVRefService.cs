@@ -197,7 +197,7 @@ namespace infra.Services
                               q.CustomerName + " for " + q.OrderNo + "-" + q.SrNo + "-" + q.CategoryName + " on " + dateTimeNow;
                          
                          var taskitem = new TaskItem((int)EnumTaskType.SubmitCVToDocControllerAdmin, t.Id, dateTimeNow, "Completed",
-                              "Completed task: " + candidatedescription, loggedInUserDto.LoggedInEmployeeId, cvref.OrderId, cvref.OrderItemId,
+                              "Completed task: " + candidatedescription, cvref.OrderId, cvref.OrderItemId,
                               q.OrderNo, loggedInUserDto.LoggedInEmployeeId, dateTimeNow.AddDays(2), q.CandidateId,
                               0, DocControllerAdminId);
                          _unitOfWork.Repository<TaskItem>().Add(taskitem);

@@ -1,0 +1,40 @@
+<div class="container">
+     <div *ngIf="cv===null || cv===undefined">
+          No candidate detail available
+     </div>
+     
+     
+     <div *ngIf="cv!==null && cv !== undefined">
+          <div style="margin-left: 32px !important;">
+                    <input type="checkbox"
+                        class="form-check-input"
+                        [checked]="cv.checked"
+                        value="cv.id"
+                        (change)="cv.checked = !cv.checked"
+                    >
+               <div class="stddSmallFont ml-1 w95" (dblclick)="downloadprofile(cv.id)">{{cv.categoryRef}}</div>
+               <div class="stddSmallFont w90" title="click to edit this prospective candidate detail"
+               >
+                    {{cv.source}}
+               </div>
+          
+               <div class="stdd ml-2 w90"> {{cv.date | date:'d-MMM-yy'}}</div>
+               <div class="stdd mx-1 w150" title="contact history of the candidate" 
+                    title="click to view contact records"
+               >
+                    {{cv.candidateName}}
+               </div>
+               <!-- routerLink='/candidate/historyfromProspectiveId/{{cv.id}}' NOT WORKING WHY ???-->
+               <div class="stdd w80 mx-1">{{cv.age}}</div>
+               <div class="stdd hvr mx-1 w125" title="double click to edit phone number" >{{cv.phoneNo}}</div>
+               <div class="stddSmallFont hvr mx-1 w150" title="double click to edit email" >{{cv.email}}</div>
+               <div class="stddSmallFont hvr mx-1 w200" title="double click to edit status" >{{cv.status}}</div>
+               <div class="stddSmallFont hvr mx-1 w80" >{{cv.userName}}</div>
+               <div class="stddSmallFont mx-1 w80" >{{cv.statusDate | date: 'd-MMM-yy'}}</div>
+               <button class="stdd fa fa-history"  title="User Contact History" (click)="initiateUserContact(cv.id)" ></button>
+               <button class="stdd fa fa-user" title="Create Candidate record and delete from Prospective Candidate records" (click)="transferProspectiveToCandidate(cv.id)" ></button>
+          </div>
+     </div>
+     
+     
+</div>

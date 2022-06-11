@@ -52,13 +52,16 @@ namespace core.Entities.Tasks
         public DateTime TaskDate { get; set; } = DateTime.Now;
         [Required]
         public int TaskOwnerId {get; set;}
+        public string TaskOwnerName {get; set;}
         [Required]
         public int AssignedToId {get; set;}
+        public string AssignedToName {get; set;}
         public int? OrderId {get; set;}
         public int? OrderNo { get; set; }
         public int? OrderItemId {get; set;}
         public int? ApplicationNo { get; set; }
         public int? CandidateId { get; set; }
+        public string PersonType {get; set;}
         [Required]
         public string TaskDescription {get; set;}
         [Required]
@@ -66,6 +69,7 @@ namespace core.Entities.Tasks
         [Required]
         public string TaskStatus {get; set;}="Open";
         public DateTime CompletedOn { get; set; }
+        public int HistoryItemId { get; set; }
         public ICollection<TaskItem> TaskItems {get; set;}
         public EnumPostTaskAction PostTaskAction { get; set; } = EnumPostTaskAction.DoNotComposeAnyMessage;
 

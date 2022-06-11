@@ -33,8 +33,10 @@ namespace core.Entities.HR
         public bool ExceptionApproved {get; set;}
         public string ExceptionApprovedBy {get; set;}
         public DateTime ExceptionApprovedOn {get; set;}
+        public bool ChecklistedOk {get; set;}
         public ICollection<ChecklistHRItem> ChecklistHRItems {get; set;}
         public Candidate Candidate {get; set;}
         public OrderItem OrderItem {get; set;}
+
     }
 }

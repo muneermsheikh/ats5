@@ -1,84 +1,102 @@
-<div class="stdd col-4">
-    <div class="mb-4">
-        <div class="btn-group" name='container'>
-            <button class="btn btn-primary" btnRadio='Unread'  
-                (click)="getMessages()">
-                <i class="fa fa-envelope"></i> Unread
-            </button>
-            <button class="btn btn-primary" btnRadio='Inbox' 
-                (click)="getInboxMessages()">
-                <i class="fa fa-envelope-open"></i> Inbox
-            </button>
-            <button class="btn btn-primary" btnRadio='Sent' 
-                (click)="getOutboxMessages()">
-                <i class="fa fa-paper-plane"></i> Outbox
-            </button>
-        </div>
-        <br>
-        <div class="d-flex mt-2" *ngIf="totalCount > 0">
-           <app-pager 
-                [pageSize]="mParams.pageSize" 
-                [totalCount]="totalCount" 
-                [pageNumber]="mParams.pageIndex" 
-                (pageChanged)="onPageChanged($event)"  >
-           </app-pager>
-       </div>
-       <div class="stdd w100">Sender</div>
-       <div class="stdd w75">Sent On</div>
-       <div class="stdd w150">Recipient</div>
-        <div class="stdd w200">Subject</div>       
-       <div *ngFor="let msg of messages">
-            <div class="stdd w100">{{msg.senderUsername}}</div>
-            <div class="stdd w75" title="click to display the message" >{{msg.messageSentOn | date: 'd-MMM-yy' }}</div>  
-            <div class="stdd w150 my-1" title="click to display the message" (click)="setMessageFromUsername(msg)"  >{{msg.recipientUserName}}</div>
-            <div class="stdd w200">{{msg.subject.substr(1,150)}}</div>
-            <button (click)="$event.stopPropagation()" (click)="deleteMessage(message.id)" class='stdd btn btn-danger fa fa-trash '></button>
-            <button [disabled]=" !message || msg.messageSentOn===null" (click)="saveMessage(message.id)" class='stdd btn mx-1 fa fa-save '></button>
-            <button [disabled]=" !message || msg.messageSentOn!==null" (click)="saveandsend()" class='stdd btn fa fa-paper-plane '></button>
-
-       </div>
-    </div>
+<div class="stdd col-3">
+     <div class="mb-4">
+          <div class="btn-group" name='container'>
+               <button class="btn btn-primary" btnRadio='Unread'  
+                    (click)="getMessages()">
+                    <i class="fa fa-envelope"></i> Unread
+               </button>
+               <button class="btn btn-primary" btnRadio='Inbox' 
+                    (click)="getInboxMessages()">
+                    <i class="fa fa-envelope-open"></i> Inbox
+               </button>
+               <button class="btn btn-primary" btnRadio='Sent' 
+                    (click)="getOutboxMessages()">
+                    <i class="fa fa-paper-plane"></i> Sent
+               </button>
+               <button class="btn btn-primary" btnRadio='Drafts' 
+                    (click)="getDraftMessages()">
+                    <i class="fa fa-plane"></i> Drafts
+               </button>
+          </div>
+          <br>
+          <div class="d-flex mt-2" *ngIf="totalCount > 0">
+               <app-pager 
+                    [pageSize]="mParams.pageSize" 
+                    [totalCount]="totalCount" 
+                    [pageNumber]="mParams.pageIndex" 
+                    (pageChanged)="onPageChanged($event)"  >
+               </app-pager>
+          </div>
+          <div class="stdd w100" *ngIf="container==='sent' || container==='draft' ">Recipient</div>
+          <div class="stdd w100" *ngIf="container==='inbox'">Sender</div>
+          <div class="stdd w100" *ngIf="container==='sent'">Sent On</div>
+          <div class="stdd w100" *ngIf="container==='inbox' || container==='draft' ">Message dated</div>
+          <div class="stdd w150">Subject</div>       
+          <div *ngFor="let msg of messages">
+               <div class="stdd w100">{{msg.senderUsername}}</div>
+               <div class="stdd w75" title="click to display the message" >{{msg.messageSentOn | date: 'd-MMM-yy' }}</div>  
+               <div class="stdd w100 my-1" title="click to display the message" (click)="setMessageFromUsername(msg)"  >{{msg.recipientUserName}}</div>
+               <div class="stdd w150">{{msg.subject.substr(1,150)}}</div>
+               <button (click)="$event.stopPropagation()" (click)="deleteMessage(msg.id)" type="button" class='stdd btn btn-danger fa fa-trash'></button>
+               <!-- 
+                    <button [disabled]=" !message || msg.messageSentOn===null" (click)="saveMessage(msg.id)" class='stdd btn mx-1 fa fa-save '></button>
+               <button [disabled]=" !message || msg.messageSentOn!==null" (click)="saveandsend()" class='stdd btn fa fa-paper-plane '></button>
+               -->
+          </div>
+     </div>
 </div>
 
-<div class="stdd col-8" style="vertical-align: top;" >
-        <div class="row" *ngIf="messages?.length === 0">
-            <div *ngIf="mParams.container==='Inbox'">
-               No Inbox messages for the logged in user
-            </div>
-        </div>
-        <div class="row" *ngIf="messages?.length === 0">
-          <div *ngIf="mParams.container==='sent'">
-             No Sent messages for the logged in user
+<div class="stdd col-9" style="vertical-align: top;" >
+     <div class="row" *ngIf="messages?.length === 0">
+          <div *ngIf="mParams.container==='Inbox'">
+          No Inbox messages for the logged in user
           </div>
-      </div>
-      <div class="row" *ngIf="messages?.length === 0">
-          <div *ngIf="mParams.container==='Unread'">
-             No Unread messages for the logged in user
+     </div>
+     <div class="row" *ngIf="messages?.length === 0">
+     <div *ngIf="mParams.container==='sent'">
+          No Sent messages for the logged in user
+     </div>
+     </div>
+     <div class="row" *ngIf="messages?.length === 0">
+     <div *ngIf="mParams.container==='Unread'">
+          No Unread messages for the logged in user
+     </div>
+     </div>
+
+     <div class="row container" *ngIf="message">
+          <div class="stdd b w50 my-1">From</div>
+          <input class="stdd mx-1 w350" type="text" [(ngModel)]="message.senderEmailAddress" id="message.senderEmailAddress" name="message.senderEmailAddress">
+          <div class="stdd b mx-1 w90" style="text-align: right;">Date Sent</div>
+          <input class="stdd mx-1 w300" type="text" [(ngModel)]="message.messageSentOn" id="message.messageSentOn" name="message.messageSentOn">
+          
+          <div class="my-1">
+               <div class="stdd b w50">To</div>
+               <input class="stdd mx-1 w250" type="text" [(ngModel)]="message.recipientEmailAddress" id="message.recipientEmailAddress" name="message.recipientEmailAddress" >
+               <div class="stdd b w40" style="text-align:right">CC</div>
+               <input class="stdd mx-1 w250" type="text" [(ngModel)]="message.ccEmailAddress" id="message.ccEmailAddress" name="message.ccEmailAddress" >
+               <div class="stdd b w40" style="text-align:right;">BCC</div>
+               <input class="stdd mx-1 w250" type="text" [(ngModel)]="message.bccEmailAddress" id="message.bccEmailAddress" name="message.bccEmailAddress" >
           </div>
-      </div>
-        <div class="row container" *ngIf="messages?.length > 0">
-            <table class="table table-hover" style="cursor: pointer">
-                <thead>
-                    <tr>
-                        <th style="width: 80%">Message</th>
-                        <th>  </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr [hidden]="loading" *ngIf="message" >    <!-- *ngFor="let message of messages" > -->
-                            <td>
-                                <angular-editor [placeholder]="'Message contents'" [(ngModel)]="message.content"></angular-editor>
-                            </td>
-                            <td>
-                              <div class="fa fa-upload"></div>  
-                              <app-upload></app-upload>
-                            </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+
+          <div class="my-1">
+               <div class="stdd b w50 my-1">Subject</div>
+               <input class="stdd mx-1 w600" type="text" [(ngModel)]="message.subject" id="message.subject" name = "message.subject">
+               <button type="button" class="btn mx-2 btn-success fa fa-paper-plane" (click)="sendMessage()"
+                     [disabled]="container!=='draft' && messageSentOn===null" style="text-align:right;" ></button>
+               <button type="button" class="fa fa-trash" (click)="deleteMessage()"
+                     style="text-align:right;" ></button>
+               
+          </div>
+          <div>
+               <angular-editor [placeholder]="'Message contents'" [(ngModel)]="message.content" [config]="editorConfig" name="message.content" ></angular-editor> 
+          </div>
+          
+     </div>
 </div>
+
+
  
+
  <!--
 
 <div class="row">

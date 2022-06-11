@@ -34,12 +34,14 @@ namespace api.Controllers
           private readonly IUserService _userService;
           private readonly AppIdentityDbContext _identityContext;
           private readonly ITaskService _taskService;
+          private readonly ITaskControlledService _taskControlledService;
           private readonly IEmployeeService _empService;
           private readonly IConfiguration _config;
           private readonly RoleManager<AppRole> _roleManager;
           public AccountController(
                UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
                ITokenService tokenService, RoleManager<AppRole> roleManager,
+               ITaskControlledService taskControlledService,
                IMapper mapper, IUserService userService, AppIdentityDbContext identityContext,
                ITaskService taskService, IEmployeeService empService, IConfiguration config)
           {
@@ -49,6 +51,7 @@ namespace api.Controllers
                _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
                _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
                _identityContext = identityContext ?? throw new ArgumentNullException(nameof(identityContext));
+               _taskControlledService=taskControlledService;
                _taskService = taskService ?? throw new ArgumentNullException(nameof(taskService));
                _empService = empService ?? throw new ArgumentNullException(nameof(empService));
                _config = config ?? throw new ArgumentNullException(nameof(config));
@@ -56,15 +59,20 @@ namespace api.Controllers
           }
 
 
-          [Authorize]
+          //[Authorize]
           [HttpGet]
           public async Task<ActionResult<core.ParamsAndDtos.UserDto>> GetCurrentUser()
           {
+               
+               /*
                var email = HttpContext.User?.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
                if (email==null) return BadRequest("User email not found");
                var user = await _userManager.FindByEmailAsync(email);
                if (user==null) return BadRequest("User Claim not found");
+               */
 
+               var user = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               if (user==null) return BadRequest("User email not found");
                return new core.ParamsAndDtos.UserDto
                {
                     loggedInEmployeeId = user.loggedInEmployeeId,
@@ -88,6 +96,7 @@ namespace api.Controllers
                var pp = await _userService.CheckPPNumberExists(ppnumber);
                return pp;
           }
+          
           
           [HttpGet("aadahrexists/{aadharno}")]
           public async Task<ActionResult<bool>> CheckAadharNoExistsAsync([FromQuery] string aadharno)
@@ -129,7 +138,7 @@ namespace api.Controllers
                //var taskParams = new TaskParams{TaskOwnerId = loggedInEmployeeId, AssignedToId = loggedInEmployeeId, TaskStatus = "Open"};
                var tasksOfLoggedInUser = new List<TaskDashboardDto>();
                if(loggedInEmployeeId != 0) {
-                    tasksOfLoggedInUser = (List<TaskDashboardDto>)await _taskService.GetDashboardTasks(loggedInEmployeeId);
+                    tasksOfLoggedInUser = (List<TaskDashboardDto>)await _taskService.GetDashboardTasksOfLoggedInUser(loggedInEmployeeId);
                }
                
                var userdto = new core.ParamsAndDtos.UserDto
@@ -285,7 +294,7 @@ namespace api.Controllers
                */
           }
 
-          [Authorize]
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
           [HttpPost("registeremployee")]
           public async Task<ActionResult<core.ParamsAndDtos.UserDto>> RegisterEmployee(RegisterEmployeeDto registerDto )
           {
@@ -407,7 +416,7 @@ namespace api.Controllers
           }
 
 
-
+          [Authorize(Roles ="Admin, HRManager")]
           [HttpDelete("user/{useremail}")]
           public async Task<ActionResult<bool>> DeleteIdentityUser (string useremail)
           {

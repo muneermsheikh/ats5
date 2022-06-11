@@ -96,10 +96,11 @@ namespace api.Controllers
           [HttpGet("loggedInUser")]
           public async Task<ActionResult<Pagination<EmailMessage>>> GetMessagesForLoggedInUser([FromQuery] EmailMessageSpecParams messageParams)
           {
-               if (messageParams.Container != "Inbox" && messageParams.Container != "Sent") return BadRequest(new ApiResponse(400, "invalid Params container"));
+
+               if (!"inboxsentdraft".Contains(messageParams.Container.ToLower())) 
+                    return BadRequest(new ApiResponse(400, "invalid Params container"));
 
                var user = await _userManager.FindByEmailAsync(User.GetIdentityUserEmailId());
-               //if(user==null) return BadRequest(new ApiResponse(401, "Unauthorized"));
                messageParams.Username=user.UserName;
 
                /* 
@@ -138,6 +139,7 @@ namespace api.Controllers
                return BadRequest("Problem deleting the message");
           }
 */
+          [Authorize(Roles = "HRManager, HRSupervisor, HRExecutive, HRTrainee")]
           [HttpGet("ComposeCVAcknToCandidateByEmail")]
           public async Task<EmailMessage> ComposeCVAcknEmailMessage(CandidateMessageParamDto paramDto)
           {
@@ -147,12 +149,13 @@ namespace api.Controllers
                if (paramDto.DirectlySendMessage)
                {
                     msgToReturn = _emailService.SendEmail(msg, AttachmentFilePaths);
-                    msgToReturn.MessageSentOn = System.DateTime.Now;
+                    //msgToReturn.MessageSentOn = System.DateTime.Now;
                }
 
                return msgToReturn;
           }
-
+          
+          [Authorize(Roles = "HRManager, HRSupervisor, HRExecutive, DocumentControllerAdmin")]
           [HttpGet("ComposeSelAdvToCandidateByEmail")]
           public async Task<ICollection<EmailMessage>> ComposeSelAdviseToCandidateByemail(ICollection<SelectionDecisionMessageParamDto> paramDto)
           {
@@ -166,6 +169,7 @@ namespace api.Controllers
                return msgs;
           }
 
+          [Authorize(Roles = "HRManager, HRSupervisor, HRExecutive, DocumentControllerAdmin")]
           [HttpGet("ComposeRejAdvToCandidateByEmail")]
           public ICollection<EmailMessage> ComposeRejAdviseToCandidateByemail(ICollection<RejDecisionToAddDto> paramDto)
           {
@@ -179,6 +183,7 @@ namespace api.Controllers
                return msgs;
           }
 
+          [Authorize(Roles = "DocumentControllerProcess, MedicalExecutive, MedicalExecutiveGAMMCA, ProcessExecutive, VisaExecutiveDubai, VisaExecutiveKSA, VisaExecutiveQatar, VisaExecutiveBahrain")]
           [HttpGet("ComposeProcessAdvToCandidateByEmail")]
           public async Task<EmailMessage> ComposeProcessAdviseToCandidateByemail(DeployMessageParamDto paramDto)
           {
@@ -188,11 +193,12 @@ namespace api.Controllers
                if (paramDto.DirectlySendMessage)
                {
                     msgToReturn = _emailService.SendEmail(msg, AttachmentFilePaths);
-                    msgToReturn.MessageSentOn = System.DateTime.Now;
+                    //msgToReturn.MessageSentOn = System.DateTime.Now;
                }
                return msgToReturn;
           }
 
+          [Authorize(Roles = "HRManager, HRSupervisor, HRExecutive, DocumentControllerAdmin")]
           [HttpGet("ComposeCVAcknToCandidateBySMS")]
           public async Task<SMSMessage> ComposeCVAcknBySMS(CandidateMessageParamDto paramDto)
           {
@@ -206,6 +212,7 @@ namespace api.Controllers
                return msg;
           }
 
+          [Authorize(Roles = "HRManager, HRSupervisor, HRExecutive, DocumentControllerAdmin")]
           [HttpGet("ComposeSelAdvToCandidateBySMS")]
           public async Task<SMSMessage> ComposeSelAdviseToCandidateBySMS(SelectionDecisionMessageParamDto paramDto)
           {
@@ -219,6 +226,7 @@ namespace api.Controllers
                return msg;
           }
 
+          [Authorize(Roles = "HRManager, HRSupervisor, HRExecutive, DocumentControllerAdmin")]
           [HttpGet("ComposeRejAdvToCandidateBySMS")]
           public async Task<SMSMessage> ComposeRejAdviseToCandidateBySMS(SelectionDecisionMessageParamDto paramDto)
           {
@@ -232,6 +240,7 @@ namespace api.Controllers
                return msg;
           }
 
+          [Authorize(Roles = "DocumentControllerProcess, MedicalExecutive, MedicalExecutiveGAMMCA, ProcessExecutive, VisaExecutiveDubai, VisaExecutiveKSA, VisaExecutiveQatar, VisaExecutiveBahrain")]
           [HttpGet("ComposeProcessAdvToCandidateBySMS")]
           public async Task<SMSMessage> ComposeProcessAdviseToCandidateBySMS(DeployMessageParamDto paramDto)
           {

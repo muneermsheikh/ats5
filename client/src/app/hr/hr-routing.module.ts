@@ -53,7 +53,7 @@ const routes = [
     }}, 
     
     {path: 'cvassess/:id', component: CvAssessComponent,
-      canDeactivate: [PreventUnsavedChangesGuard],
+      //canDeactivate: [PreventUnsavedChangesGuard],
     resolve: {
       candidateBrief: CandidateBriefResolver,
       openOrderItemsBrief: OpenOrderItemsResolver

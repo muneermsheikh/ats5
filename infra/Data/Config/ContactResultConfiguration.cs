@@ -10,7 +10,7 @@ namespace infra.Data.Config
           public void Configure(EntityTypeBuilder<ContactResult> builder)
           {
                builder.Property(p => p.Name).IsRequired().HasMaxLength(100);
-               builder.HasIndex(p => p.Name).IsUnique();
+               builder.HasIndex(p => new {p.Name, p.PersonType}).IsUnique();
           }
      }
 }

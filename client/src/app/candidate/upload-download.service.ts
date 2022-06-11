@@ -18,8 +18,19 @@ export class UploadDownloadService {
   
   constructor(private http: HttpClient) { }
 
-  uploadFile(theFile: FileToUpload) : Observable<any> {
-    return this.http.post<FileToUpload>(apiUrl + 'FileUpload', theFile, httpOptions);
+  uploadFile(theFiles: FileToUpload[]) : Observable<any> {
+    console.log('uploadFile', theFiles);
+    return this.http.post<FileToUpload>(apiUrl + 'FileUpload', theFiles, httpOptions);
   }
 
+  downloadFile(candidateid: number) {
+    console.log('downloading file for candidate id:', candidateid);
+    return this.http.get(apiUrl + 'FileUpload/downloadcandidatefile/' + candidateid);
+  }
+
+  
+  downloadProspectiveFile(prospectiveid: number) {
+
+    return this.http.get(apiUrl + 'FileUpload/downloadprospectivefile/' + prospectiveid);
+  }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { ToastRef, ToastrService } from 'ngx-toastr';
 import { IUser } from 'src/app/shared/models/user';
 import { IUserRoleObj, userRoleObj } from 'src/app/shared/models/userRolesModal';
 import { AdminService } from '../admin.service';
@@ -16,7 +17,11 @@ export class UserManagementComponent implements OnInit {
   bsModalRef: BsModalRef;
   existingRoles: string[]=[];
   sRoles: IUserRoleObj[]=[];
-  constructor(private adminService: AdminService, private modalService: BsModalService) { }
+
+  newRoleAdded: string='';
+
+  constructor(private adminService: AdminService, private modalService: BsModalService,
+      private toastr: ToastrService) { }
 
   ngOnInit(): void {
     this.getUsersWithRoles();
@@ -90,5 +95,24 @@ export class UserManagementComponent implements OnInit {
     return aroles;
   }   
 
+  addNewRole() {
+    if(this.newRoleAdded==='') {
+      this.toastr.warning('No Role name provided');
+      return;
+    }
+
+    this.adminService.addNewRole(this.newRoleAdded).subscribe(response => {
+      if(response) {
+        this.existingRoles.push(this.newRoleAdded);
+        this.newRoleAdded='';
+        this.toastr.success('new Role ' + this.newRoleAdded + ' added' );
+      } else {
+        this.toastr.warning('failed to add new Role ' + this.newRoleAdded);
+      }
+    }, error => {
+      this.toastr.error('error in adding new Role ' + this.newRoleAdded);
+    })
   }
+
+}
 

@@ -63,7 +63,7 @@ namespace infra.Services
                 string knownas = await _commonServices.GetEmployeeNameFromEmployeeId(loggedInEmployeeId);
 
                 if (!requireInternalReview) {        //the orderassessmentitems will not be set
-                    candassessment = new CandidateAssessment(candidateId, orderItemId, loggedInEmployeeId, knownas, dateIssued,false, checklistHRid);
+                    candassessment = new CandidateAssessment(candidateId, orderItemId, loggedInEmployeeId, knownas, dateIssued,false, checklistHRid, EnumCandidateAssessmentResult.NotRequired);
                 } else {
                     var itemassessment = await _context.OrderItemAssessments
                             .Where(x => x.OrderItemId == orderItemId)
@@ -158,7 +158,7 @@ namespace infra.Services
                     var knownas = await _commonServices.GetEmployeeNameFromEmployeeId(loggedInIdentityUserId);
                     var dateIssued = DateTime.Now;
                     if (!requireInternalReview) {        //the orderassessmentitems will not be set
-                        candassessment = new CandidateAssessment(candidateId, orderItemId, loggedInIdentityUserId, knownas, dateIssued,false, checklisthrid);
+                        candassessment = new CandidateAssessment(candidateId, orderItemId, loggedInIdentityUserId, knownas, dateIssued,false, checklisthrid, EnumCandidateAssessmentResult.NotRequired);
                     } else {
                         var itemassessment = await _context.OrderItemAssessments
                                 .Where(x => x.OrderItemId == orderItemId)

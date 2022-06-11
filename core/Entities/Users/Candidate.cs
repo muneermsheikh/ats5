@@ -49,6 +49,7 @@ namespace core.Entities.Users
         [Required]         
         public string KnownAs { get; set; }
         public int ReferredBy { get; set; }
+        public string Source {get; set;}
         [Required]
         public DateTime DOB { get; set; }
         public string PlaceOfBirth { get; set; }

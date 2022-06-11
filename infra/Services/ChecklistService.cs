@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using core.Entities.HR;
 using core.Entities.MasterEntities;
 using core.Entities.Orders;
@@ -20,10 +21,13 @@ namespace infra.Services
         private readonly ICVReviewService _cvReviewService;
         private readonly IUserService _userService;
         private readonly ICommonServices _commonService;
+        private readonly IMapper _mapper;
         public ChecklistService(ATSContext context, IUnitOfWork unitOfWork, IUserService userService,
             IEmployeeService empService, ICVReviewService cvReviewService, 
-            ICommonServices commonService)
+          
+            ICommonServices commonService, IMapper mapper)
         {
+            _mapper = mapper;
             _commonService = commonService;
             _userService = userService;
             _cvReviewService = cvReviewService;
@@ -32,7 +36,20 @@ namespace infra.Services
             _context = context;
         }
 
-        
+        private List<string> ChecklistErrors(ChecklistHR checklistHR) {
+
+            var errorStrings = new List<string>();
+            foreach(var item in checklistHR.ChecklistHRItems)
+            {
+                if(item.MandatoryTrue && !item.Accepts) errorStrings.Add(item.Parameter + " not accepted");
+            }
+
+            if (checklistHR.Charges >=0 && checklistHR.ChargesAgreed != checklistHR.Charges && !checklistHR.ExceptionApproved ) 
+                errorStrings.Add("Charges of " + checklistHR.Charges + " not agreed to by the candidate, and Exceptions not approved");
+            return errorStrings;
+        }
+
+
         private async Task<ChecklistHR> AddChecklistHR(int candidateid, int orderitemid, int employeeid)
         {
             var itemList = new List<ChecklistHRItem>();
@@ -50,6 +67,7 @@ namespace infra.Services
             if (await _unitOfWork.Complete() == 0) throw new Exception("Failed to save the Checklist details");
             return hrTask;
         }
+
         public async Task<ChecklistHR> AddNewChecklistHR(int candidateId, int orderItemId, int LoggedInEmployeeId)
         {
             //check if the candidate has aleady been checklisted for the order item
@@ -62,8 +80,13 @@ namespace infra.Services
             return hr;
         }
 
-        public async Task<bool> EditChecklistHR(ChecklistHRDto model, LoggedInUserDto loggedInUserDto)
+        public async Task<List<string>> EditChecklistHR(ChecklistHRDto model, LoggedInUserDto loggedInUserDto)
         {
+            
+            var chklst = _mapper.Map<ChecklistHRDto, ChecklistHR>(model);
+            var errorList = ChecklistErrors(chklst);
+            if(errorList==null || errorList.Count > 0) return errorList;
+
             var existing = await GetChecklistHRIfEditable(model, loggedInUserDto);     //returns ChecklistHR
             _context.Entry(existing).CurrentValues.SetValues(model);   //saves only the parent, not children
 
@@ -96,7 +119,9 @@ namespace infra.Services
             }
             _context.Entry(existing).State = EntityState.Modified;
 
-            return await _context.SaveChangesAsync() > 0;
+            if(await _context.SaveChangesAsync() ==0) errorList.Add("failed to update the Object");
+            
+            return errorList;
         }
 
         public async Task<bool> DeleteChecklistHR(ChecklistHRDto checklistHR, LoggedInUserDto loggedInDto)
@@ -114,6 +139,7 @@ namespace infra.Services
                 .Select(x => x.Id).FirstOrDefaultAsync();
             return checklist;
         }
+        
         public async Task<ChecklistHRDto> GetChecklistHR(int candidateId, int orderItemId, LoggedInUserDto loggedInUserDto)
         {
             var lst = await(from checklist in _context.ChecklistHRs 
@@ -180,8 +206,7 @@ namespace infra.Services
             return existing;
         }
 
-
-        //master data
+      //master data
         public async Task<ChecklistHRData> AddChecklistHRParameter(string checklistParameter)
         {
             var srno = await _context.ChecklistHRDatas.MaxAsync(x => x.SrNo) + 1;

@@ -3,10 +3,19 @@
      margin-left: 2px;
      margin-right: 2px;
      white-space: normal;
-     vertical-align: top;
 }
-.label {vertical-align: middle;}
+
+.vTop {vertical-align: top;}
+
+.lbl {
+     display: inline-block;
+     margin-left: 2px;
+     margin-right: 2px;
+     white-space: normal;
+     vertical-align:middle;
+}
 .b {font-weight: bold;}
+.blue{color: blue;}
 .fontSmall {font-size: small;}
 .w15 {width: 15px;}
 .w25 {width: 25px;}

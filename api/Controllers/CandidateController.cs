@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using api.Errors;
 using api.Extensions;
 using AutoMapper;
+using core.Entities.Admin;
 using core.Entities.Attachments;
 using core.Entities.HR;
 using core.Entities.Identity;
@@ -15,6 +16,7 @@ using core.Interfaces;
 using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -36,6 +38,7 @@ namespace api.Controllers
           private readonly IWebHostEnvironment _environment;
           private readonly IEmployeeService _empService;
           private readonly ILogger<CandidateController> _logger;
+          const string FILE_PATH = @"D:\UploadedFiles\";
           public CandidateController(IUnitOfWork unitOfWork, IMapper mapper, IEmployeeService empService,
                IGenericRepository<Candidate> candRepo, ILogger<CandidateController> logger,
                UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IWebHostEnvironment environment,
@@ -99,12 +102,10 @@ namespace api.Controllers
           }
 
           
-
+          [Authorize]
           [HttpGet("candidatelist")]
           public async Task<ActionResult<ICollection<CandidateBriefDto>>> GetCandidateListAsync(CandidateSpecParams candidateParam)
           {
-               if (!User.IsUserAuthenticated()) return Unauthorized("user is not authenticated");
-
                var spec = new CandidateSpecs(candidateParam);
                var countSpec = new CandidateForCountSpecs(candidateParam);
 
@@ -136,7 +137,6 @@ namespace api.Controllers
           [HttpGet("byid/{id}")]
           public async Task<ActionResult<Candidate>> GetCandidateById(int id)
           {
-               
                var cand = await _userService.GetCandidateByIdWithAllIncludes(id);
                return Ok(cand);
           }
@@ -189,6 +189,21 @@ namespace api.Controllers
                return Ok(c);
           }
           
+          
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRExecutive")]
+          [HttpPost]
+          public async Task<ActionResult<bool>> UploadUserAttachmentsR(FileToUpload file) {
+
+               var filePathName = FILE_PATH + Path.GetFileNameWithoutExtension(file.FileName) + "-" +
+                    DateTime.Now.ToString().Replace("/", "").Replace(":", "").Replace(" ", "") +
+                    Path.GetExtension(file.FileName);
+               
+               return Ok(true);
+
+          }
+
+
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpPost("attachment/{candidateAppUserId}")]
           public async Task<ActionResult<bool>> UploadUserAttachments(ICollection<IFormFile> files, int candidateAppUserId)
           {
@@ -249,6 +264,7 @@ namespace api.Controllers
 
           }
 
+           [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRExecutive, Candidate")]
           [HttpDelete("deleteUploadedFile")]
           public async Task<ActionResult<bool>> DeleteUploadedFile(FileUpload fileupload)
           {
@@ -326,6 +342,7 @@ namespace api.Controllers
                return errorString;
           }
 
+           [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRExecutive, HRTrainee")]
           [HttpPut("edituserprof")]
           public async Task<ActionResult<UserAndProfessions>> EditUserProfessions(UserAndProfessions userProfessions)
           {
@@ -344,10 +361,11 @@ namespace api.Controllers
                return Ok(new UserAndProfessions{CandidateId = userProfessions.CandidateId, CandidateProfessions = profs});
           }
      
-          [HttpPut("{{UserFormFiles}}")]
-          public async Task<ActionResult<Candidate>> EditCandidate(Candidate candidate, ICollection<IFormFile> UserFormFiles)
+           [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRTrainee")]
+          [HttpPut]
+          public async Task<ActionResult<Candidate>> EditCandidate(Candidate candidate)
           {
-               var cand = await _userService.UpdateCandidateAsync(candidate, UserFormFiles);
+               var cand = await _userService.UpdateCandidateAsync(candidate);
                if (cand == null) return BadRequest(new ApiResponse(404, "Failed to update the candidate"));
                return Ok(cand);
           }

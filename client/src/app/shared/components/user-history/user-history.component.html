@@ -1,0 +1,93 @@
+ <div *ngIf="historyItems" class="sddww col-10 vAlignT" >
+         <form [formGroup]="form" >  <!-- (ngSubmit)="onSubmit()"> -->
+            <!-- 
+            <div *ngIf="member">
+                 <div class="stdd b blue" >Person:</div>
+                 <div class="stdd mx-2">{{member.personName}}</div>
+                 <div class="stdd b blue" >Person Type:</div>
+                 <div class="stdd mx-2">{{member.personType}}</div>
+                 <br>
+                 <div class="stdd b blue">Phone No.:</div>
+                 <div class="stdd mx-2" >{{member.phoneNo}}</div>
+                 <div class="stdd b blue">Email:</div>
+                 <div class="stdd mx-2">{{member.emailId}}</div>
+                 
+                 <div class="stdd"s *ngIf="member.personType==='candidate'">
+                     <div class="stdd b blue">App No.:</div>
+                     <div class="stdd mx-2">{{member.applicationNo}}</div>
+                 </div>
+                 <br>
+                 <div class="stdd b blue">Created on:</div>
+                 <div class="stdd mx-2">{{member.createdOn | date}}</div>
+                 
+                 <div class="stdd alignR w400">
+                     <button [disabled]="!form.dirty" title="save the transactions" type="submit" 
+                         class="stdd btn btn-success pull-right fa fa-save" (click)="update()" >
+                         <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                     </button>
+                     <button type="button" class="stdd mx-1 btn btn-primary fa fa-refresh" title="Refresh form" (click)="clearMember()"></button>
+                 </div>            
+     
+             </div>
+             <hr>
+            -->
+ 
+             <div class="my-2">
+             <div class="stdd b">
+                    <div class="stddww b w75" >Date</div>
+                    <!-- <div class="stddww mx-1 w90 b">Subject</div> -->
+                    <div class="stddww mx-1 b w90" >Category Ref</div>
+                    <div class="stddww mx-1 b w75" >Phone No</div>
+                    <div class="stddww mx-1 b w200" >discussion</div>
+                    <div class="stddww mx-1 w150" >Result</div>
+                    <button type="button" (click)="addUserHistoryItem()" title="add a new transaction" 
+                         [disabled]="!member" class="stdd mx-1 btn btn-success alignR fa fa-plus"></button>
+             </div>
+         </div>
+         <div formArrayName="userHistoryItems" class="my-1 mx-1">
+             <div *ngFor="let item of userHistoryItems.controls; let i=index">
+                 <div [formGroupName]="i" >
+ 
+                     <input class="stddww w75 input"
+                         type="text"
+                         placeholder="Contacted On"
+                         formControlName="dateOfContact"
+                         bsDatepicker
+                         [bsValue]="bsValueDate"
+                         [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                     >   
+                    <!-- <input type="text" formControlName="subject" class="stddww input w90 mx-1" (dblclick)="subjectDblClick(i)" > -->
+                    <input type="text" formControlName="categoryRef" class="stddww mx-1 input w90" style="line-height: 3em; word-wrap: break-word;" (dblclick)="categoryDblClick(i)" >
+                    <input type="text" formControlName="phoneNo" class="stddww input w75" style="line-height: 3em;" >
+                     <textarea cols="28" rows="2" formControlName="gistOfDiscussions" class="input stdd mx-1"></textarea>
+                     
+                     <ng-select *ngIf="contactResultData" class="stddDropdown"
+                         [items]="contactResultData"
+                             bindLabel="name"
+                             bindValue="id"
+                             labelForId="id"
+                             placeholder="Result"
+                             clearAllText="Clear"
+                             formControlName="contactResult">
+                         </ng-select>
+                     <!-- <input type="text" class="sddww mx-1 w25" formControlName="personId" readonly > -->
+                     <!-- <label class="sddww w150">{{member.loggedInUserName}}</label> -->
+                     <button (click)="displayPersonTasksModal(item)" class="stddButton btn fa fa-bell" title="display tasks for the person"> </button>
+                     <button (click)="removeUserHistoryItem(i)" class="stddButtonRed btn fa fa-trash" title="Remove the transaction record"> </button>
+                 </div>
+             </div>
+         </div>
+         </form>            
+     </div>
+ 
+ <ul class="text-danger list-unstyled" *ngIf="errors">
+     <li *ngFor="let error of errors">
+             {{error}}
+     </li>
+ </ul>
+     <div>
+         {{this.form.value | json}}
+     </div>
+  
+ 
+ 

@@ -1,6 +1,8 @@
 export class userTaskParams {
      taskId?: number;
      taskDate?: Date;
+     candidateId: number;
+     personType: string;
      assignedToId?: number;
      assignedToNameLike?: string;
      taskStatus? ='';

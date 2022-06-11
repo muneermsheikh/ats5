@@ -6,5 +6,7 @@ export class userHistoryParams {
      applicationNo? = 0;
      emailId = ''
      mobileNo = '';
+     dateAdded = '';
+     categoryRef = '';
      createNewIfNull = false;
 }

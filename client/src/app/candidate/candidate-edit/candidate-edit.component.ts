@@ -1,11 +1,10 @@
-import { HttpRequest } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AsyncValidatorFn, FormArray, FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TabDirective, TabsetComponent } from 'ngx-bootstrap/tabs';
 import { ToastrService } from 'ngx-toastr';
 import { of, timer } from 'rxjs';
-import { first, map, switchMap, take } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 import { AccountService } from 'src/app/account/account.service';
 import { ICandidate } from 'src/app/shared/models/candidate';
 import { IEntityAddress } from 'src/app/shared/models/entityAddress';
@@ -189,6 +188,7 @@ export class CandidateEditComponent implements OnInit {
     setExistingProfs(userProfs: IUserProfession[]): FormArray {
       const formArray = new FormArray([]);
       userProfs.forEach(p => {
+        console.log('setExistingProfs', p);
         formArray.push(this.fb.group({
           id: p.id,
           candidateId: p.candidateId,
@@ -345,7 +345,7 @@ export class CandidateEditComponent implements OnInit {
           passportNo: ['', Validators.required, this.validatePPNotTaken()],
           ecnr: false,
           nationality: 'Indian',
-          issuedOn: ['', Validators.required],
+          issuedOn: [''],
           validity: ['', Validators.required],
           isValid: true
         })
@@ -506,6 +506,7 @@ export class CandidateEditComponent implements OnInit {
               if(this.member.userPhones !=null){for(const ph of this.member.userPhones) { this.userPhones.push(new FormControl(ph)); }}
               if (this.member.userQualifications !== null) {for(const q of this.member.userQualifications) { this.userQualifications.push(new FormControl(q)); }}
               if (this.member.userProfessions !== null) {for(const p of this.member.userProfessions) { this.userProfessions.push(new FormControl(p)); }}
+              if (this.member.userPassports !== null) {for(const p of this.member.userPassports) { this.userPassports.push(new FormControl(p)); }}
               if (this.member.userExperiences !== null) {for(const e of this.member.userExperiences) { this.userExperiences.push(new FormControl(e)); }}
               if (this.member.userAttachments !== null) {for(const a of this.member.userAttachments) { this.userAttachments.push(new FormControl(a)); }}
             }
@@ -537,7 +538,7 @@ export class CandidateEditComponent implements OnInit {
             formData.append('userFormFiles', f);
         }})
         */
-        this.service.UpdateCandidate(this.form.value, this.selectedFiles).subscribe(response => {
+        this.service.UpdateCandidate(this.form.value).subscribe(response => {
           this.toastr.success('candidate updated');
           this.router.navigateByUrl('/candidate');
 

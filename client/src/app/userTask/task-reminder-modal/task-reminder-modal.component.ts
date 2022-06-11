@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
 import { IApplicationTask } from 'src/app/shared/models/applicationTask';
-import { IApplicationTaskInBrief } from 'src/app/shared/models/applicationTaskInBrief';
 import { IEmployeeIdAndKnownAs } from 'src/app/shared/models/employeeIdAndKnownAs';
 
 
@@ -14,8 +13,9 @@ import { IEmployeeIdAndKnownAs } from 'src/app/shared/models/employeeIdAndKnownA
 })
 export class TaskReminderModalComponent implements OnInit {
   @Input() updatedRemidner = new EventEmitter();
-  obj: IApplicationTaskInBrief;
+  obj: IApplicationTask;
   emps: IEmployeeIdAndKnownAs[];
+  title: string;
   
   constructor(public bsModalRef: BsModalRef, private toastr: ToastrService) { }
 
@@ -27,11 +27,11 @@ export class TaskReminderModalComponent implements OnInit {
       this.toastr.warning('task not assigned');
       return;
     }
-    if(this.obj.completeBy.getFullYear() < 2000) {
+    if(new Date(this.obj.completeBy).getFullYear() < 2000) {
       this.toastr.warning('complete by date should be provided');
       return;
     }
-    if(this.obj.taskDate.getFullYear() < 2000) {
+    if(new Date(this.obj.taskDate).getFullYear() < 2000) {
       this.toastr.warning('task date not provided');
       return;
     }

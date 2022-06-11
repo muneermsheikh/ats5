@@ -111,6 +111,7 @@ namespace infra.Data
      //users
 
           public DbSet<Candidate> Candidates {get; set;}
+          public DbSet<ProspectiveCandidate> ProspectiveCandidates {get; set;}
           public DbSet<EntityAddress> EntityAddresses {get; set;}
           public DbSet<Photo> Photos {get; set;}
           //public DbSet<core.Entities.Users.Address> UserAddresses {get; set;}

@@ -1,6 +1,8 @@
 <div class="modal-header">
-     <div class="modal-title pull-left">Set Task Reminder</div>
-     <br>
+     <div class="modal-title pull-left">Set Task Reminder for  {{title}}</div>
+     <div class="stdd" *ngIf="obj.id===0" >Create a new task</div>
+     <div class="stdd" *ngIf="obj.id !== 0" >Edit an existing task</div>
+     <br class="mb-0">
      
      <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
          <span aria-hidden="true">&times;</span>
@@ -9,7 +11,7 @@
     <div class="modal-body">
       <form #taskForm="ngForm" id="taskForm">
           <label class="stdd mx-2 w150">Task Type: </label>
-          <div class="stdd mx-2 mb-2 w200" name="obj.taskTypeName">{{obj.taskTypeName}} </div>
+          <!-- <div class="stdd mx-2 mb-2 w200" name="obj.taskTypeName">{{obj?.taskTypeName}} </div> -->
           <br>
           <label class="stdd mx-2 w150">Task Dated:</label>
           <input class="stdd mx-2 mb-2" name="obj.taskDate" class="input"
@@ -21,11 +23,11 @@
           >
           <br>
           <label class="stdd mx-2 w150">Task Ownership:</label>
-          <div class="stdd mx-2 mb-2 w200">{{obj.taskOwnerName}} </div>
+          <!-- <div class="stdd mx-2 mb-2 w200">{{obj?.taskOwnerName}} </div> -->
           <br>
           <label class="stdd mx-2 w150">Assigned To:</label>
           <ng-select *ngIf="emps" class="stdd mx-2 mb-2 w200"
-               name="obj.assignedToId"
+               name="assignedToId"
                [items]="emps"
                bindLabel="knownAs"
                bindValue="id"
@@ -51,7 +53,7 @@
           >
           <br>
           <label class="stdd b mx-2 w150">Task status</label>
-          <input type="text" class="stdd mx-2 w200" name="obj.taskStatus" [(ngModel)]="obj.taskStatus" >
+          <input readonly type="text" class="stdd mx-2 w200" name="obj.taskStatus" [(ngModel)]="obj.taskStatus" >
       </form>
     </div>
     <div class="modal-footer">

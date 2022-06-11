@@ -11,6 +11,7 @@ export interface IApplicationTask {
      taskStatus: string;
      completedOn: Date;
      postTaskAction: number;
+     historyItemId: number;
 
      orderId: number;
      orderNo: number;
@@ -30,6 +31,7 @@ export class ApplicationTask {
      taskStatus: string;
      completedOn: Date;
      postTaskAction: number;
+     historyItemId: number;
 
      orderId: number;
      orderNo: number;

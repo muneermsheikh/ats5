@@ -1,12 +1,10 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { of, ReplaySubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { ReplaySubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { IApplicationTask } from '../shared/models/applicationTask';
-import { IPaginationTask, PaginationTask } from '../shared/models/paginationTask';
 import { IUser } from '../shared/models/user';
-import { userTaskParams } from '../shared/models/userTaskParams';
+import { PaginationTask } from '../shared/pagination/paginationTask';
+import { userTaskParams } from '../shared/params/userTaskParams';
 
 @Injectable({
   providedIn: 'root'

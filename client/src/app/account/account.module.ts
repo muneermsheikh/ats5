@@ -11,6 +11,7 @@ import { UserManagementComponent } from './user-management/user-management.compo
 import { UsersWithRolesComponent } from './users-with-roles/users-with-roles.component';
 import { UserTransactionComponent } from './user-transaction/user-transaction.component';
 import { SearchHistoryComponent } from './search-history/search-history.component';
+import { RolesComponent } from './roles/roles.component';
 
 
 
@@ -23,6 +24,7 @@ import { SearchHistoryComponent } from './search-history/search-history.componen
     UsersWithRolesComponent,
     UserTransactionComponent,
     SearchHistoryComponent,
+    RolesComponent,
   ],
   imports: [
     CommonModule,

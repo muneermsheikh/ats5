@@ -11,7 +11,8 @@ namespace core.Entities.HR
           {
           }
 
-          public CandidateAssessment(int candidateId, int orderItemId, int assessedById, string assessedByName, DateTime assessedOn, bool requirereview, int hrchecklistid)
+          public CandidateAssessment(int candidateId, int orderItemId, int assessedById, string assessedByName, 
+              DateTime assessedOn, bool requirereview, int hrchecklistid, EnumCandidateAssessmentResult assessmentResult)
           {
               CandidateId = candidateId;
               OrderItemId = orderItemId;
@@ -20,6 +21,7 @@ namespace core.Entities.HR
               AssessedOn = assessedOn;
               requireInternalReview = requirereview;
               HrChecklistId = hrchecklistid;
+              AssessResult=assessmentResult;
           }
 
           public CandidateAssessment(int candidateId, int orderItemId, int assessedById, string assessedByName, DateTime assessedOn, bool requirereview, int hrchecklistid,

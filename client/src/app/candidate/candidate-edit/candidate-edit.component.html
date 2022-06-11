@@ -4,11 +4,8 @@
 
      </div>
      <div class="col-9 py-0 my-0" style="display: inline-block;" >
-         <div class="alert alert-info" *ngIf="form.dirty">
-             <strong>Information: </strong> You have made changes.  Any unsaved changes will be lost
-         </div>
      </div>
-     <div class="col-3 my-2" style="display: inline-block;">
+     <div class="col-3 my-2" style="display: inline-block; vertical-align: top;">
          <div class="card">
              <img src="{{member.photoUrl || './assets/images/user.png'}}" alt="{{member.knownAs}}" 
                  class="card-img-top img-thumbnail">
@@ -77,7 +74,9 @@
                         <br>
                         <div class="stdd b w100">Email</div>
                             <input class="stddmx2 w350" type="text" formControlName="email" >
-                        <hr>
+                    </div>
+                    <div class="my-2" style="font-size: small;">
+                    <hr>
                         <div class="stdd col-6" >
                             <div class="w100 b">Introduction</div>
                             <textarea class="form-control ml-10" formControlName="introduction" rows="2" ></textarea>
@@ -89,30 +88,34 @@
                          <hr>
                         <div class="stdd w100 b" >Aadhar No</div>
                         <input type="text" formControlName="aadharNo" class="stdd w150 py-0 my-0">
-                        <hr>
-                        <div style="font-weight: bold;">
-                            <label style="width: 35px;" >Sr#</label>
-                            <label class="stddmx2 w100" >PP No</label>
-                            <label class="stddmx2 w100" >Nationality</label>
-                            <label class="stddmx2 w50" >ECNR</label>
-                            <label class="stddmx2 w125" >Issued On</label>
-                            <label class="stddmx2  w135" >Valid Upto</label>
-                            <label class="stddmx2 w75" >Is Valid</label>
-                            <div class="stdd w200" >
-                                <button type="button" (click)="addUserPP()" class="stdd px-15 fa fa-plus" style="color: blue; float: right;"></button>
-                            </div>
-                        </div>
                         
                     </div>
+                </tab>
+<!--
+                <tab heading='Passports' (selectTab)="onTabActivated($event)">
+
+                        <label style="width: 35px;" >Sr#</label>
+                        <label class="stddmx2 w100" >PP No</label>
+                        <label class="stddmx2 w100" >Nationality</label>
+                        <label class="stddmx2 w50" >ECNR</label>
+                        <label class="stddmx2 w125" >Issued On</label>
+                        <label class="stddmx2  w135" >Valid Upto</label>
+                        <label class="stddmx2 w75" >Is Valid</label>
+                            <button type="button" (click)="addUserPP()" class="stdd px-15 fa fa-plus" style="color: blue; float: right;"></button>
+
                     <div formArrayName="userPassports" class="my-1 px-0" style="height: 10px; font-size: small;" >
                         <div *ngFor="let q of userPassports.controls; let i=index">
                             <div [formGroupName]="i" >
                                 <div class="stdd w35" >{{i+1}}</div>
+
                                 <input type="text" formControlName="passportNo" class="stddmx2 w100"  >
+
+
                                 <input type="text" formControlName="nationality" class="stddmx2 w100" >
+
                                 <input type="checkbox" formControlName="ecnr" class="stddmx2 w50"  >
                                 <div class="stdd b w100">Issued On</div>
-                                <input class="stddmx2 w100"
+                                 <input class="stddmx2 w100"
                                     type="text"
                                     placeholder="Issued On"
                                     formControlName="issuedOn"
@@ -125,28 +128,33 @@
                                 <input class="stddmx2 w100"
                                     type="text"
                                     placeholder="Valid upto"
-                                    formControlName="valdiity"
+                                    formControlName="validity"
                                     bsDatepicker
                                     [bsValue]="bsValueDate"
                                     [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
                                 >   
+                    
+
                                 <input type="checkbox" formControlName="isValid" class="stddmx2 w50" >
+
                                 <div class="stdd w50" >
                                     <button (click)="removeUserPP(i)" class="stdd fa fa-trash" style="color:red; float: right;"></button>
                                 </div>
+                            
                             </div>
                         </div>
                     </div>
-                </tab>
                 
+                </tab>
+-->                           
                 <tab heading='Professions' (selectTab)="onTabActivated($event)">
+                    
                     <label class="px-5" style="width: 50px;">Sr. No.</label>
                     <label class="px-5" style="width: 500px;">Profession</label>
                     <label class="px-5" style="width: 50px;">Is Main</label>
                     <button type="button" (click)="addUserProfession()" class="px-15 fa fa-plus" style="color: blue;"></button>
                     <div formArrayName="userProfessions" class="my-1 px-0" style="height: 10px; font-size: small;" >
-                        <div *ngFor="let cat of userProfessions.controls; let i=index">
-                            <div [formGroupName]="i" >
+                        <div *ngFor="let cat of userProfessions.controls; let i=index"  [formGroupName]="i">
                                 <div style="display: inline-block; width: 50px;" class="px-5">{{i+1}}</div>
                                 <ng-select *ngIf="categories" style="display: inline-block; width: 500px;" class="px-5"
                                     [items]="categories"
@@ -160,17 +168,19 @@
                                 <input type="checkbox" formControlName="isMain" style="display: inline-block; width: 50px" class="px-5">
                                 <button (click)="removeUserProfession(i)" style="margin-left: 10px;" class="fa fa-trash" style="color:red; display: inline-block;"></button>
                             </div>
-                        </div>
                     </div>
+            
                 </tab>
+        
                 <tab heading='Qualifications' (selectTab)="onTabActivated($event)">
+
                     <label class="px-5" style="width: 50px;">Sr. No.</label>
                     <label class="px-5" style="width: 300px;">Qualification</label>
                     <label class="px-5" style="width: 50px;">Is Main</label>
                     <button type="button" (click)="addQualification()" class="px-15 fa fa-plus" style="color: blue;"></button>
                     <div formArrayName="userQualifications" class="my-1 px-0" style="height: 10px; font-size: small;" >
-                        <div *ngFor="let q of userQualifications.controls; let i=index">
-                            <div [formGroupName]="i" >
+                        <div *ngFor="let q of userQualifications.controls; let i=index"  [formGroupName]="i" >
+                            <!-- <div [formGroupName]="i" > -->
                                 <div style="display: inline-block; width: 50px;" class="px-5">{{i+1}}</div>
                                 <ng-select *ngIf="qualifications" style="display: inline-block; width: 300px;" class="px-5"
                                     [items]="qualifications"
@@ -183,17 +193,17 @@
                                 </ng-select>
                                 <input type="checkbox" formControlName="isMain" style="margin-left: 50px; display: inline-block; width: 50px" >
                                 <button (click)="removeUserQualification(i)" style="margin-left: 10px;" class="fa fa-trash" style="color:red; display: inline-block;"></button>
-                            </div>
+                            <!-- </div> -->
                         </div>
                     </div>
-                </tab>
 
+                </tab>
                 <tab heading='Address & Phones' (selectTab)="onTabActivated($event)">
+
                      <div class="col-7" style="display: inline-block; vertical-align: top;" >
                         <button type="button" (click)="addEntityAddress()" class="fa fa-plus" style="text-align: right; color: blue;"></button>
                         <div formArrayName="entityAddresses" style="height: 10px; font-size: small; " class="my-1 px-0"> 
-                            <div *ngFor="let ph of entityAddresses.controls; let i=index"> 
-                                <div [formGroupName]="i">
+                            <div *ngFor="let ph of entityAddresses.controls; let i=index"  [formGroupName]="i"> 
                                    <div class="stdd w40 b alignR" >Sr.No.</div>
                                    <div class="stdd w40" >{{i+1}}</div>
                                    <div class="stdd w40 alignR b" >Type</div>
@@ -220,7 +230,6 @@
                                 </div>
                                 <hr>
                             </div>
-                        </div>
                     </div>
                     <div style="display: inline-block; font-size: small; vertical-align: top;" class="col-5">
                         <div style="font-weight: bold;">Phones</div>
@@ -232,8 +241,7 @@
                             <button type="button" (click)="addPhone()" class="px-15 fa fa-plus" style="color: blue; float: right;"></button>
                         </div>
                         <div formArrayName="userPhones" class="my-1 px-0" style="font-size: small;" >
-                            <div *ngFor="let q of userPhones.controls; let j=index">
-                                <div [formGroupName]="j" >
+                            <div *ngFor="let q of userPhones.controls; let j=index"  [formGroupName]="j">
                                     <div class="stdd w40 mx-1" >{{j+1}}</div>
                                     <input class="stdd w100 mx-1" type="text" formControlName="mobileNo" >
                                     <input clss="stdd w50 mx-1" type="checkbox" formControlName="isMain" >
@@ -242,10 +250,9 @@
                                         <button (click)="removeUserPhone(j)" class="fa fa-trash" style="color:red; float: right;"></button>
                                     </div>
                                 </div>
-                                <hr>
-                            </div>
                         </div>
                     </div>
+
                 </tab>
                 <tab heading='Experiences' (selectTab)="onTabActivated($event)">
                     <div style="font-weight: bold; font-size: small;">
@@ -260,19 +267,10 @@
                         </div>
                     </div>
                     <div formArrayName="userExperiences" class="my-1 px-0" style="height: 10px; font-size: small;" >
-                        <div *ngFor="let q of userExperiences.controls; let i=index">
-                            <div [formGroupName]="i" >
+                        <div *ngFor="let q of userExperiences.controls; let i=index"  [formGroupName]="i">
                                 <div class="stdd w35" >{{i+1}}</div>
                                 <input class="stdd w125 mx-2" type="text" formControlName="workedFrom"  >
                                 <input class="stddmx2 w125" type="text" formControlName="workedUpto" >
-                                <!--`
-                                <div class="col-2" style="display: inline-block;">
-                                    <app-date-input [formControl]='form.userExperiences.controls["workedFrom"]' [label]='"Worked From"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
-                                </div>
-                                <div class="col-2" style="display: inline-block;">
-                                    <app-date-input [formControl]='form.userExperiences.controls["workedUpto"]' [label]='"Worked Upto"' [maxDate]='maxDate' [minDate]='minDate' ></app-date-input>
-                                </div>
-                                -->
                                 <input class="stddmx2 w150 px-2" type="text" formControlName="employer"  >
                                 <input class="stddmx2 w150 px-2" type="text" formControlName="position"  >
                                 <input type="text" formControlName="salaryCurrency" class="stddmx2 w50 px-1"  >
@@ -281,11 +279,13 @@
                                     <button (click)="removeUserExperience(i)" class="fa fa-trash" style="color:red; float: right;"></button>
                                 </div>
                             </div>
-                        </div>
                     </div>
+
                 </tab>
-                <tab heading='Documents' (selectTab)="onTabActivated($event)">
-                    <label class="btn btn-secondary" (click)="fileInput.value = null">
+                <tab heading='Documents' (selectTab)="onTabActivated($event)"> 
+                    <app-upload></app-upload>
+
+                    <!-- <label class="btn btn-secondary" (click)="fileInput.value = null">
                         Choose Files
                         <input
                           #fileInput
@@ -330,6 +330,8 @@
                         <p class="font-weight-bold mb-0">File uploaded</p>
                         <pre>{{ submissionResults | json }}</pre>
                       </div>
+                    -->
+                    
                     <!--
                     <div style="font-weight: bold; font-size: small;">
                         <label style="width: 35px;" >Sr#</label>
@@ -351,9 +353,6 @@
                         </div>
                     </div>
                 -->
-                </tab>
-                <tab heading='Edit Photos' (selectTab)="onTabActivated($event)">
-                    <app-photo-editor [member]="member"></app-photo-editor>
                 </tab>
              </tabset>
          </form>            

@@ -1,18 +1,16 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using core.Entities.Orders;
-using core.ParamsAndDtos;
 
 namespace core.Entities.Tasks
 {
-    public class TaskItem: BaseEntity
+     public class TaskItem: BaseEntity
     {
           public TaskItem()
           {
           }
 
         public TaskItem(int taskTypeId, DateTime transactionDate, string taskStatus, 
-                string taskItemDescription, int employeeId, int orderId, int orderItemId, int orderNo, 
+                string taskItemDescription, int orderId, int orderItemId, int orderNo, 
                 int userId, DateTime? nextFollowupOn, int NextFollowupById, 
                 int quantity)
           {
@@ -20,7 +18,6 @@ namespace core.Entities.Tasks
                TransactionDate = transactionDate;
                TaskStatus = taskStatus;
                TaskItemDescription = taskItemDescription;
-               EmployeeId = employeeId;
                OrderId = orderId;
                OrderItemId = orderItemId;
                OrderNo = orderNo;
@@ -30,10 +27,9 @@ namespace core.Entities.Tasks
           }
 
           public TaskItem(int taskTypeId, int taskId, DateTime transactionDate, string taskStatus, 
-                string taskItemDescription, int employeeId, int orderId, int orderItemId, int orderNo, 
+                string taskItemDescription, int orderId, int orderItemId, int orderNo, 
                 int userId, DateTime? nextFollowupOn, int candidateid, int NextFollowupById, 
                 int quantity
-                //, ApplicationTask applicationTask
                 )
           {
                TaskTypeId = taskTypeId;
@@ -41,14 +37,12 @@ namespace core.Entities.Tasks
                TransactionDate = transactionDate;
                TaskStatus = taskStatus;
                TaskItemDescription = taskItemDescription;
-               EmployeeId = employeeId;
                OrderId = orderId;
                OrderItemId = orderItemId;
                OrderNo = orderNo;
                UserId = userId;
                CandidateId = candidateid;
                NextFollowupOn = nextFollowupOn;
-               //ApplicationTask = applicationTask;
                Quantity = quantity;
           }
 
@@ -60,18 +54,19 @@ namespace core.Entities.Tasks
         
         [Required]
         public int TaskTypeId {get; set;}
+        public string TaskTypeName {get; set;}
         [Required]
         public string TaskStatus { get; set; }
         [Required]
         public string TaskItemDescription {get; set;}
         [Required]
-        public int EmployeeId {get; set;}
         public int OrderId { get; set; }
         public int OrderItemId { get; set; }
         public int OrderNo { get; set; }
         public int CandidateId { get; set; }
         [Required]
         public int UserId {get; set;}
+        public string UserName {get; set;}
         public int Quantity { get; set; }=1;
         public DateTime? NextFollowupOn {get; set;}
         public int? NextFollowupById {get; set;}

@@ -12,21 +12,46 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
+     [Authorize]
      public class TaskController : BaseApiController
      {
           private readonly IUnitOfWork _unitOfWork;
           private readonly ITaskService _taskService;
           private readonly IEmailService _emailService;
-          public TaskController(IUnitOfWork unitOfWork, ITaskService taskService, IEmailService emailService)
+          private readonly ITaskControlledService _taskControlledService;
+          public TaskController(IUnitOfWork unitOfWork, 
+               ITaskService taskService, 
+               ITaskControlledService taskControlledService,
+               IEmailService emailService)
           {
                _emailService = emailService;
                _taskService = taskService;
+               _taskControlledService=taskControlledService;
                _unitOfWork = unitOfWork;
           }
 
+          [Authorize]
+          [HttpPost("getorcreate")]
+          public async Task<ActionResult<ApplicationTask>> GetOrCreateApplicationTask([FromQuery]ApplicationTask task) {
+               var t = await _taskService.GetOrCreateTask(task);
+               if (t!=null) return Ok(t);
+               return BadRequest(new ApiResponse(404, "Failed to get or create new task"));
+          }
+
+          [Authorize]
+          [HttpPost("create")]
+          public async Task<ActionResult<ApplicationTask>> CreateApplicationTask(ApplicationTask task) {
+               
+               var t = await _taskService.GetOrCreateTask(task);
+               if (t!=null) return Ok(t);
+               return BadRequest(new ApiResponse(404, "Failed to create new task"));
+          }
+          
+          [Authorize]
           [HttpPost]
           public async Task<ActionResult<ICollection<EmailAndSmsMessagesDto>>> CreateNewApplicationTask(ApplicationTask task)
           {
+               var loggedInUser = User.GetUserIdentityUserEmployeeId();
                //verify object data
                if (task.TaskDate.Year < 2000) return BadRequest(new ApiResponse(404, "Task Date not set"));
                if (task.CompleteBy.Year < 2000) return BadRequest(new ApiResponse(404, "Task Completion Date not set"));
@@ -36,14 +61,8 @@ namespace api.Controllers
                if (task.AssignedToId == 0) return BadRequest(new ApiResponse(404, "Task not assigned to any one"));
 
                // ** TODO ** - verify assignedToId and TaskOwnerId exist
-               var loggedIn = new LoggedInUserDto
-               {
-                    LoggedIAppUsername = "Sanjay patil", // User.GetUsername(),
-                    LoggedInAppUserEmail = "sanjaypatil@agenterprises.com", //User.GetIdentityUserEmailId(),
-                    LoggedInAppUserId = 1026 //     User.GetIdentityUserId()
-               };
-
-               var emailMessages = await _taskService.CreateNewApplicationTask(task, loggedIn.LoggedInEmployeeId);
+               
+               var emailMessages = await _taskService.CreateNewApplicationTask(task, loggedInUser);
                var AttachmentFilePaths = new List<string>();
                if (emailMessages != null &&
                    task.PostTaskAction != EnumPostTaskAction.OnlyComposeEmailAndSMSMessages
@@ -74,19 +93,26 @@ namespace api.Controllers
           }
 
           [HttpGet]
-          public async Task<ActionResult<Pagination<ApplicationTask>>> GetApplicationTask(TaskParams taskParams)
+          public async Task<ActionResult<Pagination<ApplicationTaskDto>>> GetApplicationTask([FromQuery]TaskParams taskParams)
           {
-               var emps = await _taskService.GetApplicationTasksPaginated(taskParams);
+               var emps = await _taskControlledService.GetApplicationTasksPaginated(taskParams);
+               if (emps == null || emps.Count == 0) return BadRequest(new ApiResponse(404, "Failed to retrieve any tasks"));
+
+               return Ok(emps);
+          }
+          [HttpGet("wopagination")]
+          public async Task<ActionResult<ICollection<ApplicationTaskDto>>> GetApplicationTasksWOPagination([FromQuery]TaskParams taskParams)
+          {
+               var emps = await _taskControlledService.GetApplicationTasksWOPagination(taskParams);
                if (emps == null || emps.Count == 0) return BadRequest(new ApiResponse(404, "Failed to retrieve any tasks"));
 
                return Ok(emps);
           }
 
-
           [HttpGet("pendingtasks/{taskstatus}/{pageIndex}/{pageSize}")]
-          public async Task<ActionResult<Pagination<ApplicationTask>>> GetPendingTasks(string taskstatus, int pageIndex, int pageSize)
+          public async Task<ActionResult<Pagination<ApplicationTaskDto>>> GetPendingTasks(string taskstatus, int pageIndex, int pageSize)
           {
-               var emps = await _taskService.GetApplicationPendingTasksPaginated(taskstatus, pageIndex, pageSize);
+               var emps = await _taskControlledService.GetApplicationPendingTasksPaginated(taskstatus, pageIndex, pageSize);
                if (emps == null || emps.Count == 0) return BadRequest(new ApiResponse(404, "Failed to retrieve any tasks"));
 
                return Ok(emps);

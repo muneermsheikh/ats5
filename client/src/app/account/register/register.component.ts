@@ -9,7 +9,6 @@ import { CommonService } from 'src/app/services/common.service';
 import { ICandidate } from 'src/app/shared/models/candidate';
 import { IProfession } from 'src/app/shared/models/profession';
 import { IQualification } from 'src/app/shared/models/qualification';
-import { MustMatch } from 'src/app/shared/mustMatch';
 import { AccountService } from '../account.service';
 
 @Component({

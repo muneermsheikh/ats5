@@ -45,25 +45,29 @@ namespace infra.Services
 
                          qrymsg = qryCt.OrderByDescending(x => x.DateReadOn)
                               .Take(msgParams.PageSize)
-                              .Skip((msgParams.PageIndex-1) * msgParams.PageSize)
-                              ;
+                              .Skip((msgParams.PageIndex-1) * msgParams.PageSize);
                          break;
                     case "sent":
                          qryCt = _context.EmailMessages.Where(x => 
                               x.SenderEmailAddress == msgParams.Username
-                              && x.SenderDeleted==false);
+                              && x.SenderDeleted==false && x.MessageSentOn != null );
                          qrymsg = qryCt
                               .OrderByDescending(x => x.MessageSentOn)
                               .Skip((msgParams.PageIndex-1) * msgParams.PageSize)
-                              .Take(msgParams.PageSize)
-                              ;
+                              .Take(msgParams.PageSize);
+                         break;
+                    case "draft":
+                         qryCt = _context.EmailMessages.Where(x => x.SenderEmailAddress == msgParams.Username 
+                              && x.SenderDeleted==false && x.MessageSentOn==null);
+                         qrymsg = qryCt
+                              .OrderByDescending(x => x.MessageSentOn)
+                              .Skip((msgParams.PageIndex-1) * msgParams.PageSize)
+                              .Take(msgParams.PageSize);
                          break;
                     default:
                          break;
                }
 
-               string containing="inboxsent";
-               if (!containing.Contains(msgParams.Container.ToLower())) return null;
           
                var totalItems = await qryCt.CountAsync();
                if (totalItems > 0) {

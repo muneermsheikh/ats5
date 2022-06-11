@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using core.Entities.HR;
 using core.Entities.Users;
 using core.Interfaces;
@@ -21,6 +22,7 @@ namespace infra.Services
           private readonly IUnitOfWork _unitOfWork;
           private readonly IUserService _userService;
           private readonly IMapper _mapper;
+          private readonly ICollection<SelectionStatus> selStatuses;
           public InterviewService(ATSContext context, IUnitOfWork unitOfWork, IUserService userService, IMapper mapper)
           {
                _mapper = mapper;
@@ -28,6 +30,11 @@ namespace infra.Services
                _unitOfWork = unitOfWork;
                _context = context;
           }
+
+          private async Task<ICollection<SelectionStatus>> GetSelStatuses() {
+               return await _context.SelectionStatuses.OrderBy(x => x.Status).ToListAsync();
+          }
+
           public async Task<Interview> AddInterview(InterviewToAddDto dto)
           {
                var qry = from o in _context.Orders
@@ -177,14 +184,48 @@ namespace infra.Services
                return null;
           }
 
-          public async Task<ICollection<Interview>> GetInterviews(string interviewStatus)
+          public async Task<Interview> GetInterviewById(int Id)
           {
-               var interviews = await _context.Interviews
-                   .Where(x => x.InterviewStatus.ToLower() == interviewStatus.ToLower())
-                   .OrderBy(x => new { x.InterviewStatus, x.InterviewDateFrom.Date })
-                   .ToListAsync();
-               return interviews;
+               return await _context.Interviews
+                    .Where(x => x.Id == Id)
+                    .Include(x => x.InterviewItems)
+                    .ThenInclude(x => x.InterviewItemCandidates)
+                    .FirstOrDefaultAsync();
           }
+          
+          public async Task<PagedList<InterviewBriefDto>> GetInterviews(InterviewSpecParams specParams)
+          {
+               int totalItems = 0;
+               var qry = _context.Interviews.AsQueryable();
+
+               if(specParams.InterviewId.HasValue) {
+                    qry = qry.Where(x => x.Id == specParams.InterviewId);
+               } else if (specParams.InterviewItemId.HasValue) {
+                    qry = qry.Where(x => x.InterviewItems.Select(x => x.Id == specParams.InterviewItemId).FirstOrDefault());
+               } else if (specParams.OrderItemId.HasValue) {
+                    qry = qry.Where(x => x.InterviewItems.Select(x => x.OrderItemId == specParams.OrderItemId).FirstOrDefault());
+               //} else if (specParams.ApplicationNo.HasValue) {
+               //     qry = qry.Where(x => x.InterviewItems.Select(x => x.Id == specParams.InterviewItemId).FirstOrDefault());
+               } else if (!string.IsNullOrEmpty(specParams.InterviewStatus)) {
+                    qry = qry.Where(x => x.InterviewStatus.ToLower() == specParams.InterviewStatus.ToLower());
+               } else if (specParams.CategoryId.HasValue) {
+                    qry = qry.Where(x => x.InterviewItems.Select(x => x.CategoryId == specParams.CategoryId).FirstOrDefault());
+               } 
+
+               if(specParams.IncludeItems) qry = qry.Include(x => x.InterviewItems);
+
+               totalItems = await qry.CountAsync();
+
+               if (totalItems==0) return null;
+               
+               var data = await qry.ToListAsync();
+
+               var paged = await PagedList<InterviewBriefDto>.CreateAsync(
+                    qry.ProjectTo<InterviewBriefDto>(_mapper.ConfigurationProvider)
+                    ,specParams.PageIndex, specParams.PageSize);
+               return paged;
+          }
+
           public async Task<ICollection<Interview>> GetInterviewsWithItems(string interviewStatus)
           {
                var interviews = await _context.Interviews
@@ -265,52 +306,82 @@ namespace infra.Services
 
           }
 
-          public async Task<InterviewDto> GetInterviewAttendanceOfAProject(int orderId, List<int> attendanceStatusIds)
+       
+          public async Task<ICollection<InterviewItemCandidateDto>> GetInterviewItemAndAttendanceOfInterviewItem(int interviewItemId)
+          {
+               var statusNames = await GetSelStatuses();
+
+               var qryCands = await (from itItem in _context.InterviewItems where itItem.Id == interviewItemId
+                    join cat in _context.Categories on itItem.CategoryId equals cat.Id
+                    join cand in _context.InterviewItemCandidates on itItem.Id equals cand.InterviewItemId into g 
+                    from cv in g.DefaultIfEmpty()
+                    select new InterviewItemCandidateDto { 
+                         SelectionStatusName =  (int)cv.SelectionStatusId == 0 ? "" : statusNames.Where(x => x.Id == cv.SelectionStatusId).Select(x => x.Status).FirstOrDefault(),
+                         InterviewItemId = interviewItemId, 
+                         ApplicationNo = cv.ApplicationNo, 
+                         CandidateName = cv.CandidateName, 
+                         InterviewedDateTime = (DateTime)cv.InterviewedDateTime, 
+                         InterviewMode = cv.InterviewMode })
+               .ToListAsync();
+
+               return qryCands;
+
+          }
+
+          public async Task<InterviewBriefDto> GetInterviewAttendanceOfAProject(int orderId, List<int> attendanceStatusIds)
           {
                var qryItems = await (from it in _context.Interviews
-                                     where it.OrderId == orderId
-                                     join itItem in _context.InterviewItems on it.Id equals itItem.InterviewId
-                                     join cat in _context.Categories on itItem.CategoryId equals cat.Id
-                                     join o in _context.Orders on it.OrderId equals o.Id
-                                     join cand in _context.InterviewItemCandidates on itItem.Id equals cand.InterviewItemId
-                                     where attendanceStatusIds.Contains(cand.AttendanceStatusId)
-                                     join status in _context.InterviewAttendancesStatus on cand.AttendanceStatusId equals status.Id
-                                     group status.Status by new
-                                     {
-                                          itItem.InterviewDateFrom,
-                                          itItem.CategoryId,
-                                          itItem.OrderItemId,
-                                          cat.Name,
-                                          cand.ApplicationNo,
-                                          cand.CandidateName,
-                                          cand.PassportNo,
-                                          status.Status
-                                     } into g
-                                     select new // InterviewItemDto
-                                     {
-                                          CategoryName = g.Key.Name,
-                                          CategoryId = g.Key.CategoryId,
-                                          ApplicationNo = g.Key.ApplicationNo,
-                                          InterviewDate = g.Key.InterviewDateFrom,
-                                          CandidateName = g.Key.CandidateName,
-                                          PassportNo = g.Key.PassportNo,
-                                          AttendanceStatus = g.Key.Status
-                                     })
-                   .ToListAsync();
+                    where it.OrderId == orderId
+                    join itItem in _context.InterviewItems on it.Id equals itItem.InterviewId
+                    join cat in _context.Categories on itItem.CategoryId equals cat.Id
+                    join o in _context.Orders on it.OrderId equals o.Id
+                    join cand in _context.InterviewItemCandidates on itItem.Id equals cand.InterviewItemId
+                    where attendanceStatusIds.Contains((int)cand.AttendanceStatusId)
+                    join status in _context.InterviewAttendancesStatus on cand.AttendanceStatusId equals status.Id
+                    group status.Status by new
+                    {
+                    it.Id,
+                    itItem.OrderItemId,
+                    itItem.CategoryId,
+                    cat.Name,
+                    itItem.InterviewMode,
+                    cand.ApplicationNo,
+                    cand.CandidateName,
+                    cand.InterviewedDateTime,
+                    status.Status
+                    } into g
+                    select new // InterviewItemDto
+                    {
+                         InterviewId = g.Key.Id,
+                         OrderItemId = g.Key.OrderItemId,
+                         CategoryId = g.Key.CategoryId,
+                         CategoryName = g.Key.Name,
+                         InterviewMode = g.Key.InterviewMode,  
+                         ApplicationNo = g.Key.ApplicationNo,
+                         CandidateName = g.Key.CandidateName,
+                         InterviewedOn = g.Key.InterviewedDateTime,
+                         AttendanceStatus = g.Key.Status
+                    })
+               .ToListAsync();
 
                if (qryItems == null) return null;
 
+               /*
                var intvItems = new List<InterviewItemDto>();
                foreach (var q in qryItems)
                {
-                    intvItems.Add(new InterviewItemDto(q.CategoryId, q.CandidateName, q.InterviewDate,
-                        q.ApplicationNo, q.CandidateName, q.PassportNo, q.AttendanceStatus));
+                    //(int interviewId, int orderItemId, int categoryId, string categoryName, DateTime interviewDate, int applicationNo, string candidateName, 
+                    //\string interviewMode, string attendanceStatus, string remarks
+                    intvItems.Add(new InterviewItemDto(q.InterviewId, q.OrderItemId, q.CategoryId, q.CategoryName, q.InterviewedOn ?? DateTime.Now,
+                        q.ApplicationNo, q.CandidateName, q.InterviewMode, q.AttendanceStatus));
                }
+               */
 
                var intervw = await _context.Interviews.Where(x => x.OrderId == orderId).FirstOrDefaultAsync();
-               var dtoToReturn = new InterviewDto(intervw.CustomerName, intervw.InterviewVenue, intervw.OrderId, intervw.OrderNo,
-                   intervw.OrderDate, intvItems);
 
+               var dtoToReturn = new InterviewBriefDto(intervw.CustomerName, intervw.InterviewVenue, intervw.OrderId, intervw.OrderNo,
+                   intervw.OrderDate);
+               
                return dtoToReturn;
 
           }
@@ -332,7 +403,7 @@ namespace infra.Services
                var item = await _context.InterviewItemCandidates.FindAsync(interviewItemCandidateId);
                if (item == null) return false;
                
-               if (item.InterviewedDateTime.Year > 2000)
+               if (Convert.ToDateTime(item.InterviewedDateTime).Year > 2000)
                     throw new Exception("the candidate has already been interviewed on " + item.InterviewedDateTime);
                if (item.SelectionStatusId > 0) throw new Exception("candidate has bene interviewed and itnerview decision made");
                
@@ -349,12 +420,12 @@ namespace infra.Services
           {
                var item = await _context.InterviewItemCandidates.FindAsync(candidateInterviewedId);
                if (item == null) return false;
-               if (item.InterviewedDateTime.Year > 2000)
+               if (item.InterviewedDateTime != null)
                     throw new Exception("the candidate has already been interviewed on " + item.InterviewedDateTime);
                if (item.SelectionStatusId > 0) throw new Exception("candidate has bene interviewed and itnerview decision made");
                if(item.ScheduledFrom.Date != interviewedAt.Date) throw new Exception("Interviewed Date not as scheduled");
 
-               if (item.ReportedDateTime.Year < 2000) item.ReportedDateTime = interviewedAt;
+               if (item.ReportedDateTime == null) item.ReportedDateTime = interviewedAt;
                
                item.InterviewMode = interviewMode;
                item.InterviewedDateTime = interviewedAt;
@@ -371,7 +442,7 @@ namespace infra.Services
                var item = await _context.InterviewItemCandidates.FindAsync(candidateInterviewedId);
                if (item == null) throw new Exception("Invalid interview item candidate Id");
 
-               if (item.ReportedDateTime.Year < 2000) item.ReportedDateTime = interviewedAt;
+               if (item.ReportedDateTime  == null) item.ReportedDateTime = interviewedAt;
                item.InterviewMode = interviewMode;
                item.InterviewedDateTime = interviewedAt;
                item.AttendanceStatusId = 6;        //attendance interview status - ATTENDED
@@ -410,7 +481,7 @@ namespace infra.Services
                     join cand in _context.Candidates on up.CandidateId equals cand.Id 
                     where !DisAllowedStatus.Contains((int)cand.CandidateStatus)
                     join icand in _context.InterviewItemCandidates on cand.Id equals icand.CandidateId 
-                         where !DisAllowedStatus.Contains(icand.SelectionStatusId)
+                         where !DisAllowedStatus.Contains((int)icand.SelectionStatusId)
                     select cand.Id;
                var candidateIds = await qry.ToListAsync();
                
@@ -456,5 +527,6 @@ namespace infra.Services
                 return dto; //new Pagination<Candidate>(1, 20, ct, dto);
 
           }
+
      }
 }

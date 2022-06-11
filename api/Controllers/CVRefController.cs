@@ -38,6 +38,7 @@ namespace api.Controllers
                _cvrefService = cvrefService;
           }
 
+          [Authorize]
           [HttpGet("orderitem/{orderitemid}")]
           public async Task<ActionResult<ICollection<CVRef>>> GetReferralsOfOrderItemId(int orderitemid)
           {
@@ -46,6 +47,7 @@ namespace api.Controllers
                return Ok(refs);
           }
 
+          [Authorize]
           [HttpGet("referralsofcandidate/{candidateid}")]
           public async Task<ActionResult<ICollection<CVRef>>> GetReferralsOfACandidate(int candidateid)
           {
@@ -54,6 +56,7 @@ namespace api.Controllers
                return Ok(refs);
           }
 
+          [Authorize]
           [HttpGet("cvref/{cvrefid}")]
           public async Task<ActionResult<CVRef>> GetCVRef(int cvrefid)
           {
@@ -68,6 +71,7 @@ namespace api.Controllers
                }
           }
 
+          [Authorize(Roles="Admin, DocumentControllerAdmin, HRManager, HRSupervisor, HRExecutive")]
           [HttpGet("{candidateid}/{orderitemid}")]
           public async Task<ActionResult<CVRef>> GetReferralsOfCandidateAndOrderItem(int candidateid, int orderitemid)
           {
@@ -76,7 +80,7 @@ namespace api.Controllers
                return Ok(cvref);
           }
 
-          
+          [Authorize(Roles="DocumentControllerAdmin, HRManager")]
           [HttpPost]
           public async Task<ActionResult<MessagesDto>> MakeReferrals(ICollection<int> CVReviewIds)
           {
@@ -91,22 +95,19 @@ namespace api.Controllers
                return Ok(msgs);
           }
 
+          [Authorize(Roles="DocumentControllerAdmin, HRManager")]
           [HttpPut]
           public async Task<ActionResult<bool>> EditAReferral(CVRef cvref)
           {
                return await _cvrefService.EditReferral(cvref);
           }
 
+          [Authorize(Roles="Admin, DocumentControllerAdmin, HRManager, HRSupervisor, HRExecutive, HRTrainee")]
           [HttpGet("cvsreadytoforward")]
           public async Task<ActionResult<ICollection<CustomerReferralsPendingDto>>> CustomerReferralsPending()
           {
                var loggedInDto = await GetLoggedInUserDto();
                if (loggedInDto == null) return Unauthorized(new ApiResponse(401, "this option requires logged in User"));
-               /*
-               if (!loggedInDto.HasAdminPrivilege) {
-                    if (!User.IsInRole("DocControllerAdminRole")) return Unauthorized(new ApiResponse(401, "Only the Administrator or the Document Controller has the privilege to send CVs to clients"));
-               }
-               */
 
                var pendings = await _cvrefService.CustomerReferralsPending(0);
 

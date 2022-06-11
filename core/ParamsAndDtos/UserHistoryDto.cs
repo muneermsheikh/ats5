@@ -30,6 +30,7 @@ namespace core.ParamsAndDtos
 
         public int Id {get; set;}
         public string PersonName {get; set;}
+        public string PersonType {get; set;}
         public int PersonId {get; set;}
         public string EmailId {get; set;}
         public string PhoneNo { get; set; }

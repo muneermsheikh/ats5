@@ -174,17 +174,17 @@ namespace infra.Services
                          join t in _context.Tasks on i.ApplicationTaskId equals t.Id
                          where t.TaskOwnerId == employeeId && taskTypes.Contains((EnumTaskType)i.TaskTypeId) &&
                               i.TransactionDate.Date >= dateFrom.Date && i.TransactionDate.Date <= dateUpto.Date
-                         orderby i.EmployeeId, i.TaskTypeId
+                         orderby i.UserId, i.TaskTypeId
                          select new EmployeePerformanceDto {
-                              EmployeeId = i.EmployeeId, TaskType = EnumTaskType.AssignTaskToHRExec,
+                              UserId = i.UserId, TaskType = EnumTaskType.AssignTaskToHRExec,
                               TransactionDate = i.TransactionDate.Date, 
                               Quantity = i.Quantity
                          }
                     ).ToListAsync();
                
-               var PerfData = query.GroupBy(x => new {x.EmployeeId, x.TaskType, x.TransactionDate})
+               var PerfData = query.GroupBy(x => new {x.UserId, x.TaskType, x.TransactionDate})
                     .Select(g => new EmployeePerformanceDto { 
-                         EmployeeId = g.Key.EmployeeId, 
+                         UserId = g.Key.UserId, 
                          TaskType = g.Key.TaskType,
                          TransactionDate = g.Key.TransactionDate,
                          Quantity = g.Sum(x => x.Quantity) }

@@ -44,7 +44,7 @@ namespace api.Controllers
                return NotFound(new ApiResponse(404, "no records found"));
           }
 
-          [Authorize]    //(Policy = "CandidateSelectionRegisterRole")]
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, DocumentControllerAdmin")]
           [HttpPost]
           public async Task<ActionResult<SelectionMsgsAndEmploymentsDto>> RegisterSelectionDecisions(ICollection<SelDecisionToAddDto> dtos)
           {
@@ -57,21 +57,21 @@ namespace api.Controllers
                return BadRequest(new ApiResponse(400, "failed to update the selections"));
           }
 
-          [Authorize(Policy = "CandidateSelectionRegisterRole")]
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, DocumentControllerAdmin")]
           [HttpPut]
           public async Task<ActionResult<bool>> EditSelectionDecision(SelectionDecision selectionDecision)
           {
                return await _service.EditSelection(selectionDecision);
           }
 
-          [Authorize(Policy = "CandidateSelectionRegisterRole")]
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, DocumentControllerAdmin")]
           [HttpDelete("{id}")]
           public async Task<ActionResult<bool>> DeleteSelectionDecision(int id)
           {
                return await _service.DeleteSelection(id);
           }
 
-          
+          [Authorize]
           [HttpGet("pendingseldecisions")]
           [Authorize]
           public async Task<ActionResult<Pagination<SelectionsPendingDto>>> SelectionDecisionPending([FromQuery] CVRefSpecParams selParams)
@@ -83,6 +83,7 @@ namespace api.Controllers
                //return Ok(new Pagination<SelectionsPendingDto>(selParams.PageIndex, selParams.PageSize, data.Count, (IReadOnlyList<SelectionsPendingDto>)data));
           }
           
+          [Authorize]
           [HttpGet("selectionstatus")]
           public async Task<ActionResult<ICollection<SelectionStatus>>> GetSelectionStatus()
           {

@@ -19,28 +19,31 @@ using Microsoft.Extensions.Configuration;
 
 namespace api.Controllers
 {
+    [Authorize(Roles = "Admin, HRManager, HRSupervisor")]
     public class OrderAssignmentController : BaseApiController
     {
         private readonly UserManager<AppUser> _userManager;
         //private readonly ICommonServices _commonServices;
         private readonly string _loggedInUserEmail;
         private readonly IOrderAssignmentService _orderAssignmentService;
-        private ITaskService _taskService;
+        private readonly ITaskService _taskService;
+        private readonly ITaskControlledService _taskControlledService;
         public OrderAssignmentController(
             IOrderAssignmentService orderAssignmentService,
             UserManager<AppUser> userManager,
-            ITaskService taskService)
+            ITaskService taskService,
+            ITaskControlledService taskControlledService)
         {
             _orderAssignmentService = orderAssignmentService;
             _userManager = userManager;
             _loggedInUserEmail = User.GetIdentityUserEmailId();
             _taskService = taskService;
+            _taskControlledService=taskControlledService;
         }
 
 
         //assign task to HR Sup or HR Manager to design AssessmentQ for the 
         //order, if the flag RequireAssess is set to true
-        [Authorize]
         [HttpPost("design/{orderId}")]
         public async Task<ActionResult<EmailAndSmsMessagesDto>> AssignTaskToDesignOrderAssessmentQ(int orderId)
         {
@@ -56,7 +59,6 @@ namespace api.Controllers
         }
 
         [HttpDelete("hrexec/{taskid}")]
-        [Authorize]
         public async Task<ActionResult<bool>> DeleteHRExecAssignment(int taskid)
         {
             return await _orderAssignmentService.DeleteHRExecAssignment(taskid);
@@ -68,7 +70,7 @@ namespace api.Controllers
             // var loggedInEmployeeId = User.GetIdentityUserEmployeeId(); ** TODO ** this is not working
             if (orderassignments==null || orderassignments.Count() ==0) return BadRequest(new ApiResponse(400, "no data provided"));
             var loggedInEmployeeId = 2;
-            var msgs = await _taskService.CreateTaskForHRExecOnOrderItemIds(orderassignments, loggedInEmployeeId);
+            var msgs = await _taskControlledService.CreateTaskForHRExecOnOrderItemIds(orderassignments, loggedInEmployeeId);
             if (msgs!=null && msgs.Count > 0) return Ok(msgs);
             return BadRequest(new ApiResponse(404, "failed to create tasks"));
         }

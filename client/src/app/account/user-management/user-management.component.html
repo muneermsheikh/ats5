@@ -2,18 +2,27 @@
      <table class="table">
          <thead>
              <tr>
+                <th></th> 
+                <th>
+                    <input type="text" [(ngModel)]="newRoleAdded">
+                 </th>
+                 <th style="width: 10%;">
+                    <button class="fa fa-plus" (click)="addNewRole()">Add new Role</button>
+                </th>
+
+             </tr>
+             <tr>
                  <th style="width: 20%;">Email</th>
                  <th style="width: 20%;">User Name</th>
                  <th style="width: 40%;">Active roles</th>
-                 <th style="width: 20%;"></th>
              </tr>
          </thead>
-         <tbody>
-             <tr *ngFor="let user of users">
+         <tbody >
+             <tr *ngFor="let user of users" >
                  <td>{{user.username}}</td>
                  <td>{{user.displayName}}</td>
                  <td>{{user.roles}}</td>
-                 <td><button (click)="openRolesModal(user)" class="btn btn-info">Edit Roles</button></td>
+                 <td><button (click)="openRolesModal(user)" class="btn btn-info" style="font-size:small; margin-top: 0px; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px;">Edit Roles</button></td>
              </tr>
          </tbody>
  

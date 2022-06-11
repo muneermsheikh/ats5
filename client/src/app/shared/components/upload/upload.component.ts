@@ -20,7 +20,7 @@ export class UploadComponent implements OnInit {
   
   theFiles: any[] = [];
   messages: string[] = [];
-
+  filesUploaded: FileToUpload[] = [];
 
   constructor(private service: UploadDownloadService) { }
 
@@ -38,6 +38,10 @@ export class UploadComponent implements OnInit {
             if (file.size < MAX_SIZE) {
                 // Add file to list of files
                 this.theFiles.push(file);
+                var fileuploaded = new FileToUpload();
+                fileuploaded.fileName=file.fileName;
+                fileuploaded.fileSize=file.fileSize;
+                this.theFiles.push(fileuploaded);
             }
             else {
                 this.messages.push("File: " + file.name + " is too large to upload.");
@@ -47,9 +51,39 @@ export class UploadComponent implements OnInit {
   }
 
 
-  private readAndUploadFile(theFile: any) {
-      let file = new FileToUpload();
+  private readAndUploadFile(f: any) {
+    
+    
+        let file = new FileToUpload();
+        // Set File Information
+        file.fileName = f.name;
+        file.fileSize = f.size;
+        file.fileType = f.type;
+        file.lastModifiedTime = f.lastModifiedTime;
+        file.lastModifiedDate = f.lastModifiedDate;
+        
+        // Use FileReader() object to get file to upload
+        // NOTE: FileReader only works with newer browsers
+        let reader = new FileReader();
+        
+        // Setup onload event for reader
+        reader.onload = () => {
+            // Store base64 encoded representation of file
+            file.fileAsBase64 = reader.result.toString();
+        }
       
+    // POST to server
+    this.service.uploadFile(this.theFiles).subscribe(resp => { 
+        this.messages.push("Upload complete"); 
+      }, error => {
+        console.log('error in uploading file', error);
+      });
+
+      // Read the file
+      //reader.readAsDataURL(theFile);  
+      
+/*
+    let file = new FileToUpload();
       // Set File Information
       file.fileName = theFile.name;
       file.fileSize = theFile.size;
@@ -73,6 +107,7 @@ export class UploadComponent implements OnInit {
       
       // Read the file
       reader.readAsDataURL(theFile);
+    */
   }
 
   uploadFile(): void {

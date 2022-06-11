@@ -17,7 +17,7 @@ namespace core.ParamsAndDtos
 {
     public class EmployeePerformanceDto
     {
-        public int EmployeeId { get; set; }
+        public int UserId { get; set; }
         public EnumTaskType TaskType { get; set; }
         //public string PerformanceType { get; set; }
         public DateTime TransactionDate { get; set; }

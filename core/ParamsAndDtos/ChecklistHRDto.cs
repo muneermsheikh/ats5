@@ -23,6 +23,7 @@ namespace core.ParamsAndDtos
         public DateTime ExceptionApprovedOn {get; set;}
 
         public String HrExecComments {get; set;}
+        public bool ChecklistedOk {get; set;}
         public ICollection<ChecklistHRItem> ChecklistHRItems {get; set;}
     }
 }

@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using core.Entities;
 using core.Entities.Admin;
-using core.Entities.EmailandSMS;
 using core.Entities.HR;
 using core.Entities.Identity;
 using core.Entities.Users;
@@ -18,7 +13,6 @@ using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
 using infra.Data;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -57,11 +51,11 @@ namespace infra.Services
           }
 
 
-          public async Task<Candidate> CreateCandidateAsync(RegisterDto registerDto, int loggedInEmployeeId)
+          public async Task<Candidate> CreateCandidateObject(RegisterDto registerDto, int loggedInEmployeeId)
           {
                var NextAppNo = await _context.Candidates.MaxAsync(x => x.ApplicationNo);
                NextAppNo = NextAppNo == 0 ? 10001 : NextAppNo+1;
-               var firstAdd = registerDto.EntityAddresses.FirstOrDefault();
+               var firstAdd = registerDto.EntityAddresses?.FirstOrDefault();
                if (registerDto.Address == null) {
                     if (registerDto.EntityAddresses != null && registerDto.EntityAddresses.Count() > 0)
                          registerDto.Address= new Address{
@@ -82,11 +76,11 @@ namespace infra.Services
                //registerDto.Address is not forwarded by client, but is populated here from the collection EntityAddresses
                var cand = new Candidate(registerDto.Gender, registerDto.AppUserId, 
                     registerDto.AppUserIdNotEnforced ? registerDto.AppUserIdNotEnforced : true,
-                    NextAppNo, registerDto.FirstName, registerDto.SecondName, registerDto.FamilyName, registerDto.DisplayName, 
-                    registerDto.DOB, registerDto.PlaceOfBirth??"", registerDto.AadharNo??"", registerDto.Email, registerDto.Introduction,
-                    registerDto.Interests, registerDto.NotificationDesired, registerDto.Nationality, (int)registerDto.CompanyId, 
-                    registerDto.PpNo, registerDto.EntityAddresses.Where(x => x.IsMain).Select(x => x.City).FirstOrDefault(),
-                    registerDto.EntityAddresses.Where(x => x.IsMain).Select(x => x.Pin).FirstOrDefault(), 
+                    NextAppNo, registerDto.FirstName, registerDto.SecondName ?? "", registerDto.FamilyName ?? "", registerDto.DisplayName, 
+                    registerDto.DOB, registerDto.PlaceOfBirth ??"", registerDto.AadharNo??"", registerDto.Email, registerDto.Introduction ?? "",
+                    registerDto.Interests ?? "", registerDto.NotificationDesired, registerDto.Nationality, registerDto.CompanyId == null ? 0 : (int)registerDto.CompanyId, 
+                    registerDto.PpNo ?? "", registerDto.EntityAddresses?.Where(x => x.IsMain).Select(x => x.City).FirstOrDefault(),
+                    registerDto.EntityAddresses?.Where(x => x.IsMain).Select(x => x.Pin).FirstOrDefault(), 
                     registerDto.ReferredBy,
                     registerDto.UserQualifications, registerDto.UserProfessions,
                     registerDto.UserPassports, null);
@@ -96,19 +90,21 @@ namespace infra.Services
 
                //PP No is unique in the db - include only those passports that do not already exist in the database
                var lstPP = new List<UserPassport>();
-               foreach (var pp in cand.UserPassports)
-               {
-                    var existingPP = await _context.UserPassports.Where(c => c.PassportNo == pp.PassportNo).FirstOrDefaultAsync();
-                    if (existingPP == null)
+               if (cand.UserPassports != null) {
+                    foreach (var pp in cand.UserPassports)
                     {
-                         lstPP.Add(pp);
+                         var existingPP = await _context.UserPassports.Where(c => c.PassportNo == pp.PassportNo).FirstOrDefaultAsync();
+                         if (existingPP == null) lstPP.Add(pp);
                     }
                }
-               cand.UserPassports = lstPP.Count() > 0 ? lstPP : null;
                
+               cand.UserPassports = lstPP;
+
+               var lstP = new List<UserPhone>();
+               if (registerDto.UserPhones != null )cand.UserPhones = registerDto.UserPhones;
+               /*
                if (registerDto.UserPhones != null)
                {
-                    var lstP = new List<UserPhone>();
                     foreach (var p in registerDto.UserPhones)
                     {
                          var existingP = await _context.UserPhones.Where(c => c.MobileNo == p.MobileNo).FirstOrDefaultAsync();
@@ -117,19 +113,22 @@ namespace infra.Services
                               lstP.Add(p);
                          }
                     }
-                    cand.UserPhones = lstP.Count() > 0 ? lstP : null;
                }
+               cand.UserPhones = lstP;
+               */
 
-               if (registerDto.UserProfessions != null)
-               {
+               if (registerDto.UserProfessions != null) cand.UserProfessions = registerDto.UserProfessions;
+               /*{
                     var qry = (from p in registerDto.UserProfessions
                                group p by new {p.CategoryId, p.IndustryId} into g
                                where g.Count() > 1
                                select g.Key);
                     cand.UserProfessions = qry.Count() == 0 && qry != null ? registerDto.UserProfessions : null;
-               }
+               } 
+               */
 
-               if (registerDto.UserQualifications != null)
+               if (registerDto.UserQualifications != null) cand.UserQualifications=registerDto.UserQualifications;
+          /*
                {
                     var qry = (from p in cand.UserQualifications
                                group p by p.QualificationId into g
@@ -138,8 +137,14 @@ namespace infra.Services
 
                     cand.UserQualifications = qry.Count() == 0 && qry != null ? registerDto.UserQualifications : null;
                }
-
+          */
                
+               return cand;
+          }
+          public async Task<Candidate> CreateCandidateAsync(RegisterDto registerDto, int loggedInEmployeeId)
+          {
+               var cand = await CreateCandidateObject(registerDto, loggedInEmployeeId);
+
                _unitOfWork.Repository<Candidate>().Add(cand);
 
                if (registerDto.NotificationDesired) {
@@ -152,25 +157,6 @@ namespace infra.Services
 
                if (result <= 0) return null;
 
-          /*
-               //upload file attachments
-               var attachments = new List<UserAttachment>();
-               if (UserFormFiles != null && UserFormFiles.Count() > 0)
-               {
-                    foreach (var doc in UserFormFiles)
-                    {
-                         var filePath = Path.Combine(@"App_Data", cand.Id.ToString(),  doc.ContentType, doc.FileName);
-                         new FileInfo(filePath).Directory?.Create();
-
-                         await using var stream = new FileStream(filePath, FileMode.Create);
-                         await doc.CopyToAsync(stream);
-                         //_logger.LogInformation($"The uploaded file [{doc.FileName}] is saved as [{filePath}].");
-
-                         attachments.Add(new UserAttachment { url=filePath, AppUserId = cand.AppUserId, DateUploaded = DateTime.Now, 
-                              AttachmentSizeInBytes = doc.Length, UploadedByEmployeeId = loggedInEmployeeId });
-                    }
-               }
-          */
                return cand;
           }
 
@@ -431,7 +417,7 @@ namespace infra.Services
                
 
           }
-          public async Task<Candidate> UpdateCandidateAsync(Candidate model, ICollection<IFormFile> UserFormFiles )
+          public async Task<Candidate> UpdateCandidateAsync(Candidate model )
           {
                var existingObject = await _context.Candidates.Where(x => x.Id == model.Id)
                     .Include(x => x.EntityAddresses)
@@ -439,8 +425,9 @@ namespace infra.Services
                     .Include(x => x.UserQualifications)
                     .Include(x => x.UserProfessions)
                     .Include(x => x.UserExperiences)
-                    .Include(x => x.UserAttachments)
+                    //.Include(x => x.UserAttachments)
                     .Include(x => x.UserPassports)
+                    .AsNoTracking()
                .FirstOrDefaultAsync();
 
                if (existingObject == null) return null;
@@ -603,16 +590,16 @@ namespace infra.Services
                          }
                     }
                }
+               /*
           
                if (UserFormFiles != null && UserFormFiles.Count > 0) {
                     var id = model.Id;
                     var attachments = new List<UserAttachment>();
                     foreach (var doc in UserFormFiles)
                     {
-                         /*
                          //check if file alredy exists, if so, delete it
-                         var existingItem = existingObject.UserAttachments.Where(c => c.url.ToLower() == doc.FileName.ToLower()).FirstOrDefault();
-                         */
+                         //var existingItem = existingObject.UserAttachments.Where(c => c.url.ToLower() == doc.FileName.ToLower()).FirstOrDefault();
+                         
 
                          var filePath = Path.Combine(@"App_Data", id.ToString(),  doc.ContentType, doc.FileName);
                          new FileInfo(filePath).Directory?.Create();
@@ -628,7 +615,7 @@ namespace infra.Services
                     }
 
                }
-               
+               */
                _context.Entry(existingObject).State = EntityState.Modified;
 
                if (await _context.SaveChangesAsync() > 0) return existingObject;

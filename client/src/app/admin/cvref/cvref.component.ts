@@ -1,11 +1,14 @@
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
 import { ChecklistModalComponent } from 'src/app/candidate/checklist-modal/checklist-modal.component';
 import { ChecklistService } from 'src/app/candidate/checklist.service';
 import { ICandidateAssessedDto } from 'src/app/shared/models/candidateAssessedDto';
+import { IChecklistHRDto } from 'src/app/shared/models/checklistHRDto';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { CvRefService } from '../cvref.service';
 
@@ -21,7 +24,7 @@ export class CvrefComponent implements OnInit {
   cvSelected: ICandidateAssessedDto[]=[];
   assessmentids: number[];
   bsModalRef: BsModalRef;
-
+  
   constructor(private cvrefService: CvRefService, 
     private activatedRoute: ActivatedRoute, 
     private router: Router,
@@ -78,19 +81,7 @@ export class CvrefComponent implements OnInit {
     }
   }
 
- showChecklistModal(candidateid: number, orderitemid: number) {
-    this.checklistService.getChecklist(candidateid, orderitemid).subscribe(response => {
-      if (response===null) {
-        this.toastr.warning('checklist record does not exist for the candidateId');
-        return;
-      }
-      const config = {
-        class: 'modal-dialog-centered modal-lg', initialState: {chklst: response}
-      }
-      this.bsModalRef = this.bsModalService.show(ChecklistModalComponent, config);
-    })
-  }
-  
+   
   routeChange() {
     if (this.form.dirty) {
         this.confirmService.confirm('Confirm move to another page', 
@@ -105,5 +96,41 @@ export class CvrefComponent implements OnInit {
       this.router.navigateByUrl('');
     }
   }
+
+  openChecklistModal(candidateid: number, orderitemid: number) {
+    let clist: IChecklistHRDto;
+
+    this.checklistService.getChecklist(candidateid, orderitemid).subscribe(chklst => {
+      const config = { class: 'modal-dialog-centered modal-lg', initialState: {chklst:chklst} }
+      this.bsModalRef = this.bsModalService.show(ChecklistModalComponent, config);
+      this.bsModalRef.content.updateChecklist.subscribe(values => {
+          this.checklistService.updateChecklist(values).subscribe(() => {
+            this.toastr.success('checklist updated');
+          }, error => {
+            this.toastr.error('failed to update the checklist Service', error);
+          })
+      })  
+    }, error => {
+      console.log('error', error);
+    })
+  }
+
+  private getChecklistHRDto(candidateid: number, orderitemid: number): any {
+    let lst: IChecklistHRDto;
+    return this.checklistService.getChecklist(candidateid, orderitemid).subscribe(response => {
+      if (response === null) {
+        this.toastr.warning('checklist record does not exist for the candidate for the selected order item id');
+        return null;
+      } else {
+        lst = response;
+        return lst;
+      }
+    }, error => {
+      console.log('failed to return checklsit', error);
+    })
+  }
+
+  //ngClass for charges
+  
 
 }

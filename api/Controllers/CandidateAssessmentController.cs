@@ -34,14 +34,11 @@ namespace api.Controllers
                _tokenService = tokenService;
           }
 
-
+          [Authorize(Roles ="HRManager, HRSupervisor, HRExecutive, HRTrainee")]
           [HttpPost("assess/{requireReview}/{candidateId}/{orderItemId}")]
           //[Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           public async Task<ActionResult<CandidateAssessmentWithErrorStringDto>> AssessNewCandidate(bool requireReview, int candidateId, int orderItemId, DateTime dateAdded)
           {
-               //if (!User.IsUserAuthenticated()) return Unauthorized("user is not authenticated");
-               //var userid = User.GetIdentityUserId();
-               //if(string.IsNullOrEmpty(userid)) return Unauthorized("this function requires authorization");
                var userdto = await GetCurrentUser();
                int intEmployeeId = userdto.loggedInEmployeeId;
                var assessed = await _candidateAssessService.AssessNewCandidate(requireReview, candidateId, orderItemId, intEmployeeId );
@@ -55,6 +52,7 @@ namespace api.Controllers
                return assessed;
           }
 
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRExecutive, HRTrainee")]
           [HttpGet("assessobject/{requireReview}/{candidateId}/{orderItemId}")]
           //[Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
           public async Task<ActionResult<CandidateAssessment>> GetNewAssessmentCandidate(bool requireReview, int candidateId, int orderItemId, DateTime dateAdded)
@@ -88,10 +86,12 @@ namespace api.Controllers
                return await _empService.GetEmployeeIdFromEmail(email);
           }
           
+          [Authorize(Roles ="HRManager, HRSupervisor, HRExecutive, HRTrainee")]
           [HttpPut]
           public async Task<ActionResult<bool>> EditCVAssessment(CandidateAssessment candidateAssessment)
           {
-               var loggedInEmpId = await ApiUserId();
+               var userdto = await GetLoggedInUserDto();
+               var loggedInEmpId = userdto.LoggedInEmployeeId;
 
                if (await _candidateAssessService.EditCandidateAssessment(candidateAssessment, loggedInEmpId)==null)
                {
@@ -103,11 +103,12 @@ namespace api.Controllers
                }
           }
 
-          //[Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
+          [Authorize(Roles = "HRExecutive, HRSupervisor, HRManager")]
           [HttpPut("assess")]
           public async Task<ActionResult<string>> EditCandidateAssessment(CandidateAssessment candidateAssessment)
           {
-               var loggedInEmpId = await ApiUserId();
+               var userdto = await GetLoggedInUserDto();
+               var loggedInEmpId = userdto.LoggedInEmployeeId;
 
                var msgs = await _candidateAssessService.EditCandidateAssessment(candidateAssessment, loggedInEmpId);
                if (!string.IsNullOrEmpty(msgs.ErrorString))
@@ -120,7 +121,7 @@ namespace api.Controllers
                }
           }
 
-          //[Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
+          [Authorize(Roles ="HRManager, HRSupervisor, HRExecutive")]
           [HttpDelete("assess/{assessmentid}")]
           public async Task<ActionResult<bool>> DeleteCandidateAssessment(int assessmentid )
           {
@@ -134,7 +135,7 @@ namespace api.Controllers
                }
           }
 
-          //[Authorize(Policy = "HRExecutiveRole, HRSupervisorRole, HRManagerRole")]
+          [Authorize(Roles ="HRManager, HRSupervisor, HRExecutive")]
           [HttpDelete("assessitem")]
           public async Task<ActionResult<bool>> DeleteCandidateAssessmentItem(CandidateAssessmentItem assessmentItem)
           {
@@ -148,6 +149,7 @@ namespace api.Controllers
                }
           }
 
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor")]
           [HttpGet("{orderItemId}/{candidateId}")]
           public async Task<ActionResult<CandidateAssessment>> GetCandidateAssessment(int orderItemId, int candidateId)
           {
@@ -159,13 +161,15 @@ namespace api.Controllers
                }
           }
 
-          
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpGet("assessmentandchecklist/{orderItemId}/{candidateId}")]
           public async Task<ActionResult<CandidateAssessmentAndChecklistDto>> GetCandidateAssessmentWithChecklist(int orderItemId, int candidateId)
           {
-               var apiuserid = await ApiUserId();
-               var assessment = await _candidateAssessService.GetCandidateAssessmentAndChecklist(candidateId, orderItemId, apiuserid);
+               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               var loggedInEmployeeId = loggedInUser.loggedInEmployeeId;
+               var assessment = await _candidateAssessService.GetCandidateAssessmentAndChecklist(candidateId, orderItemId, loggedInEmployeeId);
                if (assessment != null) {
+                    if(assessment.Assessed != null) assessment.Assessed.AssessedByName=loggedInUser.DisplayName;
                     return Ok(assessment);
                } else {
                     return null;
@@ -173,7 +177,7 @@ namespace api.Controllers
           }
 
           
-
+          [Authorize(Roles ="Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpGet("assessedandapproved")]
           public async Task<ActionResult<CandidateAssessedDto>> GetCandidateAssessedAndApproved()
           {

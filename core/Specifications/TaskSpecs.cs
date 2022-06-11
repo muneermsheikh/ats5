@@ -23,7 +23,10 @@ namespace core.Specifications
                 (string.IsNullOrEmpty(eParams.TaskStatus) || x.TaskStatus.ToLower() == eParams.TaskStatus.ToLower()) &&
                 (!eParams.TaskOwnerId.HasValue || x.TaskOwnerId == eParams.TaskOwnerId) &&
                 (!eParams.AssignedToId.HasValue || x.AssignedToId == eParams.AssignedToId) &&
-                (!eParams.TaskTypeId.HasValue || x.TaskTypeId == eParams.TaskTypeId)
+                (!eParams.TaskTypeId.HasValue || x.TaskTypeId == eParams.TaskTypeId) 
+                /* &&
+                (!eParams.CandidateId.HasValue || x.PersonType.ToLower() == eParams.PersonType.ToLower() && x.CandidateId == eParams.CandidateId) 
+                */
             )
         {
             if (eParams.IncludeItems) AddInclude(x => x.TaskItems);

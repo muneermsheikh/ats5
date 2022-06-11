@@ -26,6 +26,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { UserHistoryComponent } from './components/user-history/user-history.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,9 @@ import { MatNativeDateModule } from '@angular/material/core';
     ConfirmModalComponent,
     RightClickMenuComponent,
     StepperComponent,
-    UploadComponent
+    UploadComponent,
+    UserHistoryComponent,
+    //EditorComponent
   ],
 
   imports: [
@@ -58,7 +61,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     , MatButtonModule
     , MatDatepickerModule
     , MatNativeDateModule
-    
+    //, AngularEditorComponent
     
   ],
   exports: [
@@ -84,6 +87,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     ,MatButtonModule
     , MatDatepickerModule
     , MatNativeDateModule
+    , UserHistoryComponent
   ]
 })
 export class SharedModule { }

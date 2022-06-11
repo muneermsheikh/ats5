@@ -20,6 +20,7 @@ namespace api.Helpers
           {
                CreateMap<ApplicationTask, TaskDashboardDto>();
                CreateMap<ChecklistHR, ChecklistHRDto>();
+               CreateMap<ChecklistHRDto, ChecklistHR>();
                CreateMap<Customer, CustomerTypeNameKnownAsOfficialsToReturnDto>();
                CreateMap<Customer, CustomerDto>();
                CreateMap<CVRef, CVRefDto>();

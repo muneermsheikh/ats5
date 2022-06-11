@@ -1,0 +1,17 @@
+<div *ngFor="let cat of cats">
+     <div class="stdd w150">{{cat.categoryname}}</div>
+     <div class="stdd w50">{{cat.interviewMode}}</div>
+     <div class="stdd w150">{{cat.applicationNo}}</div>
+     <div class="stdd w150">{{cat.candidatename}}</div>
+     <div class="stdd 75">{{cat.interviewMode}}</div>
+     <ng-select *ngIf="attendanceStatuses" class="stdd fontSmall w350"
+          [items]="attendanceStatuses"
+          bindLabel="name"
+          bindValue="name"
+          labelForId="name"
+          placeholder="Status"
+          clearAllText="Clear"
+          [(ngSelect)]="cat.attendanceStatus">
+     </ng-select>
+     <button class="btn btn-primary fa fa-save" (click)="EmitData()" ></button>
+</div>

@@ -354,3 +354,5 @@ D:\ats8\api\obj\Debug\net5.0\api.dll
 D:\ats8\api\obj\Debug\net5.0\ref\api.dll
 D:\ats8\api\obj\Debug\net5.0\api.pdb
 D:\ats8\api\obj\Debug\net5.0\api.genruntimeconfig.cache
+D:\ats8\api\bin\Debug\net5.0\ExcelDataReader.dll
+D:\ats8\api\bin\Debug\net5.0\ExcelDataReader.DataSet.dll

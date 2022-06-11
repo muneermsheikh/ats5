@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
+     [Authorize(Roles = "Admin, HRManager, HRSupervisor")]
      public class MastersController : BaseApiController
      {
           private readonly IMastersService _mastersService;
@@ -99,9 +100,6 @@ namespace api.Controllers
           }
 
      //qualification
-
-          [Authorize]         //(Policy = "MastersAddRole")]
-          //qualifications
           [HttpPost("addqualification/{qualificationname}")]
           public async Task<ActionResult<Qualification>> AddQualification(string qualificationname)
           {
@@ -110,7 +108,6 @@ namespace api.Controllers
                return Ok(qualificationAdded);
           }
 
-          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpPut("editqualification")]
           public async Task<ActionResult<bool>> EditQualification(Qualification qualification)
           {
@@ -119,7 +116,6 @@ namespace api.Controllers
                return true;
           }
 
-          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpDelete("deletequalification")]
           public async Task<ActionResult<bool>> DeleteCategory(Qualification qualification)
           {
@@ -136,7 +132,6 @@ namespace api.Controllers
                return Ok(lst);
           }
 
-          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpGet("qualificationlist")]
           public async Task<ActionResult<Qualification>> GetQualificationListAsync(QualificationSpecParams specParams)
           {
@@ -145,7 +140,6 @@ namespace api.Controllers
                return Ok(lst);
           }
 
-          [Authorize]         //(Policy = "MastersEditRole")]
           [HttpGet("industrylist")]
           public async Task<ActionResult<Industry>> GetIndustryListAsync(IndustrySpecParams industryParams)
           {
@@ -168,27 +162,6 @@ namespace api.Controllers
                if (lst == null) return BadRequest(new ApiResponse(400, "no data returned"));
                return Ok(lst);
           }
-          /*
-    
-    //ReviewItemStatus.Description for Contract REVIEW RESULTS
-        Task<ReviewItemData> AddReviewItemData(string reviewDescriptionName);
-        Task<bool> EditReviewItemDataAsync(ReviewItemData reviewItemData);
-        Task<bool> DeleteQualificationAsync(ReviewItemData reviewItemData);
-        Task<IReadOnlyList<ReviewItemData>> GetReviewItemDataDescriptionListAsync();
-
- //ReviewItemStatus.Description for Contract REVIEW RESULTS
-        Task<ReviewItemStatus> AddReviewItemStatus(string reviewDescriptionName);
-        Task<bool> EditReviewItemStatusAsync(ReviewItemStatus ReviewItemStatus);
-        Task<bool> DeleteReviewItemStatusAsync(ReviewItemStatus ReviewItemStatus);
-        Task<IReadOnlyList<ReviewItemStatus>> GetReviewItemStatusListAsync();
-
-    //ReviewItemData.Description for Contract REVIEW RESULTS
-        Task<SkillData> AddSkillData(string skillname);
-        Task<bool> EditSkillDataAsync(SkillData skillData);
-        Task<bool> DeleteSkillDataAsync(SkillData skillData);
-        Task<IReadOnlyList<SkillData>> GetSkillDataListAsync();
-
-    
-          */
+         
      }
 }

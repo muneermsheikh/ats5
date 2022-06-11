@@ -4,6 +4,7 @@ namespace core.ParamsAndDtos
 {
     public class InterviewItemCandidateDto
     {
+        public int InterviewItemId {get; set;}
         public string CandidateName { get; set; }
         public int ApplicationNo { get; set; }
         public string PassportNo { get; set; }

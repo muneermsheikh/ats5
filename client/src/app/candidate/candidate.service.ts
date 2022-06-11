@@ -14,6 +14,7 @@ import { IPaginationCandidate, PaginationCandidate } from '../shared/pagination/
 import { IProfession } from '../shared/models/profession';
 import { IUser } from '../shared/models/user';
 import { PaginationCandidateBrief } from '../shared/pagination/paginationCandidateBrief';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,7 @@ export class CandidateService {
   cache = new Map();
   cacheBrief = new Map();
 
-  constructor(private http: HttpClient, private toastr: ToastrService) {}
+  constructor(private http: HttpClient, private toastr: ToastrService, private router: Router) {}
 
   
   async onClickLoadDocument() {
@@ -116,8 +117,8 @@ export class CandidateService {
       }));
     }
   
-  UpdateCandidate(model: any, files: File[]) {
-    return this.http.put(this.apiUrl + 'candidate/' + files, model).pipe(
+  UpdateCandidate(model: any) {
+    return this.http.put(this.apiUrl + 'candidate', model).pipe(
       map((user: IUser) => {
         if (user) {
         this.setCurrentUser(user);
@@ -174,5 +175,6 @@ export class CandidateService {
     // get a document from the Web API endpoint 'LoadDocument'
     return this.http.get<any>(this.apiUrl + 'fileupload/viewdocument/' + id);
   }
+
 
 }

@@ -168,11 +168,11 @@ namespace infra.Services
                               ", task for the same is created in your name.  Check your Task Dashboard for details.",
                               ((DateTime)order.ForwardedToHRDeptOn).Date.AddDays(8), "Not Started",0, null);
                          
-                         return new EmailMessageDto { EmailMessage = emailMsg, Success = true };
+                         return new EmailMessageDto { EmailMessage = emailMsg, ErrorMessage = "" };
                     }
                     else
                     {
-                         return new EmailMessageDto { EmailMessage = null, Success = true };
+                         return new EmailMessageDto { EmailMessage = null, ErrorMessage = "" };
                     }
                }
                throw new Exception("Failed to save the changes");

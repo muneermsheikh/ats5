@@ -41,4 +41,16 @@ export class AdminService {
     return this.http.post(this.baseUrl + 'DLForward', itemsAndAgents )
   }
 
+  addNewRole(newRoleName: string) {
+
+    return this.http.post(this.baseUrl + 'admin/role/' + newRoleName, {});
+  }
+
+  deleteRole(roleName: string) {
+    return this.http.delete(this.baseUrl + 'admin' + roleName);
+  }
+
+  editrRole(existingRoleName: string, newRoleName: string) {
+    return this.http.put(this.baseUrl + 'role/' + existingRoleName + '/' + newRoleName, {});
+  }
 }

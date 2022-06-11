@@ -10,11 +10,13 @@ using core.Interfaces;
 using core.Params;
 using core.ParamsAndDtos;
 using core.Specifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
+    [Authorize]
     public class UserHistoryController : BaseApiController
     {
         private readonly IUserHistoryService _userHistoryService;
@@ -27,7 +29,7 @@ namespace api.Controllers
             _userHistoryService = userHistoryService;
         }
 
-       
+ 
         [HttpGet("byhistoryid/{historyid}")]
         public async Task<ActionResult<UserHistoryDto>> GetUserHistoryDataByCandidateId(int historyid)
         {
@@ -40,41 +42,48 @@ namespace api.Controllers
         }
 
         [HttpGet("bycandidateid/{candidateid}")]
-        public async Task<ActionResult<UserHistoryDto>> GetUserHistoryByCandidateId(int candidateid)
+        public async Task<ActionResult<UserHistory>> GetUserHistoryByCandidateId(int candidateid)
         {
+            var cParams = new UserHistoryParams();
+            cParams.PersonType="candidate";
+            cParams.PersonId = candidateid;
             
-            var data = await _userHistoryService.GetHistoryByCandidateId(candidateid);
-            if (data == null) return NotFound("No record found with selected id");
-            if (data != null) return Ok(data);
-
-            return NotFound(new ApiResponse(400, "Your search parameters did not yield any result"));
+            var d = await GetCandidateHistoryFromParams(cParams);
+            
+            return d.Value;
+            
         }
 
-    
-        /*
-        [HttpGet("dtofromnameandphone/{callername}/{phoneno}")]
-        public async Task<ActionResult<UserHistoryDto>> GetHistoryDtoFromNonDBEntity(string callername, string phoneno)
+        [HttpGet("prospective/{prospectiveId}")]
+        public async Task<ActionResult<UserHistory>> GetUserHistoryByProspectiveCandidateId(int prospectiveId)
         {
-            var hist = await _userHistoryService.GetOrAddUserHistoryByNamePhone(callername, phoneno);
-
-            if (hist == null) return BadRequest("failed to retrieve/write new History of the entity");
-
-            return Ok(hist);
+            var cParams = new UserHistoryParams();
+            cParams.PersonType="prospective";
+            cParams.PersonId = prospectiveId;
+            
+            var d = await GetCandidateHistoryFromParams(cParams);
+            
+            return d.Value;
+            
         }
-        */
-        
+
+  
         [HttpGet("dto")]
-        public async Task<ActionResult<UserHistoryDto>> GetCandidateHistoryFromParams([FromQuery]UserHistoryParams histParams)
+        public async Task<ActionResult<UserHistory>> GetCandidateHistoryFromParams([FromQuery]UserHistoryParams histParams)
         {
             string err="";
+            var hist = new UserHistory();
+
+            if (histParams.PersonType == "prospective") {
+                hist = await _userHistoryService.GetOrAddUserHistoryByParams(histParams);
+                if (hist==null) return BadRequest(new ApiResponse(400, "failed to retrieve/create history record"));
+                return hist;
+            }
             var ph = histParams.MobileNo;
             if (!string.IsNullOrEmpty(ph)) {
-                var ss= ph.Substring(0, 4);
-                if (ss=="0091") ph=ph.Substring(4);
-                    ss=ph.Substring(0,3);
-                if (ss=="+91") ph=ph.Substring(3);
-                    ss=ph.Substring(0,1);
-                if (ss=="0") ph=ph.Substring(1);
+                if(ph.Substring(0,4) == "0091") ph=ph.Substring(4);
+                if(ph.Substring(0,3) == "+91") ph=ph.Substring(3);
+                if(ph.Substring(0,1)=="0") ph=ph.Substring(1);
                 int l=ph.Length;
                 if (l < 10 || l > 15) {
                     ph="";
@@ -88,11 +97,11 @@ namespace api.Controllers
 
             if (!histParams.ApplicationNo.HasValue && string.IsNullOrEmpty(histParams.EmailId) &&
                 string.IsNullOrEmpty(ph) && !histParams.PersonId.HasValue) return BadRequest(new ApiResponse(404, "The search object empty" + err));
-            
+
             histParams.MobileNo=ph;
             if(string.IsNullOrEmpty(histParams.PersonType)) histParams.PersonType="candidate";
 
-            var hist = await _userHistoryService.GetOrAddUserHistoryByParams(histParams);
+            hist = await _userHistoryService.GetOrAddUserHistoryByParams(histParams);
             if (hist==null) return BadRequest(new ApiResponse(400, "failed to retrieve/create history record"));
             return hist;
         }
@@ -108,13 +117,12 @@ namespace api.Controllers
             var empId = await _empService.GetEmployeeIdFromAppUserIdAsync(loggedInUser.Id);
             if (empId == 0) return Unauthorized("Employee Id not on record");
 
-            //userContact.LoggedInUserId = empId;
             if (userContact.PersonId == 0 ) {
                 return BadRequest(new ApiResponse(400, "Either Candidate Id or customer official Id should be provided"));
             }
             return await _userHistoryService.AddUserContact(userContact);
         }
-        
+
         
         [HttpDelete("{userContactId}")]
         public async Task<bool> DeleteUserContactById(int userContactId)
@@ -130,17 +138,43 @@ namespace api.Controllers
             if (results != null ) return Ok(results);
             return BadRequest(new ApiResponse(404, "No contact result data available"));
         }
-
+        
+        [Authorize]
         [HttpPut]
-        public async Task<ActionResult<bool>> UpdateContactHistory(UserHistory userhistory)
+        public async Task<ActionResult<UserHistoryReturnDto>> UpdateContactHistory(UserHistory userhistory)
+        {
+            var returnDto = new UserHistoryReturnDto();
+            if (string.IsNullOrEmpty(userhistory.PersonName) && userhistory.PersonId == 0 ) {
+                return BadRequest(new ApiResponse(404, "Person Id and name not provided"));
+            } else if (userhistory.Id==0) {
+                return BadRequest(new ApiResponse(404, "UserHistory Id not available"));
+            }
+
+            var dto = await GetLoggedInUserDto();
+
+            returnDto = await _userHistoryService.EditContactHistory(userhistory, dto);
+            if (!returnDto.Succeeded) return BadRequest(new ApiResponse(402, "failed to update the contact history"));
+            return Ok(returnDto);
+
+        }
+
+        [HttpGet("userItems")]
+        public async Task<ActionResult<bool>> UpdateContactHistory(ICollection<UserHistoryItem> userItems)
         {
             var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);   
-            //if (loggedInUser == null) return Unauthorized("Access allowed to authorized loggedin user only");
             if (loggedInUser == null) return Unauthorized(new ApiResponse(404, "unable to retrieve loggedin User"));
-            var succeeded = await _userHistoryService.EditContactHistory(userhistory, loggedInUser);
+            var succeeded = await _userHistoryService.EditContactHistoryItems(userItems, loggedInUser.loggedInEmployeeId);
             if (succeeded) return Ok(true);
-            return BadRequest(new ApiResponse(402, "Failed to Update the transactions"));
+            return BadRequest(new ApiResponse(402, "Failed to Update the transactions items"));
         }
+
+        [HttpGet("categoryrefdetails")]
+        public async Task<ICollection<CategoryRefDto>> GetCategoryRefDetails()
+        {
+            var dtos = await _userHistoryService.GetCategoryRefDetails();
+            return dtos;
+        }
+        
         private async Task<LoggedInUserDto> GetLoggedInUserDto()
         {
             var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);

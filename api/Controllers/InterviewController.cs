@@ -6,6 +6,7 @@ using core.Entities.HR;
 using core.Interfaces;
 using core.Params;
 using core.ParamsAndDtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -18,6 +19,7 @@ namespace api.Controllers
                _interviewService = interviewService;
           }
 
+          [Authorize(Roles = "Admin, HRManagr, HRSupervisor")]
           [HttpPost]
           public async Task<ActionResult<Interview>> AddInterview(InterviewToAddDto dto)
           {
@@ -32,6 +34,7 @@ namespace api.Controllers
                return intvw;
           }
 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor")]
           [HttpPut]
           public async Task<ActionResult<Interview>> EditInterview ([FromQuery] Interview interview)
           {
@@ -42,17 +45,29 @@ namespace api.Controllers
                return intvw;
           }
 
-          [HttpGet("{interviewStatus}")]
-          public async Task<ActionResult<ICollection<Interview>>> GetInterviews(string interviewStatus )
+          [Authorize]
+          [HttpGet("interviews")]
+          public async Task<ActionResult<Pagination<InterviewBriefDto>>> GetInterviews(InterviewSpecParams specParams )
           {
-               var interviews = await _interviewService.GetInterviews(interviewStatus);
+               var interviews = await _interviewService.GetInterviews(specParams);
                if (interviews == null) return NotFound(new ApiResponse(404, "No interviews found matching the status"));
 
                return Ok(interviews);
           }
           
+          [Authorize]
+          [HttpGet("interviewById/{id}")]
+          public async Task<ActionResult<Interview>> GetInterviewById(int Id )
+          {
+               var interviews = await _interviewService.GetInterviewById(Id);
+               if (interviews == null) return NotFound(new ApiResponse(404, "No interviews found matching the status"));
+
+               return Ok(interviews);
+          }
+
+          [Authorize]
           [HttpGet("openInterviews")]
-          public async Task<ActionResult<ICollection<InterviewDto>>> GetAllOpenInterviews()
+          public async Task<ActionResult<Pagination<InterviewBriefDto>>> GetAllOpenInterviews()
           {
                var interviews = await _interviewService.GetOpenInterviews();
                if (interviews == null) return NotFound(new ApiResponse(404, "No open interviews found"));
@@ -60,15 +75,8 @@ namespace api.Controllers
                return Ok(interviews);
           }
 
-          [HttpGet("interviewsWithItems/{interviewStatus}")]
-          public async Task<ActionResult<ICollection<Interview>>> GetInterviewsWithItems(string interviewStatus )
-          {
-               var interviews = await _interviewService.GetInterviews(interviewStatus);
-               if (interviews == null) return NotFound(new ApiResponse(404, "No interviews found matching the status"));
 
-               return Ok(interviews);
-          }
-
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpPost("assigncandidates")]
           public async Task<ActionResult<ICollection<InterviewItemCandidate>>> AssignCandidatesToInterviewItem(AssignCandidatesToAddDto dto)
           {
@@ -85,6 +93,15 @@ namespace api.Controllers
 
           }
      
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive")]
+          [HttpDelete("deleteInterviewbyid/{id}")]
+          public async Task<ActionResult<bool>> DeleteInterview (int id)
+          {
+               return await _interviewService.DeleteInterview(id);
+          }
+          
+
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpDelete("deleteCandidateAssignments")]
           public async Task<ActionResult<bool>> DeleteCandidateAssignedToInterview ([FromQuery] List<int> candidateInterviewIds)
           {
@@ -92,6 +109,7 @@ namespace api.Controllers
                return await _interviewService.DeleteFromInterviewItemCandidates(candidateInterviewIds);
           }
           
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpPut("registerCandidateArrived/{candidateInterviewId}")]
           public async Task<ActionResult<bool>> RegisterCandidateArrivedForInterview(int candidateInterviewId, DateTime reportedAt)
           {
@@ -100,6 +118,7 @@ namespace api.Controllers
                return await _interviewService.RegisterCandidateReportedForInterview(candidateInterviewId, reportedAt);
           }
 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpPut("registerCandidateInterviewed/{candidateInterviewId}/{interviewMode}/{interviewedAt}")]
           public async Task<ActionResult<bool>> RegisterCandidateAsInterviewed (int candidateInterviewId, 
                string interviewMode, DateTime interviewedAt)
@@ -108,6 +127,7 @@ namespace api.Controllers
                return await _interviewService.RegisterCandidateAsInterviewed(candidateInterviewId, interviewMode, interviewedAt);
           }
 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpPut("registerCandidateInterviewedWithResult/{candidateInterviewId}/{interviewMode}/{interviewedAt}/{selectionStatusId}")]
           public async Task<ActionResult<bool>> RegisterCandidateInterviewedWithResult (int candidateInterviewId, 
                string interviewMode, DateTime interviewedAt, int selectionStatusId)
@@ -117,6 +137,7 @@ namespace api.Controllers
                     candidateInterviewId, interviewMode, interviewedAt, selectionStatusId);
           }
 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive")]
           [HttpGet("interviewAttendance/{orderId}")]
           public async Task<ActionResult<ICollection<InterviewAttendanceDto>>> GetInterviewAttendance(int orderId, [FromQuery] List<int> attendanceStatusIds)
           {
@@ -128,7 +149,20 @@ namespace api.Controllers
 
                return Ok(lst);
           }
-          
+
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive")]
+          [HttpGet("catandcandidates/{interviewItemId}")]
+          public async Task<ActionResult<ICollection<InterviewItemCandidateDto>>> GetInterviewCategoryAndAttendance(int interviewItemId)
+          {
+               
+               var lst = await _interviewService.GetInterviewItemAndAttendanceOfInterviewItem(interviewItemId);
+
+               if (lst == null) return NotFound(new ApiResponse(400, "No records found matching the criteria"));
+
+               return Ok(lst);
+          }
+
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive, HRTrainee")]
           [HttpGet("candidatesmatchinginterviewcat")]
           public async Task<ActionResult<ICollection<CandidateBriefDto>>> GetCandidatesMatchingInterviewCategory(InterviewSpecParams interviewParams)
           {

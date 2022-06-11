@@ -28,12 +28,15 @@ namespace infra.Services
           private readonly IUnitOfWork _unitOfWork;
           private readonly IComposeMessagesForHR _composeMessages;
           private readonly IEmailService _emailService;
-          public CVRvwService(ITaskService taskService, IConfiguration config, IComposeMessagesForHR composeMessages,
+          private readonly IComposeMessagesForInternalReviewHR _composeMsgForInternalReviewHR;
+          public CVRvwService(ITaskService taskService, IConfiguration config, 
+               IComposeMessagesForHR composeMessages, IComposeMessagesForInternalReviewHR composeMsgForInternalReviewHR,
                IUnitOfWork unitOfWork, IEmailService emailService,
-                    ICommonServices commonServices, ATSContext context, IVerifyService verifyService)
+               ICommonServices commonServices, ATSContext context, IVerifyService verifyService)
           {
                _emailService = emailService;
                _composeMessages = composeMessages;
+               _composeMsgForInternalReviewHR = composeMsgForInternalReviewHR;
                _unitOfWork = unitOfWork;
                _verifyService = verifyService;
                _context = context;
@@ -131,7 +134,7 @@ namespace infra.Services
                     if(assignee == gDocControllerId) {
                          msg = await _composeMessages.ComposeHTMLToPublish_CVReadiedToForwardToClient(cands, loggedInUserDto, assignee);
                     } else {
-                         msg = await _composeMessages.ComposeHTMLToPublish_CVSubmittedToHRSup(cands, loggedInUserDto, assignee);
+                         msg = await _composeMsgForInternalReviewHR.ComposeHTMLToPublish_CVSubmittedToHRSup(cands, loggedInUserDto, assignee);
                     }
                     
                     if (msg!= null)
@@ -228,7 +231,7 @@ namespace infra.Services
                               _unitOfWork.Repository<ApplicationTask>().Update(hrexecTask);
 
                               var hrExecTaskItem = new TaskItem((int)EnumTaskType.SubmitCVToHRSupForReview,hrexecTask.Id, dateTimeNow, "Completed",
-                                   "CV reviewed by Sup",loggedInDto.LoggedInEmployeeId, item.CommonDataDto.OrderId, item.CommonDataDto.OrderItemId,
+                                   "CV reviewed by Sup", item.CommonDataDto.OrderId, item.CommonDataDto.OrderItemId,
                                    item.CommonDataDto.OrderNo, loggedInDto.LoggedInEmployeeId, dateTimeNow, item.CommonDataDto.CandidateId, item.CommonDataDto.HRSupId,
                                    1  //,hrexecTask
                                    );
@@ -290,7 +293,7 @@ namespace infra.Services
                          if(assignee == gDocControllerId && cv.CommonDataDto.HRMId == 0) {
                               msg = await _composeMessages.ComposeHTMLToPublish_CVReadiedToForwardToClient(cands, loggedInDto, cv.AssignedToId);
                          } else {
-                              msg = await _composeMessages.ComposeHTMLToPublish_CVReviewedByHRSup(cands, loggedInDto, cv.AssignedToId);
+                              msg = await _composeMsgForInternalReviewHR.ComposeHTMLToPublish_CVReviewedByHRSup(cands, loggedInDto, cv.AssignedToId);
                          }
                          
                          if (msg!= null)
@@ -348,7 +351,7 @@ namespace infra.Services
                               var hrExecTaskItem = new TaskItem((int)EnumTaskType.SubmitCVToDocControllerAdmin, 
                                    (int)cvrvw.SupTaskId,  dateTimeNow, "Open", 
                                    "CV Forwarded to Doc Controller: " + item.CommonDataDto.CandidateDesc, 
-                                   loggedInDto.LoggedInEmployeeId,  item.CommonDataDto.OrderId, item.OrderItemId, 
+                                   item.CommonDataDto.OrderId, item.OrderItemId, 
                                    item.CommonDataDto.OrderNo, loggedInDto.LoggedInEmployeeId,
                                    dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0//, item.ParentTask
                               );
@@ -378,8 +381,7 @@ namespace infra.Services
                          if(item.HRMReviewResultId == EnumSelStatus.Selected) {
                               hrmtaskitem =  new TaskItem((int)EnumTaskType.SubmitCVToHRMMgrForReview, 
                                    hrmTask.Id,  dateTimeNow, "Completed", 
-                                   "Candidate approved", 
-                                   loggedInDto.LoggedInEmployeeId,  item.CommonDataDto.OrderId, item.OrderItemId, 
+                                   "Candidate approved", item.CommonDataDto.OrderId, item.OrderItemId, 
                                    item.CommonDataDto.OrderNo, loggedInDto.LoggedInEmployeeId,
                                    dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0  //, item.ParentTask
                               );
@@ -387,8 +389,7 @@ namespace infra.Services
                          } else {
                               hrmtaskitem =  new TaskItem((int)EnumTaskType.SubmitCVToHRMMgrForReview, 
                                    hrmTask.Id,  dateTimeNow, "Completed", 
-                                   "Candidate rejected", 
-                                   loggedInDto.LoggedInEmployeeId,  0, item.OrderItemId, 
+                                   "Candidate rejected", 0, item.OrderItemId, 
                                    0, loggedInDto.LoggedInEmployeeId,
                                    dateTimeNow.AddDays(2), item.CandidateId,  item.AssignedToId, 0//, item.ParentTask
                               );
@@ -424,7 +425,7 @@ namespace infra.Services
                {
                     var cands = cvsSubmittedDto.Where(x => x.AssignedToId == item).Select(x => x.CommonDataDto).ToList();
                     if (cands.Count > 0) {
-                         msg = await _composeMessages.ComposeHTMLToPublish_CVReviewedByHRManager(cands, loggedInDto, item);
+                         msg = await _composeMsgForInternalReviewHR.ComposeHTMLToPublish_CVReviewedByHRManager(cands, loggedInDto, item);
                          if (msg != null) lstMsgs.Add(msg);
                     }
                }

@@ -15,14 +15,16 @@ namespace core.Interfaces
         Task<Interview> AddInterviewCategories(int orderId);
         Task<bool>DeleteInterviewItem(InterviewItem interviewItem);
         Task<ICollection<CandidateBriefDto>> GetCandidatesMatchingInterviewCategory(InterviewSpecParams interviewParams);
-        Task<ICollection<Interview>> GetInterviews (string interviewStatus);
+        Task<PagedList<InterviewBriefDto>> GetInterviews (InterviewSpecParams interviewSpecParams);
+        Task<Interview> GetInterviewById (int Id);
         Task<ICollection<Interview>> GetInterviewsWithItems (string interviewStatus);
         Task<InterviewItem> EditInterviewItem (InterviewItem interviewItem);
         Task<ICollection<InterviewItemCandidate>> AddCandidatesToInterviewItem (int interviewItemId, DateTime scheduledTime, 
             int durationInMinutes, string interviewMode,  List<int> CandidateIds);
         Task<bool> DeleteFromInterviewItemCandidates(List<int> InterviewItemCandidateIds);
 
-        Task<InterviewDto> GetInterviewAttendanceOfAProject(int orderId, List<int> attendanceStatusIds);
+        Task<InterviewBriefDto> GetInterviewAttendanceOfAProject(int orderId, List<int> attendanceStatusIds);
+        Task<ICollection<InterviewItemCandidateDto>>  GetInterviewItemAndAttendanceOfInterviewItem(int interviewItemId);
         Task<ICollection<Interview>> GetOpenInterviews();
         Task<bool> RegisterCandidateReportedForInterview(int interviewItemCandidateId, DateTime ReportedAt);
         Task<bool> UpdateCandidateScheduledAttendanceStatus(int candidateInterviewId, int attendanceStatusId);

@@ -12,6 +12,7 @@ import { AssessQComponent } from './assess-q/assess-q.component';
 import { CommonModule } from '@angular/common';
 import { AssessComponent } from './assess/assess.component';
 import { ItemQComponent } from './item-q/item-q.component';
+import { CandidateAssessmentComponent } from './candidate-assessment/candidate-assessment.component';
 
 
 
@@ -28,6 +29,7 @@ import { ItemQComponent } from './item-q/item-q.component';
     AssessQComponent,
     AssessComponent,
     ItemQComponent,
+    CandidateAssessmentComponent,
   ],
   imports: [
     SharedModule,

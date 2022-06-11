@@ -31,7 +31,7 @@ export class AssessQComponent implements OnInit {
     this.activatedRoute.data.subscribe(data => { 
       this.orderitem = data.itembrief;
       this.assess= data.assessment;
-      console.log('ngONINit', this.assess);
+      //console.log('ngONINit', this.assess);
       this.createForm();
       if (this.assess) {
         this.patchForm(this.assess);

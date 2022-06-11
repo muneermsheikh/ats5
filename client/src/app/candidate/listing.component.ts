@@ -12,6 +12,7 @@ import { IProfession } from '../shared/models/profession';
 import { IUser } from '../shared/models/user';
 import { SharedService } from '../shared/services/shared.service';
 import { CandidateService } from './candidate.service';
+import { UploadDownloadService } from './upload-download.service';
 
 declare const loadDocument: any;
 declare const loadInitialDocument: any;
@@ -58,7 +59,7 @@ export class ListingComponent implements OnInit {
   constructor(private service: CandidateService, 
       private sharedService: SharedService, 
       private modalService: BsModalService,
-      private orderService: OrderService,
+      private orderService: OrderService, private downloadservice: UploadDownloadService,
       private toastr: ToastrService) { }
 
   ngOnInit(): void {
@@ -204,16 +205,24 @@ export class ListingComponent implements OnInit {
   }
 
   //output value from child
-  showDocumentViewer(id: number)
-  {
+  showDocumentViewer(id: number){
     this.idFromChild = id;
     return this.service.viewDocument(id).subscribe(result => {
       loadInitialDocument(result);
     }, error => {
       this.toastr.error(error);
     })
+    
   }
 
+  downloadfile(candidateid: number) {
+    console.log('received emitted value', candidateid);
+    return this.downloadservice.downloadFile(candidateid).subscribe(response => {
+      this.toastr.success('document downloaded');
+    }, error => {
+      this.toastr.error('failed to download document', error);
+    })
+  }
   loadInitialDocument(document) {
       this.documentLoading = true;
       window.addEventListener("documentViewerLoaded", function () {

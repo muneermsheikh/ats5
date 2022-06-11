@@ -1,20 +1,26 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
 import { AccountService } from 'src/app/account/account.service';
-import { ApplicationTask, IApplicationTask } from 'src/app/shared/models/applicationTask';
-import { ApplicationTaskInBrief, IApplicationTaskInBrief } from 'src/app/shared/models/applicationTaskInBrief';
+import { ICategoryRefDto } from 'src/app/shared/dtos/categoryRefDto';
+import { IMessageDto } from 'src/app/shared/dtos/messageDto';
+import { IUserHistoryReturnDto } from 'src/app/shared/dtos/userHistoryReturnDto';
+import { IApplicationTask } from 'src/app/shared/models/applicationTask';
 import { IContactResult } from 'src/app/shared/models/contactResult';
 import { IEmployeeIdAndKnownAs } from 'src/app/shared/models/employeeIdAndKnownAs';
+import { IMessage, message } from 'src/app/shared/models/message';
 import { IUser } from 'src/app/shared/models/user';
 import { IUserHistory } from 'src/app/shared/models/userHistory';
+import { IUserHistoryDto } from 'src/app/shared/models/userHistoryDto';
 import { IUserHistoryItem } from 'src/app/shared/models/userHistoryItem';
+import { categoryRefParam } from 'src/app/shared/params/categoryRefParam';
 import { userHistoryParams } from 'src/app/shared/params/userHistoryParams';
+import { userTaskParams } from 'src/app/shared/params/userTaskParams';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { TaskReminderModalComponent } from 'src/app/userTask/task-reminder-modal/task-reminder-modal.component';
+import { TasksModalComponent } from 'src/app/userTask/tasks-modal/tasks-modal.component';
 import { UserTaskService } from 'src/app/userTask/user-task.service';
 import { BreadcrumbService } from 'xng-breadcrumb';
 import { CandidateHistoryService } from '../candidate-history.service';
@@ -42,6 +48,7 @@ export class CandidateHistoryComponent implements OnInit {
   
   employees: IEmployeeIdAndKnownAs[];
   contactResults: IContactResult[];
+  contactResultData: IContactResult[]=[];
   bsValue = new Date();
   bsRangeValue: Date[];
   maxDate = new Date();
@@ -51,6 +58,12 @@ export class CandidateHistoryComponent implements OnInit {
 
   candidateFromDb: boolean=false;
   err: string;
+
+  msg: IMessage=new message();
+
+  catRefParam=new categoryRefParam();
+
+  categoryRefTextOnHover: string;
 
   constructor(private service: CandidateHistoryService, 
     private bcService: BreadcrumbService, 
@@ -65,18 +78,33 @@ export class CandidateHistoryComponent implements OnInit {
     this.bcService.set('@candidateHistory',' ');
     //this.routeId = this.activatedRoute.snapshot.params['id'];
     this.accountService.currentUser$.pipe(take(1)).subscribe(user => this.user = user);
-    this.maxDate.setFullYear(this.maxDate.getFullYear() - 1);  //1 years later
-    this.minDate.setFullYear(this.minDate.getFullYear() + 1);
-    this.bsRangeValue = [this.bsValue, this.maxDate];
+    //this.maxDate.setFullYear(this.maxDate.getFullYear() - 1);  //1 years later
+    //this.minDate.setFullYear(this.minDate.getFullYear() + 1);
+    //this.bsRangeValue = [this.bsValue, this.maxDate];
  }
 
   ngOnInit(): void {
-    this.activatedRoute.data.subscribe(data => { this.member= data.history;})
-    this.activatedRoute.data.subscribe(data => { this.contactResults = data.results;})
-    this.activatedRoute.data.subscribe(data => { this.employees = data.employees;})
+    this.activatedRoute.data.subscribe(data => { 
+      this.member= data.history?.body;
+      this.contactResults = data.results;
+      this.employees = data.employees
+    })
+    //this.activatedRoute.data.subscribe(data => { this.contactResults = data.results;})
+    //this.activatedRoute.data.subscribe(data => { this.employees = data.employees;})
+   
     this.histParams = new userHistoryParams();
     
     this.createForm();
+    //this.contactResultData = this.contactResults.filter(x => x.personType===this.member?.personType);
+    this.contactResultData = this.contactResults;
+    if(this.member != null) this.patchMember(this.member);
+
+    this.msg.content="contents one two three four";
+    this.msg.recipientId=12;
+    this.msg.senderId=10;
+    this.msg.senderUserName='munir';
+    this.msg.recipientUserName='recipient user name';
+
   }
 
   createForm() {
@@ -93,7 +121,7 @@ export class CandidateHistoryComponent implements OnInit {
     } 
     );
 
-    if(this.member != null) this.patchMember(this.member);
+   
     //this.patchMember(this.member);
   }
 
@@ -118,131 +146,128 @@ export class CandidateHistoryComponent implements OnInit {
         formArray.push(this.fb.group({
           id: ph.id,
           phoneNo: ph.phoneNo,
+          personId: ph.personId,
           subject: ph.subject,
+          personType: ph.personType,
           categoryRef: ph.categoryRef,
           dateOfContact: ph.dateOfContact,
           loggedInUserName: ph.loggedInUserName,
-          contactResult: ph.contactResult,
+          contactResultId: ph.contactResultId,
+          composeEmaiMessage: ph.composeEmailMessage,
           gistOfDiscussions: ph.gistOfDiscussions
         }))
       });
       return formArray;
   }
 
-  get userHistoryItems() : FormArray {
-    return this.form.get("userHistoryItems") as FormArray
-  }
-  
-  newUserHistoryItem(): FormGroup {
-    const todayISOString  = new Date().toISOString();
-    return this.fb.group({
-      id: 0,
-      phoneNo: this.member.phoneNo,
-      subject: '',
-      categoryRef: '',
-      dateOfContact: [todayISOString, Validators.required],
-      loggedInUserName: [this.user.username, Validators.required],
-      contactResult: [0, Validators.required],
-      gistOfDiscussions: ''
-    })
-  }
-
-  subjectDblClick(i: number) {
-    if (i===0) return;
-    var arrayControl = this.form.get('userHistoryItems') as FormArray;
-    const sub = arrayControl.at(i-1).get('subject').value;
-    arrayControl.at(i).get('subject').setValue(sub);
-  }
-
-  categoryDblClick(i: number) {
-    if (i===0) return;
-    //get previous value
-    var arrayControl = this.form.get('userHistoryItems') as FormArray;
-    const categoryref = arrayControl.at(i-1).get('categoryRef').value;
-    arrayControl.at(i).get('categoryRef').setValue(categoryref);
-  }
-
-  addUserHistoryItem() {
-    this.userHistoryItems.push(this.newUserHistoryItem());
-  }
-
-  removeUserHistoryItem(i:number) {
-    this.userHistoryItems.removeAt(i);
-    this.userHistoryItems.markAsDirty();
-    this.userHistoryItems.markAsTouched();
-  }
-
-  update() {
-    this.service.updateCandidateHistory(this.form.value).subscribe(() => {
-      this.toastr.success('candidate history updated');
-      this.router.navigateByUrl('');
-
-    }, error => {
-      this.toastr.error(error);
-    }) 
-  }
-
-  displayModalReminder(i: number) {
-    let taskDto: IApplicationTaskInBrief;
-    const config = {
-      class: 'modal-dialog-centered modal-lg',
-      initialState: {
-        obj: this.getReminderObject(i),
-        emps: this.employees
-      }
+    get userHistoryItems() : FormArray {
+      return this.form.get("userHistoryItems") as FormArray
     }
-    this.bsModalRef = this.modalService.show(TaskReminderModalComponent, config);
     
-    this.bsModalRef.content.updatedRemidner.subscribe(values => {
-      taskDto = values;
-      if(taskDto ===undefined) {
-        this.toastr.warning('failed to retrieve the emitted object');
-        return;
-      }
-      let appTask = new ApplicationTask();
-      appTask.applicationNo=taskDto.applicationNo;
-      appTask.assignedToId=taskDto.assignedToId;
-      appTask.candidateId=taskDto.candidateId;
-      appTask.completeBy=taskDto.completeBy;
-      appTask.taskDate=taskDto.taskDate;
-      appTask.taskDescription=taskDto.taskDescription;
-      appTask.taskOwnerId=taskDto.taskOwnerId;
-      appTask.taskStatus=taskDto.taskStatus;
-      appTask.taskTypeId=taskDto.taskTypeId;
-
-      this.toastr.info('calling userTaskService to create task');
-      this.userTaskService.createTaskFromAppTask(appTask).subscribe(response => {
-        if (response) this.toastr.success('task created');
-        }, error => {
-          this.toastr.warning('failed to create the task');
-        })
-    }, error => {
-      this.toastr.warning('failed to retrieve the task', error);
-    })
-  }
-
-    private getReminderObject(i: number): IApplicationTaskInBrief {
-    const dt= new Date().toISOString();
-    const dt1 = new Date(dt);
-    //var arrayControl = this.form.get('userHistoryItems') as FormArray;
-    //const disc = arrayControl.at(i).get('gistOfDiscussions').value;
-    const user: IUser = JSON.parse(localStorage.getItem('user'));
-    if(user.loggedinEmployeeId === 0) {
-      this.toastr.error('cannot get logged in user employee id');
-      return null;
+    newUserHistoryItem(): FormGroup {
+      const todayISOString  = new Date().toISOString();
+      return this.fb.group({
+        id: 0,
+        phoneNo: this.member.phoneNo,
+        personType: '',
+        personId: 0,
+        subject: '',
+        categoryRef: '',
+        hoverText:'',
+        dateOfContact: [todayISOString, Validators.required],
+        loggedInUserName: [this.user.displayName, Validators.required],
+        contactResultId: [0, Validators.required],
+        composeEmailMessage: false,
+        gistOfDiscussions: ''
+      })
     }
-    let obj = new ApplicationTaskInBrief();
-    obj.id=0, obj.taskTypeId = 0, obj.taskTypeName ='',
-    obj.taskDate = new Date(); obj.taskOwnerId=0,
-    obj.taskOwnerName='', obj.assignedToId=2,
-    obj.assignedToName='', obj.completeBy=new Date(dt1.setDate(dt1.getDate()+ 7)),
-    obj.taskStatus='not started'
-    obj.taskDescription='reminder for ';
-    obj.taskOwnerName=user.username;
-    obj.taskOwnerId=user.loggedinEmployeeId;
 
-    return obj;
-    };
+    subjectDblClick(i: number) {
+      if (i===0) return;
+      var arrayControl = this.form.get('userHistoryItems') as FormArray;
+      const sub = arrayControl.at(i-1).get('subject').value;
+      arrayControl.at(i).get('subject').setValue(sub);
+    }
+
+    categoryDblClick(i: number) {
+      if (i===0) return;
+      //get previous value
+      var arrayControl = this.form.get('userHistoryItems') as FormArray;
+      const categoryref = arrayControl.at(i-1).get('categoryRef').value;
+      arrayControl.at(i).get('categoryRef').setValue(categoryref);
+    }
+
+    addUserHistoryItem() {
+      this.userHistoryItems.push(this.newUserHistoryItem());
+    }
+
+    removeUserHistoryItem(i:number) {
+      this.userHistoryItems.removeAt(i);
+      this.userHistoryItems.markAsDirty();
+      this.userHistoryItems.markAsTouched();
+    }
+
+    update() {
+      this.service.updateCandidateHistory(this.form.value).subscribe((response: IUserHistoryReturnDto) => {
+        if(response.succeeded) {
+          if (response.messageCount === 0) {
+            this.toastr.success('Call Record transaction updated - no email message composed'); 
+          } else {
+            this.toastr.success('Call Record transaction updated, ' + response.messageCount + ' messages were composed.  The messages are available in messages, draft folder');
+          }
+        } else {
+          this.toastr.warning('failed to update the history object');
+        }
+      }, error => {
+        this.toastr.error(error);
+      }) 
+    }
+
+    displayPersonTasksModal(event: any) {
+
+      //var historyItemId = event.controls['id'].value;
+      var sPerson = this.member.personType;
+      //var iPersonId = event.controls['personId'].value;
+
+
+      let taskDto: IApplicationTask;
+      
+      const dt= new Date().toISOString();
+      const dt1 = new Date(dt);
+      var loggedinEmployeeId = this.user.loggedInEmployeeId;     //why is this.user.loggedInEmployeeId undefined?
+      if(loggedinEmployeeId === 0 || loggedinEmployeeId === undefined) {
+        return null;
+      }
+      
+      let oParams = new userTaskParams;
+      oParams.personType = sPerson;
+      oParams.candidateId = this.form.get('personId').value; // iPersonId;
+      this.userTaskService.setOParams(oParams);
+      console.log('oParams in displayPersonTask', oParams);
+      this.userTaskService.getTasks(false, true).subscribe(response => {
+        var objs = response; //IApplicationTask[]
+          
+          const config = {
+            class: 'modal-dialog-centered modal-lg',
+            initialState: {
+              objs, 
+              emps: this.employees,
+              title: this.member.personName,
+              user:this.user
+            }
+          }
+          
+          console.log('config', config);
+
+          this.bsModalRef = this.modalService.show(TasksModalComponent, config);
+        }, error => {
+          console.log(error);
+        });
+    }
+
+    composeEmailOfConsent() {
+      
+    }
 
     routeChange() {
       if (this.form.dirty) {
@@ -259,6 +284,18 @@ export class CandidateHistoryComponent implements OnInit {
       }
     }
     
+    goBackTo() {
+      switch(this.member.personType) {
+        case 'prospective':
+          this.router.navigateByUrl('/prospectives');
+          break;
+        case 'candidate':
+          this.member.personType === 'candidate';
+          break;
+        default:
+          break;
+      }
+    }
 
     getCandidate() {
       this.err='';
@@ -275,12 +312,37 @@ export class CandidateHistoryComponent implements OnInit {
                 this.toastr.info('no such history transaction on record');
                 return;
               }
-              console.log('get candidate got', this.member);
+              this.contactResultData = this.contactResults.filter(x=>x.personType === this.member?.personType);
               this.patchMember(this.member);
         }, error => {
           this.err = error;
           this.toastr.error(error);
         })
  
+    }
+
+    clearMember() {
+      this.member=null;
+      this.userHistoryItems.clear();
+    }
+//hover text
+
+
+
+  public getCategoryRef(categoryref: string): ICategoryRefDto {
+
+    if(categoryref==='') return null;
+                
+    var i = categoryref.indexOf("-");
+    if (i== -1) return null;
+    var orderno = categoryref.substring(0,i);
+    var srno = categoryref.substring(i+1);
+    if (orderno==='' || srno==='') return null;
+    this.catRefParam.orderNo=+orderno;
+    this.catRefParam.srNo=+srno;
+    this.service.setParams(this.catRefParam);
+    this.service.getCategoryRefDetailFromParam(true).subscribe(response => {
+      this.categoryRefTextOnHover=response.categoryRef + response.companyName;
+    })
   }
 }

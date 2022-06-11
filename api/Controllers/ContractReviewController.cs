@@ -28,7 +28,7 @@ namespace api.Controllers
         }
 
 
-        //[Authorize] //(Roles = "ContractReviewRole")]
+        [Authorize(Roles = "ContractReviewRole")]
         [HttpPost("createobject/{orderId}")]
         public async Task<ContractReview> CreateContractReviewObject(int orderId)
         {
@@ -37,7 +37,7 @@ namespace api.Controllers
             return cReview;
         }
 
-        //[Authorize] //(Roles = "ContractReviewRole")]
+        [Authorize(Roles = "ContractReviewRole")]
         [HttpPut("update")]
         public async Task<ActionResult<EmailMessage>> UpdateContractReview(ContractReview contractReview)
         {
@@ -50,7 +50,7 @@ namespace api.Controllers
         }
 
        
-        // [Authorize] //(Roles = "ContractReviewRole")]
+        [Authorize(Roles = "ContractReview")]
         [HttpGet("reviews")]
         public async Task<Pagination<ContractReview>> GetContractReviews([FromQuery]ContractReviewSpecParams reviewParams)
         {
@@ -58,12 +58,14 @@ namespace api.Controllers
             return obj;
         }
 
+         [Authorize(Roles ="ContractReview")]
         [HttpGet("reviewdata")]
         public async Task<ICollection<ReviewItemData>> GetReviewItemData()
         {
             return await _reviewService.GetReviewData();
         }
         
+         [Authorize(Roles ="ContractReview")]
         [HttpGet("{id}")]
         public async Task<ICollection<ContractReview>> GetContractReviews(int id)
         {
@@ -79,7 +81,7 @@ namespace api.Controllers
         }
 
 
-        //[Authorize] //(Roles = "ContractReviewRole")]
+        [Authorize(Roles = "ContractReview")]
         [HttpGet("orderitemdto/{orderitemid}")]
         public async Task<ICollection<ContractReviewItemDto>> GetContractReviewItemsDto(ContractReviewItemSpecParams cParams)
         {
@@ -89,7 +91,7 @@ namespace api.Controllers
 
 
 
-        //[Authorize] //(Roles = "ContractReviewRole")]
+        [Authorize(Roles = "ContractReview")]
         [HttpDelete("{orderid}")]           //deletes contractreview and all children
         public async Task<ActionResult<bool>> DeleteContractReview(int orderid)
         {
@@ -97,7 +99,7 @@ namespace api.Controllers
             return Ok(true);
         }
 
-        //[Authorize] //(Roles = "ContractReviewRole")]
+        [Authorize(Roles = "ContractReview")]
         [HttpDelete("item/{orderitemid}")]      //deletes contractReviewItem and all reviewitems
         public async Task<ActionResult<bool>> DeleteContractReviewItem(int orderitemid)
         {
@@ -105,7 +107,7 @@ namespace api.Controllers
             return Ok(true);
         }
 
-        [Authorize] //(Roles = "ContractReviewRole")]
+        [Authorize(Roles = "ContractReview")]
         [HttpDelete("reviewitem/{id}")]
         public async Task<ActionResult<bool>> DeleteContractReviewReviewItem(int id)
         {
@@ -113,6 +115,7 @@ namespace api.Controllers
             return Ok(true);
         }
 
+         [Authorize(Roles ="ContractReview")]
         [HttpGet("reviewitem/{orderitemid}")]
         public async Task<ActionResult<ContractReviewItemDto>> GetReviewResults (int orderitemid)
         {
@@ -123,6 +126,7 @@ namespace api.Controllers
             return NotFound(new ApiResponse(404, "Not found"));
         }
 
+        [Authorize(Roles ="ContractReview")]
         [HttpPut("reviewitem")]
         public async Task<ActionResult<bool>> UpdateContractReviewItem(ContractReviewItemDto model)
         {

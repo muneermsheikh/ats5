@@ -6,6 +6,7 @@ import { UserTaskLineComponent } from './user-task-line/user-task-line.component
 import { SharedModule } from '../shared/shared.module';
 import { UserTaskRoutingModule } from './user-task-routing.module';
 import { TaskReminderModalComponent } from './task-reminder-modal/task-reminder-modal.component';
+import { TasksModalComponent } from './tasks-modal/tasks-modal.component';
 
 
 
@@ -14,7 +15,8 @@ import { TaskReminderModalComponent } from './task-reminder-modal/task-reminder-
     UserTaskComponent,
     UserTaskEditComponent,
     UserTaskLineComponent,
-    TaskReminderModalComponent
+    TaskReminderModalComponent,
+    TasksModalComponent
   ],
   imports: [
     CommonModule,

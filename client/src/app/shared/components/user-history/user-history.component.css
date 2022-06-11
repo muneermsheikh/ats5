@@ -1,0 +1,57 @@
+.stddww {
+     display: inline-block;
+     vertical-align: top;
+     font-size: small;
+     line-height: 3em;
+     word-wrap: break-word;
+}
+
+.stdd {
+     display: inline-block;
+     vertical-align: top;
+     font-size: small;
+}
+
+.stddButton{
+     display: inline-block;
+     margin: 0px;
+     padding: 0px;
+     font-Size: small
+}
+
+.stddButtonRed{
+     display: inline-block;
+     margin-left: 2px;
+     margin-right: 0px;
+     padding: 0px;
+     font-Size: small;
+     color: red;
+}
+
+.stddDropdown{
+     display: inline-block;
+     vertical-align: top;
+     font-size: smaller;
+     margin-left: 1px;
+     width: 175px !important;
+}
+
+.vAlignT {vertical-align: top;}
+
+.alignR {text-align: right;}
+
+.b {font-weight: bold;}
+
+.blue {color: blue;}
+
+.w25 {width: 25px;}
+.w75 {width: 75px;}
+.w90 {width: 90px;}
+.w100 {width: 100px;}
+.w120 {width: 120px;}
+.w125 {width: 125px;}
+.w150 {width: 150px;}
+.w175 {width: 175px;}
+.w200 {width: 200px;}
+.w250 {width: 250px;}
+.w400 {width: 400px;}

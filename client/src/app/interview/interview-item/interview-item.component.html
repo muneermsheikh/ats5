@@ -1,0 +1,31 @@
+<div *ngIf="interview===null" >
+     No interview data available
+</div>
+<div *ngIf="interview!==null" class="col-12">
+     <div class="stdd row mb-0">
+          <div class="stdd form-check mx-1 w10" >
+               <input type="checkbox"
+                   class="form-check-input"
+                   [checked]="interview.checked"
+                   value="interview.id"
+                   (change)="interview.checked = !interview.checked"
+               >
+           </div>
+
+          <div class="stdd w50" title="click to edit" routerLink="/interview/edit/{{interview.id}}" >  {{interview.companyName}}</div>
+          <div class="stdd mx-1 w200">{{interview.orderNo}}</div> 
+          <div class="stdd mx-1 w70">{{interview.orderDate | date: 'd-MMM-yy'}}</div>
+          <div class="stdd mx-1 w200" routerLink = "/interview/assignCandidates/{{interview.id}}" title="Assign candidates to interview category" >{{interview.interviewVenue}}</div>
+          <div class="stdd mx-1 w70">{{interview.interviewDateFrom | date: 'd-MMM'}}</div>
+          <div class="stdd mx-1 w70">{{interview.interviewDateUpto | date: 'd-MMM'}}</div>
+          <div class="stdd mx-1 w70">{{interview.interviewStatus}}</div>
+          <div class="stdd mx-1 w70">{{interview.concludingRemarks}}</div>
+          <button class="stdd w25 fSmall mx-1 fa fa-trash red" type="button" routerLink="/candidate/delete/{{cv.id}}" ></button>
+          <button class="stdd w25 fSmall fa fa-balance-scale" title="Assess this candidate" routerLink="/hr/cvassess/{{cv.id}}" ></button>
+          <button class="stdd w25 fSmall ml-1 fa fa-users" type="button" title="display categories and candidates" (click)="displayCategories(interview.id)"></button>
+           <app-interview-categories
+               [cats]="catsandcands"
+           ></app-interview-categories>
+     </div>
+</div>
+

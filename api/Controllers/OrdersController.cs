@@ -1,24 +1,20 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using api.DTOs;
 using api.Errors;
 using api.Extensions;
-using api.Helpers;
 using AutoMapper;
 using core.Entities.Identity;
 using core.Entities.Orders;
 using core.Interfaces;
 using core.Params;
 using core.ParamsAndDtos;
-using core.Specifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
-     //[Authorize]
+     [Authorize]
      public class OrdersController : BaseApiController
      {
           private readonly IOrderService _orderService;
@@ -36,7 +32,7 @@ namespace api.Controllers
           }
 
 
-          [Authorize]         //(Policy = "OrdersViewReportRole")]
+          //(Policy = "OrdersViewReportRole")]
           [HttpGet]
           public async Task<ActionResult<Pagination<OrderToReturnDto>>> GetOrdersAll(OrdersSpecParams orderParams)
           {
@@ -46,7 +42,6 @@ namespace api.Controllers
                return Ok(orders);
           }
           
-          //[Authorize]         //(Policy = "OrdersViewReportRole")]
           [HttpGet("ordersbriefpaginated")]
           public async Task<ActionResult<Pagination<OrderToReturnDto>>> GetOrdersBriefAll([FromQuery]OrdersSpecParams orderParams)
           {
@@ -110,11 +105,11 @@ namespace api.Controllers
                return (ICollection<CustomerCity>)await _orderService.GetOrderCityNames();
           }
 
-          //[Authorize(Policy = "OrdersCreateRole")] 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor")]
           [HttpPost]
           public async Task<ActionResult<Order>> CreateOrder(OrderToCreateDto dto)
           {
-               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+                    var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
                dto.LoggedInAppUserId = loggedInUser.Id;
                var order = await _orderService.CreateOrderAsync(dto);
                if (order == null) return BadRequest(new ApiResponse(400, "Problem creating order"));
@@ -122,6 +117,7 @@ namespace api.Controllers
                return Ok(order);
           }
 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor")]
           [HttpPost("orders")]
           public async Task<ActionResult<ICollection<Order>>> CreateOrders(ICollection<OrderToCreateDto> dtos)
           {
@@ -134,7 +130,7 @@ namespace api.Controllers
                return Ok(order);
           }
 
-          //[Authorize(Policy = "OrdersCreateRole")]
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor")]
           [HttpPut]
           public async Task<ActionResult<bool>> EditOrder(Order order)
           {
@@ -146,6 +142,7 @@ namespace api.Controllers
                return BadRequest(new ApiResponse(400, "Problem updating the order"));
           }
           
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, HRExecutive, DocumentControllerAdmin")]
           [HttpPut("updatedlfwd")]
           public async Task<bool> UpdateOrderDLForwardedToHR(IdAndDate idanddate)
           {
@@ -153,7 +150,7 @@ namespace api.Controllers
           }
 
           //remunerations
-          [Authorize]         //(Policy = "OrdersCreateRole")]
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, DocumentControllerAdmin")]
           [HttpPost("remun")]
           public async Task<ActionResult<Remuneration>> CreateRemuneration(Remuneration remuneration)
           {
@@ -175,6 +172,7 @@ namespace api.Controllers
 
           }
 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor, DocumentControllerAdmin")]
           [HttpGet("remuneration/{orderitemid}")]
           public async Task<ActionResult<RemunerationFullDto>> GetOrCreateRemuneration(int orderitemid)
           {
@@ -187,6 +185,7 @@ namespace api.Controllers
           }
 
 
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor")]
           [HttpPut("jd")]
           public async Task<ActionResult<bool>> UpdateJD (JDDto jddto)
           {
@@ -194,6 +193,7 @@ namespace api.Controllers
           }
 
           
+          [Authorize(Roles = "Admin, HRManager, HRSupervisor")]
           [HttpPut("remuneration")]
           public async Task<ActionResult<bool>> UpdateRemuneration (RemunerationFullDto dto)
           {

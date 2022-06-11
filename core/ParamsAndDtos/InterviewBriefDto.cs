@@ -3,20 +3,22 @@ using System.Collections.Generic;
 
 namespace core.ParamsAndDtos
 {
-    public class InterviewDto
+    public class InterviewBriefDto
     {
-        public InterviewDto()
+        public InterviewBriefDto()
         {
         }
 
-        public InterviewDto(string companyName, string interviewVenue, int orderId, int orderNo, DateTime orderDate, ICollection<InterviewItemDto> interviewItemsDto)
+        public InterviewBriefDto(string companyName, string interviewVenue, int orderId, int orderNo, DateTime orderDate
+            //, ICollection<InterviewItemDto> interviewItemsDto
+            )
         {
             CompanyName = companyName;
             InterviewVenue = interviewVenue;
             OrderId = orderId;
             OrderNo = orderNo;
             OrderDate = orderDate;
-            InterviewItemsDto = interviewItemsDto;
+            //InterviewItemsDto = interviewItemsDto;
         }
 
         public string CompanyName { get; set; }
@@ -24,6 +26,8 @@ namespace core.ParamsAndDtos
         public int OrderId {get; set;}
         public int OrderNo {get; set;}
         public DateTime OrderDate {get; set;}
-        public ICollection<InterviewItemDto> InterviewItemsDto {get; set;}
+        public DateTime InterviewDateFrom {get; set;}
+        public DateTime InterviewDateUpto {get; set;}
+        //public ICollection<InterviewItemDto> InterviewItemsDto {get; set;}
     }
 }

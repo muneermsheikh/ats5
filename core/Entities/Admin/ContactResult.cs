@@ -8,5 +8,7 @@ namespace core.Entities.Admin
     public class ContactResult: BaseEntity
     {
         public string Name { get; set; }
+        public int EnumNo {get; set;}
+        public string PersonType {get; set;}
     }
 }
