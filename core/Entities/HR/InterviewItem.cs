@@ -26,6 +26,7 @@ namespace core.Entities.HR
         public DateTime InterviewDateUpto {get; set;}
         public string InterviewMode { get; set; }
         public string InterviewerName { get; set; }
+        public string InterviewStatus {get; set;}
         public string ConcludingRemarks {get; set;}
         public ICollection<InterviewItemCandidate> InterviewItemCandidates {get; set;}
 

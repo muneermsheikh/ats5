@@ -5,18 +5,19 @@ import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { IInterview } from '../shared/models/hr/interview';
 import { IInterviewItemDto } from '../shared/models/hr/interviewItemDto';
+import { IOrder } from '../shared/models/order';
 import { IUser } from '../shared/models/user';
 import { IPaginationInterview, PaginationInterview } from '../shared/pagination/paginationInterview';
 import { interviewParams } from '../shared/params/interviewParams';
-import { orderParams } from '../shared/params/orderParams';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class InterviewService {
   apiUrl = environment.apiUrl;
-  private currentUserSource = new ReplaySubject<IUser>(1);
-  currentUser$ = this.currentUserSource.asObservable();
+  //private currentUserSource = new ReplaySubject<IUser>(1);
+  //currentUser$ = this.currentUserSource.asObservable();
   params = new interviewParams();
   pagination = new PaginationInterview();
   cache = new Map();
@@ -38,7 +39,6 @@ export class InterviewService {
     }
 
     let params = new HttpParams();
-    
     if (this.params.orderNo !== 0) params = params.append('orderNo', this.params.orderNo.toString());
     if (this.params.orderId !== 0) params = params.append('orderId', this.params.orderId.toString());
     if (this.params.customerId !== 0) params = params.append('orderId', this.params.orderId.toString());
@@ -79,6 +79,13 @@ export class InterviewService {
 
   getInterviewItemCatAndCandidates(interviewItemId: number) {
     return this.http.get<IInterviewItemDto[]>(this.apiUrl + 'interview/catandcandidates/' + interviewItemId );
+  }
+  
+  //GetOrCreateInterview
+  //if the Interview data exists in DB, returns the same
+  //if it does not exist, creates an Object and returns it
+  getOrCreateInterview(orderid: number) { //returns itnerview + interviewItems
+    return this.http.get<IInterview>(this.apiUrl + 'interview/getorcreateinterview/' + orderid);
   }
   
   getParams(){

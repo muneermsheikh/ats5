@@ -1,6 +1,7 @@
 import {IInterviewItem} from "./interviewItem";
 
 export interface IInterview{
+     id: number;
      orderId: number;
      orderNo: number;
      orderDate: Date;

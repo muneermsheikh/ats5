@@ -10,6 +10,7 @@ import { MessagesComponent } from './admin/messages/messages.component';
 import { AdminGuard } from './guards/admin.guard';
 import { AuthorizedGuard } from './guards/authorized.guard';
 import { ProspectiveListingComponent } from './prospectives/prospective-listing/prospective-listing.component';
+import { InterviewlistComponent } from './interview/interviewlist/interviewlist.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent, data: {breadcrumb: 'Home'}},

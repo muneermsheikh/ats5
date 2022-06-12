@@ -230,13 +230,19 @@ namespace infra.Services
 
           }
           
-          public async Task<Order> GetOrderByIdAsyc (int id)
+          public async Task<Order> GetOrderByIdWithItemsJDRemunertionAsyc (int id)
           {
                return await _context.Orders.Where(x => x.Id == id)
                     .Include(x => x.OrderItems)
                     .ThenInclude(x => x.JobDescription)
                     .Include(x => x.OrderItems)
                     .ThenInclude(x => x.Remuneration)
+               .FirstOrDefaultAsync();
+          }
+          public async Task<Order> GetOrderByIdWithItemsAsyc (int id)
+          {
+               return await _context.Orders.Where(x => x.Id == id)
+                    .Include(x => x.OrderItems)
                .FirstOrDefaultAsync();
           }
           public async Task<Pagination<OrderBriefDto>> GetOrdersBriefAllAsync(OrdersSpecParams orderParams)

@@ -11,15 +11,13 @@
                    (change)="interview.checked = !interview.checked"
                >
            </div>
-
-          <div class="stdd w50" title="click to edit" routerLink="/interview/edit/{{interview.id}}" >  {{interview.companyName}}</div>
           <div class="stdd mx-1 w200">{{interview.orderNo}}</div> 
-          <div class="stdd mx-1 w70">{{interview.orderDate | date: 'd-MMM-yy'}}</div>
-          <div class="stdd mx-1 w200" routerLink = "/interview/assignCandidates/{{interview.id}}" title="Assign candidates to interview category" >{{interview.interviewVenue}}</div>
-          <div class="stdd mx-1 w70">{{interview.interviewDateFrom | date: 'd-MMM'}}</div>
-          <div class="stdd mx-1 w70">{{interview.interviewDateUpto | date: 'd-MMM'}}</div>
-          <div class="stdd mx-1 w70">{{interview.interviewStatus}}</div>
-          <div class="stdd mx-1 w70">{{interview.concludingRemarks}}</div>
+          <div class="stdd mx-1 w100">{{interview.orderDate | date: 'd-MMM-yy'}}</div>
+          <div class="stdd w150 mx-1" title="click to edit" routerLink="/interview/edit/{{interview.id}}" >  {{interview.companyName}}</div>
+          <div class="stdd w150 mx-1" routerLink = "/interview/assignCandidates/{{interview.id}}" title="Assign candidates to interview category" >{{interview.interviewVenue}}</div>
+          <div class="stdd mx-1 w90">{{interview.interviewDateFrom | date: 'd-MMM'}}</div>
+          <div class="stdd mx-5 w90">{{interview.interviewDateUpto | date: 'd-MMM'}}</div>
+          <div class="stdd mx-1 w75">{{interview.interviewStatus}}</div>
           <button class="stdd w25 fSmall mx-1 fa fa-trash red" type="button" routerLink="/candidate/delete/{{cv.id}}" ></button>
           <button class="stdd w25 fSmall fa fa-balance-scale" title="Assess this candidate" routerLink="/hr/cvassess/{{cv.id}}" ></button>
           <button class="stdd w25 fSmall ml-1 fa fa-users" type="button" title="display categories and candidates" (click)="displayCategories(interview.id)"></button>

@@ -5,6 +5,9 @@ import { InterviewItemComponent } from './interview-item/interview-item.componen
 import { InterviewEditComponent } from './interview-edit/interview-edit.component';
 import { InterviewCategoriesComponent } from './interview-categories/interview-categories.component';
 import { SharedModule } from '../shared/shared.module';
+import { InterviewIndexComponent } from './interview-index/interview-index.component';
+import { InterviewAddComponent } from './interview-add/interview-add.component';
+import { InterviewRoutingModule } from './interview-routing.module';
 
 
 
@@ -13,11 +16,14 @@ import { SharedModule } from '../shared/shared.module';
     InterviewlistComponent,
     InterviewItemComponent,
     InterviewEditComponent,
-    InterviewCategoriesComponent
+    InterviewCategoriesComponent,
+    InterviewIndexComponent,
+    InterviewAddComponent
   ],
   imports: [
     CommonModule,
-    SharedModule
+    SharedModule,
+    InterviewRoutingModule
   ]
 })
 export class InterviewModule { }

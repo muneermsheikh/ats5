@@ -38,6 +38,7 @@ namespace api.Controllers
           private readonly IEmployeeService _empService;
           private readonly IConfiguration _config;
           private readonly RoleManager<AppRole> _roleManager;
+          
           public AccountController(
                UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
                ITokenService tokenService, RoleManager<AppRole> roleManager,
@@ -61,7 +62,7 @@ namespace api.Controllers
 
           //[Authorize]
           [HttpGet]
-          public async Task<ActionResult<core.ParamsAndDtos.UserDto>> GetCurrentUser()
+          public async Task<ActionResult<UserDto>> GetCurrentUser()
           {
                
                /*
@@ -70,17 +71,15 @@ namespace api.Controllers
                var user = await _userManager.FindByEmailAsync(email);
                if (user==null) return BadRequest("User Claim not found");
                */
-
-               var user = await _userManager.FindByEmailFromClaimsPrinciple(User);
-               if (user==null) return BadRequest("User email not found");
-               return new core.ParamsAndDtos.UserDto
+               var loggedInUser = await _userManager.FindByEmailFromClaimsPrinciple(User);
+               if (loggedInUser==null) return BadRequest("User email not found");
+               return new UserDto
                {
-                    loggedInEmployeeId = user.loggedInEmployeeId,
-                    Email = user.Email,
-                    Token = await _tokenService.CreateToken(user),
-                    DisplayName = user.DisplayName
-               };
-
+                    loggedInEmployeeId = loggedInUser.loggedInEmployeeId,
+                    Email = loggedInUser.Email,
+                    Token = await _tokenService.CreateToken(loggedInUser),
+                    DisplayName = loggedInUser.DisplayName 
+               };  
           }
           
 

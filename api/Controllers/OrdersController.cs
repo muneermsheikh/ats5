@@ -89,10 +89,20 @@ namespace api.Controllers
                return NotFound();
           }
 
-          [HttpGet("byid/{id}")]
-          public async Task<ActionResult<Order>> GetOrderById (int id)
+          [HttpGet("byidwithitems/{id}")]
+          public async Task<ActionResult<Order>> GetOrderByIdWithItemsAsync (int id)
           {
-               var order = await _orderService.GetOrderByIdAsyc(id);
+               var order = await _orderService.GetOrderByIdWithItemsAsyc(id);
+
+               if (order !=null) return Ok(order);
+
+               return NotFound();
+          }
+
+          [HttpGet("byid/{id}")]
+          public async Task<ActionResult<Order>> GetOrderByIdWithItemsJDRemunertionAsyc (int id)
+          {
+               var order = await _orderService.GetOrderByIdWithItemsJDRemunertionAsyc(id);
 
                if (order !=null) return Ok(order);
 

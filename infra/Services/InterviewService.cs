@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,7 +9,6 @@ using core.Entities.Users;
 using core.Interfaces;
 using core.Params;
 using core.ParamsAndDtos;
-using core.Specifications;
 using infra.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,18 +33,17 @@ namespace infra.Services
                return await _context.SelectionStatuses.OrderBy(x => x.Status).ToListAsync();
           }
 
-          public async Task<Interview> AddInterview(InterviewToAddDto dto)
-          {
+          private async Task<Interview> CreateInterviewObject(InterviewToAddDto dto) {
                var qry = from o in _context.Orders
-                         where o.Id == dto.OrderId
-                         join c in _context.Customers on o.CustomerId equals c.Id
-                         select new
-                         {
-                              CustomerId = o.CustomerId,
-                              CustomerName = c.CustomerName,
-                              OrderNo = o.OrderNo,
-                              OrderDate = o.OrderDate
-                         };
+                    where o.Id == dto.OrderId
+                    join c in _context.Customers on o.CustomerId equals c.Id
+                    select new
+                    {
+                         CustomerId = o.CustomerId,
+                         CustomerName = c.CustomerName,
+                         OrderNo = o.OrderNo,
+                         OrderDate = o.OrderDate
+                    };
 
                var qryObj = await qry.FirstOrDefaultAsync();
 
@@ -63,6 +60,13 @@ namespace infra.Services
                var intervw = new Interview(dto.OrderId, qryObj.OrderNo, qryObj.OrderDate.Date, qryObj.CustomerId, qryObj.CustomerName, dto.InterviewVenue,
                    dto.InterviewDateFrom.Date, dto.InterviewDateUpto.Date, dto.InterviewLeaderId,
                    dto.CustomerRepresentative, dto.InterviewMode, intervwItems);
+
+               return intervw;
+          }
+          public async Task<Interview> AddInterview(InterviewToAddDto dto)
+          {
+               var intervw = await CreateInterviewObject(dto);
+               if (intervw==null) return null;
 
                _unitOfWork.Repository<Interview>().Add(intervw);
 
@@ -192,6 +196,26 @@ namespace infra.Services
                     .ThenInclude(x => x.InterviewItemCandidates)
                     .FirstOrDefaultAsync();
           }
+
+          //GetOrCreateInterviewByOrderId
+          //if the Interview data exists in DB, returns the same
+          //if it does not exist, creates an Object and returns it
+          public async Task<Interview> GetOrCreateInterviewByOrderId(int OrderId)
+          {
+               var interview = await _context.Interviews
+                    .Where(x => x.OrderId == OrderId)
+                    .Include(x => x.InterviewItems)
+                    .FirstOrDefaultAsync();
+               
+               if (interview==null) {
+                    var dto = new InterviewToAddDto();
+                    dto.OrderId = OrderId;
+                    interview = await CreateInterviewObject(dto);
+               }
+
+               return interview;
+          }
+          
           
           public async Task<PagedList<InterviewBriefDto>> GetInterviews(InterviewSpecParams specParams)
           {

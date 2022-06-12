@@ -21,6 +21,9 @@ import { OpenOrderItemsResolver } from '../resolvers/openOrderItemsResolver';
 import { PreventUnsavedChangesGuard } from '../guards/prevent-unsaved-changes.guard';
 import { CvrefComponent } from '../admin/cvref/cvref.component';
 import { AssessedAndApprovedCVsResolver } from '../resolvers/assessedAndApprovedCVsResolver';
+import { InterviewlistComponent } from '../interview/interviewlist/interviewlist.component';
+import { InterviewsBriefResolver } from '../resolvers/interviewsBriefResolver';
+import { InterviewIndexComponent } from '../interview/interview-index/interview-index.component';
 
 
 const routes = [
@@ -61,9 +64,13 @@ const routes = [
 
     {path: 'cvforward', component: CvrefComponent,
     //canDeactivate: [PreventUnsavedChangesGuard],
-    resolve: {assessedcvs: AssessedAndApprovedCVsResolver},
-  }
+    resolve: {assessedcvs: AssessedAndApprovedCVsResolver}},
+
+    {path: 'interviews', component: InterviewlistComponent,
+    //canDeactivate: [PreventUnsavedChangesGuard],
+    resolve: {interviews: InterviewsBriefResolver}},
     
+    {path: 'interviewindex', component: InterviewIndexComponent}
     
 ]
 

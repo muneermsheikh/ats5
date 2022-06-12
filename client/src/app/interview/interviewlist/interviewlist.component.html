@@ -1,12 +1,51 @@
-<div *ngIf="!interviews || interviews===undefined">
-     No data available
-</div>
-<div *ngIf="interviews">
-     <div *ngFor="let item of interviews">
-          <div class="stdd w150">{{item.companyName}}</div>
-          <div class="stdd w75">{{item.orderno}}</div>
-          <div class="stdd w125">{{item.orderDate | date:'d-MMM-yy'}}</div>
-          <div class="stdd w100">{{item.interviewDateFrom | date :'d-MMM'}}</div>
-          <div class="stdd w100">{{item.interviewDateUpto | date: 'd-MMM'}}</div>
+
+     <div class="stdd col-2">
+          <select class="stdd w50" name="" id="" class="custom-select mb-2" (change)="onSortSelected($event.target.value)">
+               <option *ngFor="let sort of sortOptions"
+                    [value] = "sort.value"
+               >{{sort.name}}</option>
+          </select>
      </div>
-</div>
+     <div class="stdd col-10">
+          <div class="d-flex justify-contents-between align-items-center">
+               <app-paging-header [totalCount]="totalCount" [pageNumber]="iParams.pageNumber" [pageSize]="iParams.pageSize"></app-paging-header>
+     
+               <div class="stdd d-flex justify-contents-between align-items-center">
+                    <div class="stdd form-inline mt-2" *ngIf="interviews">
+                         <input (keyup.enter)="onSearch()" type="text" class="form-control ml-5 w300" #search placeholder="Search">
+                         <button type="button" (click)="onSearch()" class="btn btn-outline-primary mx-1 my-1" style="font-size: small;">Search</button>
+                         <button type="button" (click)="onReset()" class="btn btn-outline-success mx-1 my-1" style="font-size: small;">Reset</button>
+                    </div>
+                    <button class="stdd btn btn-outline-success ml-2 my-1 fa fa-plus" type="button" title="add a new interview program" routerLink="/interviews/add"></button>
+               </div>
+          </div>
+     </div>
+     <div class="container">
+          <div class="stdd b">
+               <div class="lbl ml-3 w50">Select</div>
+               <div class="lbl w50 mx-1">Order No</div>
+               <div class="lbl w100 mx-1">Order Date</div>
+               <div class="lbl w150 mx-1">Customer</div>
+               <div class="lbl w150 mx-1">Interview Venue</div>
+               <div class="lbl w200 mx-1">Interview Dates</div>
+               <div class="lbl w75 mx-1">Status</div>
+          </div>
+          <div *ngIf="!interviews || interviews===undefined">
+               No data available
+          </div>
+          <div *ngIf="interviews">
+               <div class="row" *ngFor="let interview of interviews" >
+                    <app-interview-item [interview]="interview" 
+                         (editEvent)="editInterview($event)" 
+                         (deleteEvent)="deleteInterview($event)"
+                    ></app-interview-item>
+               </div>
+               <div class="d-flex justify-content-between align-items-center mt-2" *ngIf="totalCount > 0">
+                    <app-pager 
+                         [pageSize]="cvParams.pageSize" [totalCount]="totalCount" [pageNumber]="cvParams.pageNumber" (pageChanged)="onPageChanged($event)"  >
+                    </app-pager>
+               </div>
+          </div>
+     </div>
+
+

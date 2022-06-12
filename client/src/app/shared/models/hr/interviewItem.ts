@@ -10,5 +10,6 @@ export interface IInterviewItem {
      interviewMode: string;
      interviewerName: string;
      concludingRemarks: string;
+     interviewStatus: string;
      interviewItemCandidates: IInterviewItemCandidate[];
 }

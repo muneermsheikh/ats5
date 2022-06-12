@@ -17,7 +17,8 @@ namespace core.Interfaces
             Task<Pagination<OrderBriefDto>> GetOrdersBriefAllAsync(OrdersSpecParams orderParams);
             Task<bool> OrderForwardedToHRDept(int orderId);
             Task<ICollection<CustomerCity>> GetOrderCityNames();
-            Task<Order> GetOrderByIdAsyc (int id);
+            Task<Order> GetOrderByIdWithItemsJDRemunertionAsyc (int id);
+            Task<Order> GetOrderByIdWithItemsAsyc (int id);
             Task<OrderBriefDtoR> GetOrderBrief(int OrderId);
             //Task<ICollection<OrderBriefDtoR>> GetOpenOrdersBrief();
 

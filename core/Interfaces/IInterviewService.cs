@@ -17,6 +17,10 @@ namespace core.Interfaces
         Task<ICollection<CandidateBriefDto>> GetCandidatesMatchingInterviewCategory(InterviewSpecParams interviewParams);
         Task<PagedList<InterviewBriefDto>> GetInterviews (InterviewSpecParams interviewSpecParams);
         Task<Interview> GetInterviewById (int Id);
+        //GetOrCreateInterviewByOrderId
+        //if the Interview data exists in DB, returns the same
+        //if it does not exist, creates an Object and returns it
+        Task<Interview> GetOrCreateInterviewByOrderId (int OrderId);
         Task<ICollection<Interview>> GetInterviewsWithItems (string interviewStatus);
         Task<InterviewItem> EditInterviewItem (InterviewItem interviewItem);
         Task<ICollection<InterviewItemCandidate>> AddCandidatesToInterviewItem (int interviewItemId, DateTime scheduledTime, 

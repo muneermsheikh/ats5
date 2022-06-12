@@ -1,0 +1,124 @@
+<div *ngIf="!interview">
+     No interview data returned
+</div>
+<div style="margin-top: 0px;" *ngIf="interview">
+     <form [formGroup]="form" >
+          <input class="stdd w50" type="hidden" formControlName="id"> 
+          <br>
+          <div class="stdd col-10">
+               <label class="lblFirst my-1" for="orderNo">Order No</label>
+               <div class="stdd w100">{{interview.orderNo}}</div>
+               <label class="lbl ml-5" for="orderDate">Order Date: </label>
+               <div class="stdd w125">{{interview.orderDate | date: 'd-MMM-yy'}}</div>
+               <label class="lblFirst my-1" for="companyName">Customer</label>
+               <div class="stdd w200">{{interview.companyName}}</div>
+               <label for="interviewDateFrom" class="lblFirst mt-1">Interviews From:</label>
+               <input class="stdd w125"
+                    type="text"
+                    placeholder="Order Date"
+                    formControlName="interviewDateFrom"
+                    bsDatepicker
+                    [bsValue]="bsValue"
+                    [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+               >
+          
+               <label class="lbl ml-5" for="interviewDateUpto">Upto:</label>
+               <input class="stdd w125"
+                    type="text"
+                    placeholder="Interviews upto"
+                    formControlName="interviewDateUpto"
+                    bsDatepicker
+                    [bsValue]="bsValue"
+                    [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+               >
+               <label class="lblFirst my-1" for="interviewVenue">Venue</label>
+               <input type="text" class="stdd w200" formControlName="interviewVenue">
+               <label class="lbl ml-5 w110" for="orderRef">Client delegate</label>
+               <input class="stdd w400" type="text" formControlName="interviewerName">
+               <label for="interviewLeaderId" class="lbl">Agency Representative</label>
+               <ng-select *ngIf="employees" class="ngselect w300 my-0 blue b stdd fontSmall" 
+                    [items]="employees"
+                    bindLabel="knownAs"
+                    bindValue="id"
+                    labelForId="interviewLeaderId"
+                    placeholder="Select Agency Delegater"
+                    clearAllText="Clear"
+                    formControlName="interviewLeaderId"
+                    (change)="customerChange()">
+               </ng-select>
+               <label class="lbl ml-5 w110" for="orderRef">status</label>
+               <input class="stdd w150" type="text" formControlName="interviewStatus">
+               <br>
+               <label class="lbl ml-5 w110" for="orderRef">Remarks</label>
+               <input class="stdd w600" type="text" formControlName="concludingRemarks">
+               <button type="submit" class="stdd btn btn-success fa fa-save" (click)="onSubmit()" title="updte the interview" >
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+               </button>
+          </div>
+          
+          <br>
+          <hr style="margin: 0px; padding: 0px;">
+          <div style="font-weight: bold; margin-left: 0px; font-size: medium;">
+               <label class="lbl valignMiddle w30">Sel</label>
+               <label class="lbl valignMiddle w30" >Sr#</label>
+               <label class="lbl valignMiddle w250">Category</label>
+               <label class="lbl valignMiddle w250">Interview Dates</label>
+               <label class="lbl valignMiddle w100">Interview Mode</label>
+               <label class="lbl valignMiddle w200">Interviewer</label>
+               <label class="lbl valignMiddle w150">Status</label>
+               <label class="lbl valignMiddle w200">Remarks</label>
+
+               <div style="width: 50px; display: inline-block;">
+                    <button type="button" (click)="addItem()" class="stdd alignR fa fa-plus blue"></button>
+               </div>
+          </div>
+          <hr style="margin: 0px; padding: 0px;">
+          <div formArrayName="interviewItems" class="my-1 px-0" >
+               <div *ngFor="let q of interviewItems.controls; let i=index">
+                    <div [formGroupName]="i" >
+                         <input type="checkbox" formControlName="selected" class="stdd w30" >
+                         <input type="text" formControlName="srNo" class="stdd w30" >
+                         <input type="text" formControlName="categoryName" readonly class="stdd w250" >
+                         <input class="stdd w125"
+                              type="text"
+                              placeholder="Interview Date Upto"
+                              formControlName="interviewDateFrom"
+                              bsDatepicker
+                              [bsValue]="bsValue"
+                              [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                         >
+                         <input class="stdd w125"
+                              type="text"
+                              placeholder="Interviews upto"
+                              formControlName="interviewDateUpto"
+                              bsDatepicker
+                              [bsValue]="bsValue"
+                              [bsConfig]="{dateInputFormat: 'YYYY-MM-DD' }"
+                         >
+                         <input type="text" formControlName="interviewMode" class="stdd w100" >
+                         <input type="text" formControlName="interviewerName" class="stdd w200" >
+                         <input type="text" formControlName="interviewStatus" class="stdd w150 ml-1">
+                         <input type="text" formControlName="concludingRemarks" class="stdd w200 ml-1">
+
+                         <div class="stdd w125 mx-1 blue fontSmaller" title="open contract review for the category" (click)="openReviewModal(i)" >
+                              {{getItemReviewString(q.controls['reviewItemStatusId'].value)}}
+                         </div>
+
+                         <button (click)="displayAttendingCandidates(i)" class="stdd blue fa fa-tasks" title="display attending candidates"> </button>
+                    </div>
+               </div>
+          </div>
+     </form>            
+
+     <ul class="text-danger list-unstyled" *ngIf="errors">
+          <li *ngFor="let error of errors">
+               {{error}}
+          </li>
+     </ul>
+</div>
+
+
+     <div style="float:inline-end; margin-top: 5px; font-size: smaller;">
+         {{this.form.value | json}}
+     </div>
+

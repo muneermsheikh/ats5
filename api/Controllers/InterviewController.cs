@@ -47,7 +47,7 @@ namespace api.Controllers
 
           [Authorize]
           [HttpGet("interviews")]
-          public async Task<ActionResult<Pagination<InterviewBriefDto>>> GetInterviews(InterviewSpecParams specParams )
+          public async Task<ActionResult<Pagination<InterviewBriefDto>>> GetInterviews([FromQuery]InterviewSpecParams specParams )
           {
                var interviews = await _interviewService.GetInterviews(specParams);
                if (interviews == null) return NotFound(new ApiResponse(404, "No interviews found matching the status"));
@@ -63,6 +63,18 @@ namespace api.Controllers
                if (interviews == null) return NotFound(new ApiResponse(404, "No interviews found matching the status"));
 
                return Ok(interviews);
+          }
+
+          //if the Interview data exists in DB, returns the same
+          //if it does not exist, creates an Object and returns it
+          [Authorize]
+          [HttpGet("getorcreateinterview/{id}")]
+          public async Task<ActionResult<Interview>> GetOrCreateInterviewByOrderId(int id)
+          {
+               var interview = await _interviewService.GetOrCreateInterviewByOrderId(id);
+               if (interview == null) return NotFound(new ApiResponse(404, "No interviews found matching the status"));
+
+               return Ok(interview);
           }
 
           [Authorize]
